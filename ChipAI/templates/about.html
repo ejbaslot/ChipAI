@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChipAI - About</title>
+
+<style>
+    /* General Styles */
+    body {
+        font-family: 'Arial', sans-serif;
+        background-color: #1b1b1b; /* Dark background */
+        color: #e0e0e0; /* Light text color */
+        margin: 0;
+        padding: 0;
+        position: relative;
+        min-height: 100vh;
+    }
+
+    h1, h2 {
+        color: #f40911; /* Chili red color */
+        text-align: center;
+    }
+
+    .content {
+        padding: 20px;
+        margin: 20px;
+        text-align: center;
+        height: 100vh;
+    }
+
+    /* Header Styles */
+    header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: #333;
+        padding: 20px;
+        color: white;
+    }
+
+    header h1 {
+        margin: 0;
+        font-size: 2.5rem;
+    }
+
+            /* Card Styles */
+            .card {
+            color: #1b1b1b;
+            width: 190px;
+            height: 254px;
+            position: relative;
+            outline: 6px solid #f5f5f5;
+            border-radius: 8px;
+            line-height: 150%;
+            padding: 16px;
+            background: linear-gradient(to top, #ff930f, #ffcc33);
+            transition: background-color 1s ease-in-out;
+            overflow: hidden;
+        }
+        .card-front {
+            bottom: 16px;
+            left: 0;
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            transition: transform 1s cubic-bezier(0.785, 0.135, 0.150, 0.860);
+        }
+        .card-back {
+            transform: translateX(120%);
+            transition: transform 1s cubic-bezier(0.785, 0.135, 0.150, 0.860);
+        }
+        .title {
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+        .title::after {
+            content: "";
+            display: block;
+            width: 50%;
+            border-radius: 50%;
+            height: 2px;
+            margin: 2px auto;
+            background-color: #1b1b1b;
+        }
+        .card:hover {
+            background-color: #1b1b1b25;
+        }
+        .card:hover .card-front {
+            transform: translateX(-100%);
+        }
+        .card:hover .card-back {
+            transform: translateX(0);
+        }
+
+    /* Footer Styles */
+    footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    height: 50px; /* Set your footer height */
+    background-color: #333;
+    color: white;
+    text-align: center;
+    line-height: 50px;
+}
+    .about-section {
+            text-align: center;
+            padding: 20px;
+            height: 80vh;
+        }
+
+        .developer-cards {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .developer-card {
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 15px;
+            width: 200px;
+        }
+
+        .developer-card img {
+            width: 100%;
+            border-radius: 8px;
+        }
+
+/* Back to Login Button Styles */
+.back-link {
+    text-decoration: none;
+    list-style-type: none; /* Removes bullet points */
+    display: inline-block; /* Ensures proper button alignment */
+    margin: 0; /* Removes any default margin */
+    padding: 0; /* Removes any default padding */
+}
+
+ul {
+    list-style-type: none; /* Removes bullets from all list items */
+    padding-left: 0; /* Removes default padding */
+}
+
+.back-btn {
+    background-color: #f40911; /* Chili red background */
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.back-btn:hover {
+    background-color: #c62828; /* Darker red on hover */
+    transform: scale(1.05);
+}
+
+.back-btn:focus {
+    outline: none;
+}
+</style>
+</head>
+<body>
+    <header>
+        <h1>ChipAI</h1>
+        <nav>
+            <div class="container">
+            <ul class="back-to-login">
+                <li>
+                    <a href="http://127.0.0.1:5000" class="back-link">
+                        <button class="back-btn">Back to Login</button>
+                    </a>
+                </li>
+            </ul>
+            </div>
+        </nav>
+    </header>
+    <h2>About the Developers & Contact Information</h2>
+    <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 20px;">
+        <div class="card">
+            <div class="card-front">
+                <p class="title">Evander Jay P. Baslot</p>
+                <p class="subtitle">Programmer</p>
+            </div>
+            <div class="card-back">
+                <p>Email: evanderjay.baslot@bisu.edu.ph</p>
+                <p>Phone: +639 925229645</p>
+                <p>Facebook: <a href="https://www.facebook.com/nightmare.ej/" target="_blank">nightmare.ej</a></p>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-front">
+                <p class="title">John Carlo Alleluya</p>
+                <p class="subtitle">System Analyst</p>
+            </div>
+            <div class="card-back">
+                <p>Email: johncarlo@example.com</p>
+                <p>Phone: +0987654321</p>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-front">
+                <p class="title">Meryjane Quiño</p>
+                <p class="subtitle">Documentor</p>
+            </div>
+            <div class="card-back">
+                <p>Email: meryjane@example.com</p>
+                <p>Phone: +1122334455</p>
+            </div>
+        </div>
+    </div>
+
+        <!-- Footer -->
+        <footer>
+            <p>&copy; 2024 ChipAI. All rights reserved.</p>
+        </footer>
+
+</body>
+</html>

@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChipAI - Home</title>
+    
+    <!-- Add custom CSS for the chili theme -->
+<style>
+
+html, body {
+    height: 100%;
+    margin: 0;
+    overflow-y: hidden; /* Prevent vertical scrolling */
+}
+
+main {
+    overflow-y: auto; /* Make the main content scrollable if needed */
+    height: calc(100vh - 50px); /* Adjust height based on your footer's height */
+}
+        /* General Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #0a0a0a;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 0;
+            position: relative;
+            min-height: 100vh;
+            text-shadow: 0 0 5px #f40911;
+        }
+
+        h1, h2 {
+            color: #f40911;
+            text-align: center;
+            text-shadow: 0 0 10px #f40911, 0 0 20px #ff3333;
+        }
+
+    .content {
+        padding: 20px;
+        margin: 20px;
+        text-align: center;
+        height: 100vh;
+    }
+
+        /* Header Styles */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #111;
+            padding: 20px;
+            color: white;
+            text-shadow: 0 0 8px #ff3333;
+        }
+
+    header h1 {
+        margin: 0;
+        font-size: 2.5rem;
+    }
+         /* Burger Menu Styles */
+         #checkbox {
+            display: none;
+        }
+
+        .toggle {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: transform 0.3s ease;
+        }
+
+        .bars {
+            width: 100%;
+            height: 4px;
+            background-color: #fff;
+            border-radius: 2px;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        #checkbox:checked + .toggle #bar1 {
+            transform: translateY(12px) rotate(45deg);
+        }
+
+        #checkbox:checked + .toggle #bar2 {
+            opacity: 0;
+        }
+
+        #checkbox:checked + .toggle #bar3 {
+            transform: translateY(-12px) rotate(-45deg);
+        }
+
+        nav ul {
+            list-style: none;
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+            position: absolute;
+            top: 50px;
+            right: 0;
+            background-color: #333;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        nav ul li a {
+            color: #fff;
+            text-decoration: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            transition: background 0.2s;
+        }
+
+        nav ul li a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        #checkbox:checked ~ nav ul {
+            display: flex;
+        }
+
+        /* Card Styles */
+        .card {
+            color: #1b1b1b;
+            width: 200px;
+            height: 260px;
+            outline: 4px solid #f5f5f5;
+            border-radius: 8px;
+            padding: 16px;
+            background: linear-gradient(to top, #ff930f, #ffcc33);
+            box-shadow: 0 0 15px #ffcc33;
+            transition: 0.3s;
+        }
+
+        .card-front {
+            bottom: 16px;
+            left: 0;
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            transition: transform 1s cubic-bezier(0.785, 0.135, 0.150, 0.860);
+        }
+        .card-back {
+            transform: translateX(120%);
+            transition: transform 1s cubic-bezier(0.785, 0.135, 0.150, 0.860);
+        }
+        .title {
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+        .title::after {
+            content: "";
+            display: block;
+            width: 50%;
+            border-radius: 50%;
+            height: 2px;
+            margin: 2px auto;
+            background-color: #1b1b1b;
+        }
+        .card:hover {
+            box-shadow: 0 0 25px #ffcc33, 0 0 40px #ff930f;
+        }
+
+        .card:hover .card-front {
+            transform: translateX(-100%);
+        }
+
+        .card:hover .card-back {
+            transform: translateX(0);
+        }
+
+    /* Footer Styles */
+
+         /* Footer */
+        footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            height: 50px;
+            background-color: #111;
+            color: white;
+            text-align: center;
+            line-height: 50px;
+            text-shadow: 0 0 5px #ff3333;
+        }
+
+        /* Buttons */
+        .btn {
+            background-color: #f40911;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+            margin: 10px 0;
+            box-shadow: 0 0 10px #ff3333;
+            transition: all 0.3s ease-in-out;
+        }
+
+    .btn:hover {
+            background-color: #c62828;
+            box-shadow: 0 0 15px #ff3333, 0 0 25px #ff0000;
+        }
+
+
+ /* Modal Styles */
+ .modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    padding-top: 100px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+    background-color: white;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 30%;
+    border-radius: 8px;
+}
+
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+        /* Neon Form */
+        .form {
+            background-color: #15172b;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 0 15px #08d;
+        }
+
+        .title {
+            color: #eee;
+            font-family: sans-serif;
+            font-size: 36px;
+            font-weight: 600;
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .input-container {
+        position: relative;
+        margin-top: 30px;
+        width: 100%;
+}
+
+        .input {
+        background-color: #303245;
+        border-radius: 12px;
+        color: #eee;
+        font-size: 18px;
+        width: 100%;
+        padding: 14px 10px;
+        box-shadow: 0 0 10px #08d;
+        border: none;
+        outline: none;
+        }
+
+        .cut {
+            background-color: #15172b;
+            border-radius: 10px;
+            height: 20px;
+            position: absolute;
+            left: 20px;
+            top: -20px;
+            transform: translateY(0);
+            transition: transform 200ms;
+            width: 76px;
+        }
+
+        .iLabel {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #65657b;
+    font-size: 18px;
+    pointer-events: none;
+    transition: all 0.3s ease-in-out;
+}
+
+.input:focus ~ .iLabel,
+.input:not(:placeholder-shown) ~ .iLabel {
+    top: 8px;
+    left: 10px;
+    font-size: 14px;
+    color: #dc2f55;
+}
+
+.cut {
+    display: none; /* Remove unnecessary cut styling */
+}
+
+        .input:focus ~ .cut {
+            transform: translateY(8px);
+        }
+
+        .input::placeholder {
+    color: transparent;
+}
+
+        .input:focus ~ .iLabel {
+            transform: translateY(-30px) translateX(10px) scale(0.75);
+            color: #dc2f55;
+        }
+
+        .submit {
+            background-color: #08d;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+            box-shadow: 0 0 15px #08d;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .submit:active {
+            background-color: #06b;
+            box-shadow: 0 0 25px #08d, 0 0 40px #06b;
+        }
+
+    /* Content Card */
+    .content-card {
+        background-color: rgba(50, 50, 50, 0.8);
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Mobile Responsive Styles */
+@media only screen and (max-width: 768px) {
+    header {
+        flex-direction: column;
+    }
+
+    nav ul {
+        flex-direction: column;
+    }
+
+    nav ul li {
+        width: 100%;
+    }
+
+    .modal-content {
+        width: 90%;
+        margin-top: 30%;
+    }
+
+    .content {
+        margin: 10px;
+        padding: 10px;
+        height: auto;
+    }
+
+    footer {
+        position: static;
+    }
+}
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <h1>ChipAI</h1>
+        <input id="checkbox" type="checkbox">
+        <label class="toggle" for="checkbox">
+            <div id="bar1" class="bars"></div>
+            <div id="bar2" class="bars"></div>
+            <div id="bar3" class="bars"></div>
+        </label>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('about') }}" id="about">About</a></li>
+                <li><a href="#" id="loginBtn">Login</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <!-- Main content of the page -->
+    <div class="content">
+        <div class="content-card">
+            {% if user_id %}
+                <h2>Welcome, User {{ user_id }}!</h2>
+            {% else %}
+                <h2>Welcome to ChipAI!</h2>
+                <p>Identify different chili pepper varieties with ease!</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2024 ChipAI. All rights reserved.</p>
+    </footer>
+
+    <!-- The Modal -->
+<!-- Login Modal -->
+<div id="loginModal" class="modal">
+    <div class="modal-content form">
+        <span class="close" id="closeLoginModal">&times;</span>
+        <h2 class="title">Login</h2>
+        <form action="/login" method="POST">
+            <div class="input-container">
+                <input type="text" class="input" id="loginUsername" name="username" required>
+                <div class="cut"></div>
+                <label class="iLabel" for="loginUsername">Username</label>
+            </div>
+            <div class="input-container">
+                <input type="password" class="input" id="loginPassword" name="password" required>
+                <div class="cut"></div>
+                <label class="iLabel" for="loginPassword">Password</label>
+            </div>
+            <button type="submit" class="submit">Login</button>
+        </form>
+        <p>Don't have an account? <a href="#" id="openSignupLink">Sign up</a></p>
+    </div>
+</div>
+
+<!-- Signup Modal -->
+<div id="signupModal" class="modal">
+    <div class="modal-content form">
+        <span class="close" id="closeSignupModal">&times;</span>
+        <h2 class="title">Signup</h2>
+        <form id="signupForm" action="/signup" method="POST">
+            <div class="input-container">
+                <input type="text" id="signupUsername" name="username" class="input" required>
+                <div class="cut"></div>
+                <label for="signupUsername" class="iLabel">Username</label>
+            </div>
+            <div class="input-container">
+                <input type="password" id="signupPassword" name="password" class="input" required>
+                <div class="cut"></div>
+                <label for="signupPassword" class="iLabel">Password</label>
+            </div>
+            <div class="input-container">
+                <input type="password" id="confirmPassword" name="confirm_password" class="input" required>
+                <div class="cut"></div>
+                <label for="confirmPassword" class="iLabel">Confirm Password</label>
+            </div>
+            <button type="submit" class="submit">Sign Up</button>
+        </form>
+    </div>
+</div>
+
+<!-- Success Modal -->
+<div id="successModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <p id="modalMessage"></p>
+    </div>
+</div>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div id="flashMessage">
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                    {{ message }}
+                </div>
+                {% if 'success' in category %}
+                    <script>
+                        document.getElementById('successModal').style.display = 'block';
+                    </script>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
+
+    <!-- JavaScript to control the modal -->
+    <script>
+        // Elements for login, signup, and success modals
+        var loginModal = document.getElementById("loginModal");
+        var signupModal = document.getElementById("signupModal");
+        var successModal = document.getElementById("successModal");
+    
+        // Buttons to open modals
+        var loginBtn = document.getElementById("loginBtn");
+        var openSignupLink = document.getElementById("openSignupLink");
+    
+        // Close buttons for modals
+        var closeLoginModal = document.getElementById("closeLoginModal");
+        var closeSignupModal = document.getElementById("closeSignupModal");
+        var closeSuccessModal = document.getElementById("closeSuccessModal");
+    
+        // Open the login modal
+        if (loginBtn) {
+            loginBtn.onclick = function() {
+                loginModal.style.display = "block";
+            }
+        }
+    
+        // Switch from login modal to signup modal
+        if (openSignupLink) {
+            openSignupLink.onclick = function() {
+                signupModal.style.display = "block";
+                loginModal.style.display = "none";
+            }
+        }
+    
+        // Close modal actions
+        if (closeLoginModal) {
+            closeLoginModal.onclick = function() {
+                loginModal.style.display = "none";
+            }
+        }
+        
+        if (closeSignupModal) {
+            closeSignupModal.onclick = function() {
+                signupModal.style.display = "none";
+            }
+        }
+        
+        if (closeSuccessModal) {
+            closeSuccessModal.onclick = function() {
+                successModal.style.display = "none";
+            }
+        }
+    
+        // Close modals when clicking outside of them
+        window.onclick = function(event) {
+            if (event.target == loginModal) {
+                loginModal.style.display = "none";
+            }
+            if (event.target == signupModal) {
+                signupModal.style.display = "none";
+            }
+            if (event.target == successModal) {
+                successModal.style.display = "none";
+            }
+        }
+    
+        // Display the success modal if a success message is present
+        window.addEventListener('DOMContentLoaded', () => {
+            var flashMessage = document.getElementById('flashMessage');
+            if (flashMessage && flashMessage.textContent.includes('success')) {
+                successModal.style.display = 'block';
+            }
+        });
+    
+        // Add 'filled' class to inputs if they are not empty (for label animation)
+        document.querySelectorAll('.input').forEach((input) => {
+            if (input.value !== '') {
+                input.classList.add('filled');
+            }
+            input.addEventListener('blur', () => {
+                if (input.value !== '') {
+                    input.classList.add('filled');
+                } else {
+                    input.classList.remove('filled');
+                }
+            });
+        });
+    
+        // Hide label when user types in the input field
+        document.addEventListener("DOMContentLoaded", function () {
+            const inputs = document.querySelectorAll(".input");
+    
+            inputs.forEach(input => {
+                input.addEventListener("input", function () {
+                    const label = this.nextElementSibling; // Get the label element
+                    if (this.value.trim() !== "") {
+                        label.style.display = "none";
+                    } else {
+                        label.style.display = "block";
+                    }
+                });
+    
+                // Hide label if input is pre-filled (e.g., after reload)
+                if (input.value.trim() !== "") {
+                    input.nextElementSibling.style.display = "none";
+                }
+            });
+        });
+    </script>
+    
+    
+
+
+</body>
+</html>
