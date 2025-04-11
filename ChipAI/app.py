@@ -10,7 +10,7 @@ app = Flask(__name__)
 app.secret_key = os.getenv('FLASK_SECRET_KEY', 'your_default_secret')  # Change for production
 
 # Load the updated model
-model = tf.keras.models.load_model('models/chili_pepper_classifier.h5')  # Ensure the correct model path
+model = tf.keras.models.load_model('ChipAI/models/chili_pepper_classifier.h5')  # Ensure the correct model path
 
 # Ensure the uploads directory exists
 upload_folder = 'uploads'
