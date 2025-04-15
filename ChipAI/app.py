@@ -1,10 +1,11 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
-import mysql.connector
+import psycopg2
 import tensorflow as tf
 import numpy as np
 import os
 from PIL import Image
 import io
+from dotenv import load_dotenv
 
 app = Flask(__name__)
 app.secret_key = os.getenv('FLASK_SECRET_KEY', 'your_default_secret')  # Change for production
@@ -17,13 +18,17 @@ upload_folder = 'uploads'
 if not os.path.exists(upload_folder):
     os.makedirs(upload_folder)
 
-# Database connection function
+# Load environment variables from .env file
+load_dotenv()
+
+# Database connection function for PostgreSQL using environment variables
 def get_db_connection():
-    connection = mysql.connector.connect(
-        host='localhost',
-        user='root',
-        password='root',
-        database='ChipAI'
+    connection = psycopg2.connect(
+        host=os.getenv('DB_HOST'),           # PostgreSQL host from environment variable
+        port=os.getenv('DB_PORT', 5432),    # Default port 5432
+        user=os.getenv('DB_USER'),           # Database username from environment variable
+        password=os.getenv('DB_PASSWORD'),   # Database password from environment variable
+        dbname=os.getenv('DB_NAME')          # Database name from environment variable
     )
     return connection
 
