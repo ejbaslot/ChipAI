@@ -121,7 +121,6 @@ def signup():
 
     return render_template('login.html')
 
-# Route for the login page
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -132,27 +131,26 @@ def login():
         cursor = conn.cursor()
 
         try:
-            # Call the stored procedure for login
-            cursor.callproc('sp_login', (username, password, 0, '', '@p_status'))
-            conn.commit()
-
-            # Retrieve the results from the stored procedure
-            cursor.execute('SELECT @p_status, @p_user_id')
+            # Execute the login function and retrieve values
+            cursor.execute("SELECT * FROM sp_login(%s, %s)", (username, password))
             result = cursor.fetchone()
-            login_status, user_id = result
 
-            if login_status == 'User found' and user_id > 0:
-                session['user_id'] = user_id
-                flash('Login successful!', 'success')
-                return redirect(url_for('index'))
+            if result:
+                p_user_id, p_stored_password, p_status = result
+                if p_status == 'User found' and p_user_id > 0:
+                    session['user_id'] = p_user_id
+                    flash('Login successful!', 'success')
+                    return redirect(url_for('index'))
+                else:
+                    flash(p_status, 'error')
             else:
-                flash(login_status, 'error')  # Use the login status as the error message
-                return redirect(url_for('login'))
+                flash("Login failed: No result returned", 'error')
         except Exception as e:
-            flash(str(e), 'error')
-            return redirect(url_for('login'))
+            flash(f"Database error: {str(e)}", 'error')
         finally:
             conn.close()
+
+        return redirect(url_for('login'))
 
     return render_template('login.html')
 
