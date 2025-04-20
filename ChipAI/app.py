@@ -132,11 +132,13 @@ def login():
         cursor = conn.cursor()
 
         try:
+            # Call the stored function (returns record: p_user_id, p_stored_password, p_status)
             cursor.execute("SELECT * FROM sp_login(%s, %s)", (username, password))
             result = cursor.fetchone()
+
             if result:
-                p_user_id, p_stored_password, p_status = result
-                if p_status == 'User found' and p_user_id > 0:
+                p_user_id, _, p_status = result  # Ignore p_stored_password using "_"
+                if p_status == 'User found' and p_user_id is not None:
                     session['user_id'] = p_user_id
                     flash('Login successful!', 'success')
                     return redirect(url_for('index'))
@@ -172,13 +174,11 @@ def upload_image():
         preprocessed_image = preprocess_image(image.stream)
 
         # Step 3: Make prediction after preprocessing
-        prediction = model.predict(preprocessed_image)
-
-        # Check the model output and return appropriate label
         predicted_label = predict_chili_variety(image.stream)
 
         # Return the prediction result as JSON
         return jsonify({'prediction': predicted_label})
+
     except (IOError, SyntaxError) as e:
         print(f"Invalid image file: {str(e)}")
         return jsonify({'error': 'Invalid image file. Please upload a valid image.'}), 400
