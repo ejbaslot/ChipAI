@@ -7,6 +7,7 @@ from PIL import Image
 import io
 import pymysql.cursors
 from dotenv import load_dotenv
+from psycopg2 import OperationalError
 
 app = Flask(__name__)
 app.secret_key = os.getenv('FLASK_SECRET_KEY', 'your_default_secret')  # Change for production
@@ -19,17 +20,18 @@ upload_folder = 'uploads'
 if not os.path.exists(upload_folder):
     os.makedirs(upload_folder)
 
-# PostgreSQL DB connection
 def get_db_connection():
     try:
-        return psycopg2.connect(
+        connection = psycopg2.connect(
             host=os.getenv('DB_HOST'),
-            port=os.getenv('DB_PORT', 5432),
+            port=os.getenv('DB_PORT', '5432'),  # default to string '5432'
             user=os.getenv('DB_USER'),
             password=os.getenv('DB_PASSWORD'),
             dbname=os.getenv('DB_NAME')
         )
-    except psycopg2.Error as e:
+        print("Database connection established.")
+        return connection
+    except OperationalError as e:
         print("Database connection failed:", e)
         raise
 
