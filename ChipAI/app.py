@@ -1,4 +1,4 @@
- from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
 import psycopg2
 import tensorflow as tf
 import numpy as np
@@ -8,18 +8,18 @@ import io
 import pymysql.cursors
 from dotenv import load_dotenv
 
-    app = Flask(__name__)
-    app.secret_key = os.getenv('FLASK_SECRET_KEY', 'your_default_secret')  # Change for production
+app = Flask(__name__)
+app.secret_key = os.getenv('FLASK_SECRET_KEY', 'your_default_secret')  # Change for production
 
-    # Load the updated model
-    model = tf.keras.models.load_model('ChipAI/models/chili_pepper_classifier.h5')  # Ensure the correct model path
+# Load the updated model
+model = tf.keras.models.load_model('ChipAI/models/chili_pepper_classifier.h5')  # Ensure the correct model path
 
-    # Ensure the uploads directory exists
-    upload_folder = 'uploads'
-    if not os.path.exists(upload_folder):
-        os.makedirs(upload_folder)
+# Ensure the uploads directory exists
+upload_folder = 'uploads'
+if not os.path.exists(upload_folder):
+    os.makedirs(upload_folder)
 
- # PostgreSQL DB connection
+# PostgreSQL DB connection
 def get_db_connection():
     try:
         return psycopg2.connect(
@@ -33,56 +33,55 @@ def get_db_connection():
         print("Database connection failed:", e)
         raise
 
+# Mapping of chili names to image filenames (No need to store images in DB)
+IMAGE_MAPPING = {
+    "Siling Labuyo": "siling_labuyo.jpg",
+    "Siling Atsal": "bell_pepper.jpg",
+    "Siling Espada": "siling_haba.jpg",
+    "Siling Demonyo": "siling_demonyo.jpg"
+}
 
-    # Mapping of chili names to image filenames (No need to store images in DB)
-    IMAGE_MAPPING = {
-        "Siling Labuyo": "siling_labuyo.jpg",
-        "Siling Atsal": "bell_pepper.jpg",
-        "Siling Espada": "siling_haba.jpg",
-        "Siling Demonyo": "siling_demonyo.jpg"
-    }
-
-    # Image preprocessing function (handling both in-memory and file path)
-    def preprocess_image(image_stream):
-        try:
-            # Open the image from the in-memory stream
-            img = Image.open(image_stream)
-            img = img.resize((150, 150))  # Resize the image to match the model input size
-            img = np.array(img)  # Convert image to numpy array
-            img = img / 255.0  # Normalize to [0, 1]
-            img = np.expand_dims(img, axis=0)  # Add batch dimension
-            return img
-        except Exception as e:
-            print(f"Error in preprocess_image: {str(e)}")
-            return None
+# Image preprocessing function (handling both in-memory and file path)
+def preprocess_image(image_stream):
+    try:
+        # Open the image from the in-memory stream
+        img = Image.open(image_stream)
+        img = img.resize((150, 150))  # Resize the image to match the model input size
+        img = np.array(img)  # Convert image to numpy array
+        img = img / 255.0  # Normalize to [0, 1]
+        img = np.expand_dims(img, axis=0)  # Add batch dimension
+        return img
+    except Exception as e:
+        print(f"Error in preprocess_image: {str(e)}")
+        return None
         
-    # Prediction function for the chili pepper classifier
-    def predict_chili_variety(image_stream):
-        try:
-            # Define image parameters
-            IMG_HEIGHT, IMG_WIDTH = 150, 150
+# Prediction function for the chili pepper classifier
+def predict_chili_variety(image_stream):
+    try:
+        # Define image parameters
+        IMG_HEIGHT, IMG_WIDTH = 150, 150
 
-            # Load and preprocess the image from stream
-            img = Image.open(image_stream).resize((IMG_HEIGHT, IMG_WIDTH))
-            img_array = np.array(img) / 255.0  # Normalize pixel values
-            img_array = np.expand_dims(img_array, axis=0)  # Expand dimensions to fit model input shape
+        # Load and preprocess the image from stream
+        img = Image.open(image_stream).resize((IMG_HEIGHT, IMG_WIDTH))
+        img_array = np.array(img) / 255.0  # Normalize pixel values
+        img_array = np.expand_dims(img_array, axis=0)  # Expand dimensions to fit model input shape
 
-            # Predict using the model
-            prediction = model.predict(img_array)
+        # Predict using the model
+        prediction = model.predict(img_array)
 
-            # Get the predicted label with the highest probability
-            class_labels = ["Siling Atsal", "Siling Labuyo", "Siling Espada", "Siling Demonyo"]
-            predicted_prob = np.max(prediction)  # Highest predicted probability
-            predicted_label = class_labels[np.argmax(prediction)]  # Corresponding class label
+        # Get the predicted label with the highest probability
+        class_labels = ["Siling Atsal", "Siling Labuyo", "Siling Espada", "Siling Demonyo"]
+        predicted_prob = np.max(prediction)  # Highest predicted probability
+        predicted_label = class_labels[np.argmax(prediction)]  # Corresponding class label
 
-            # Check confidence threshold (e.g., 50% confidence)
-            if predicted_prob < 0.50:
-                return "No Chili Detected"
+        # Check confidence threshold (e.g., 50% confidence)
+        if predicted_prob < 0.50:
+            return "No Chili Detected"
 
-            return predicted_label
-        except Exception as e:
-            print(f"Error in prediction function: {str(e)}")
-            return "Error processing the image."
+        return predicted_label
+    except Exception as e:
+        print(f"Error in prediction function: {str(e)}")
+        return "Error processing the image."
 
 
 @app.route('/signup', methods=['GET', 'POST'])
@@ -150,73 +149,71 @@ def login():
     return render_template('login.html')
 
 
-    # Route for uploading and processing image
-    @app.route('/upload', methods=['POST'])
-    def upload_image():
-        if 'image' not in request.files:
-            return jsonify({'error': 'No image uploaded.'}), 400
+@app.route('/upload', methods=['POST'])
+def upload_image():
+    if 'image' not in request.files:
+        return jsonify({'error': 'No image uploaded.'}), 400
 
-        image = request.files['image']
-        
-        if image.filename == '':
-            return jsonify({'error': 'No selected file'}), 400
-        
-        try:
-            # Check if the file is a valid image
-            img = Image.open(image.stream)  # Open the image from the stream
-            img.verify()  # Verify that it's an image file
+    image = request.files['image']
+    
+    if image.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+    
+    try:
+        # Check if the file is a valid image
+        img = Image.open(image.stream)  # Open the image from the stream
+        img.verify()  # Verify that it's an image file
 
-            # Step 2: Preprocess the image
-            preprocessed_image = preprocess_image(image.stream)
+        # Step 2: Preprocess the image
+        preprocessed_image = preprocess_image(image.stream)
 
-            # Step 3: Make prediction after preprocessing
-            prediction = model.predict(preprocessed_image)
+        # Step 3: Make prediction after preprocessing
+        prediction = model.predict(preprocessed_image)
 
-            # Check the model output and return appropriate label
-            predicted_label = predict_chili_variety(image.stream)
+        # Check the model output and return appropriate label
+        predicted_label = predict_chili_variety(image.stream)
 
-            # Return the prediction result as JSON
-            return jsonify({'prediction': predicted_label})
-        except (IOError, SyntaxError) as e:
-            print(f"Invalid image file: {str(e)}")
-            return jsonify({'error': 'Invalid image file. Please upload a valid image.'}), 400
-        except Exception as e:
-            print(f"Error processing the image: {str(e)}")
-            return jsonify({'error': 'Error processing the image. Please try again.'}), 500
+        # Return the prediction result as JSON
+        return jsonify({'prediction': predicted_label})
+    except (IOError, SyntaxError) as e:
+        print(f"Invalid image file: {str(e)}")
+        return jsonify({'error': 'Invalid image file. Please upload a valid image.'}), 400
+    except Exception as e:
+        print(f"Error processing the image: {str(e)}")
+        return jsonify({'error': 'Error processing the image. Please try again.'}), 500
 
-    # Route for homepage (index)
-    @app.route('/')
-    def index():
-        user_id = session.get('user_id')
-        return render_template('index.html', user_id=user_id)
+@app.route('/')
+def index():
+    user_id = session.get('user_id')
+    return render_template('index.html', user_id=user_id)
 
-    @app.route('/ai')
-    def ai_model():
-        return render_template('AI.html')  # Ensure this matches the file name exactly
+@app.route('/ai')
+def ai_model():
+    return render_template('AI.html')  # Ensure this matches the file name exactly
 
-    @app.route('/about')
-    def about():
-        return render_template('about.html')
+@app.route('/about')
+def about():
+    return render_template('about.html')
 
-    @app.route('/FAQs')
-    def faqs():
-        return render_template('faqs.html')
+@app.route('/FAQs')
+def faqs():
+    return render_template('faqs.html')
 
 
-    @app.route('/add_user', methods=['POST'])
-    def add_user():
-        # Your code to add the user
-        success = True  # Assuming the user is added successfully
-        if success:
-            flash('User added successfully!', 'success')
-        return redirect('/index.html')
+@app.route('/add_user', methods=['POST'])
+def add_user():
+    # Your code to add the user
+    success = True  # Assuming the user is added successfully
+    if success:
+        flash('User added successfully!', 'success')
+    return redirect('/index.html')
 
-    # Route for logout
-    @app.route('/logout')
-    def logout():
-        session.pop('user_id', None)
-        flash('You have been logged out.', 'success')
-        return redirect(url_for('login'))
+# Route for logout
+@app.route('/logout')
+def logout():
+    session.pop('user_id', None)
+    flash('You have been logged out.', 'success')
+    return redirect(url_for('login'))
 
 
 @app.route('/get_chili_info', methods=['GET'])
@@ -258,5 +255,5 @@ def chili_trivia():
         cursor.close()
         conn.close()
 
-    if __name__ == '__main__':
-        app.run()
+if __name__ == '__main__':
+    app.run()
