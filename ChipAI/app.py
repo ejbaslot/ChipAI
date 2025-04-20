@@ -177,14 +177,23 @@ def upload_image():
         # Validate the image (optional, helps avoid fake files)
         img = Image.open(image_stream)
         img.verify()  # Validate format
+        print("Image is valid.")
 
         # Rewind the stream before reusing
         image_stream.seek(0)
 
         # Preprocess and predict using the same image_stream
         preprocessed_image = preprocess_image(image_stream)
-        image_stream.seek(0)  # Rewind again before prediction
+        if preprocessed_image is None:
+            raise Exception("Error in preprocessing image")
+
+        print("Image preprocessing successful.")
+
+        # Rewind again before prediction
+        image_stream.seek(0)
         predicted_label = predict_chili_variety(image_stream)
+        
+        print(f"Prediction result: {predicted_label}")
 
         return jsonify({'prediction': predicted_label})
 
@@ -194,7 +203,7 @@ def upload_image():
     except Exception as e:
         print(f"Error processing the image: {str(e)}")
         return jsonify({'error': 'Error processing the image. Please try again.'}), 500
-    
+
 @app.route('/')
 def index():
     user_id = session.get('user_id')
