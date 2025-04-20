@@ -14,8 +14,14 @@ from io import BytesIO
 app = Flask(__name__)
 app.secret_key = os.getenv('FLASK_SECRET_KEY', 'your_default_secret')  # Change for production
 
-# Load the updated model
-model = tf.keras.models.load_model('ChipAI/models/chili_pepper_classifier.h5')  # Ensure the correct model path
+# Load TFLite model
+interpreter = tf.lite.Interpreter(model_path="ChipAI/models/chili_pepper_classifier.tflite")
+interpreter.allocate_tensors()
+
+# Get input and output details for reuse
+input_details = interpreter.get_input_details()
+output_details = interpreter.get_output_details()
+
 
 # Ensure the uploads directory exists
 upload_folder = 'uploads'
@@ -63,32 +69,32 @@ def preprocess_image(image_stream):
 # Prediction function for the chili pepper classifier
 def predict_chili_variety(image_stream):
     try:
-        # Define image parameters
         IMG_HEIGHT, IMG_WIDTH = 150, 150
 
-        # Load and preprocess the image from stream
+        # Load and preprocess the image
         img = Image.open(image_stream).resize((IMG_HEIGHT, IMG_WIDTH))
-        img_array = np.array(img) / 255.0  # Normalize pixel values
-        img_array = np.expand_dims(img_array, axis=0)  # Expand dimensions to fit model input shape
+        img_array = np.array(img) / 255.0
+        img_array = np.expand_dims(img_array, axis=0).astype(np.float32)
 
-        # Predict using the model
-        prediction = model.predict(img_array)
+        # Set the tensor to the input data
+        interpreter.set_tensor(input_details[0]['index'], img_array)
+        interpreter.invoke()  # Run inference
 
-        # 🔍 Add this line here:
-        print("Prediction raw output:", prediction)
+        # Get prediction results
+        output_data = interpreter.get_tensor(output_details[0]['index'])
 
-        # Get the predicted label with the highest probability
+        print("Prediction raw output (TFLite):", output_data)
+
         class_labels = ["Siling Atsal", "Siling Labuyo", "Siling Espada", "Siling Demonyo"]
-        predicted_prob = np.max(prediction)  # Highest predicted probability
-        predicted_label = class_labels[np.argmax(prediction)]  # Corresponding class label
+        predicted_prob = np.max(output_data)
+        predicted_label = class_labels[np.argmax(output_data)]
 
-        # Check confidence threshold (e.g., 50% confidence)
         if predicted_prob < 0.50:
             return "No Chili Detected"
 
         return predicted_label
     except Exception as e:
-        print(f"Error in prediction function: {str(e)}")
+        print(f"Error in TFLite prediction: {str(e)}")
         return "Error processing the image."
 
 
