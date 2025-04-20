@@ -8,6 +8,8 @@ import io
 import pymysql.cursors
 from dotenv import load_dotenv
 from psycopg2 import OperationalError
+from psycopg2.extras import RealDictCursor
+
 
 app = Flask(__name__)
 app.secret_key = os.getenv('FLASK_SECRET_KEY', 'your_default_secret')  # Change for production
