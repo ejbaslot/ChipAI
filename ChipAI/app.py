@@ -8,6 +8,7 @@ import io
 from dotenv import load_dotenv
 from psycopg2 import OperationalError
 from psycopg2.extras import RealDictCursor
+from io import BytesIO
 
 
 app = Flask(__name__)
@@ -72,6 +73,9 @@ def predict_chili_variety(image_stream):
 
         # Predict using the model
         prediction = model.predict(img_array)
+
+        # 🔍 Add this line here:
+        print("Prediction raw output:", prediction)
 
         # Get the predicted label with the highest probability
         class_labels = ["Siling Atsal", "Siling Labuyo", "Siling Espada", "Siling Demonyo"]
@@ -161,22 +165,27 @@ def upload_image():
         return jsonify({'error': 'No image uploaded.'}), 400
 
     image = request.files['image']
-    
+
     if image.filename == '':
         return jsonify({'error': 'No selected file'}), 400
-    
+
     try:
-        # Check if the file is a valid image
-        img = Image.open(image.stream)  # Open the image from the stream
-        img.verify()  # Verify that it's an image file
+        # Read the image into memory and wrap it in BytesIO
+        image_bytes = image.read()
+        image_stream = BytesIO(image_bytes)
 
-        # Step 2: Preprocess the image
-        preprocessed_image = preprocess_image(image.stream)
+        # Validate the image (optional, helps avoid fake files)
+        img = Image.open(image_stream)
+        img.verify()  # Validate format
 
-        # Step 3: Make prediction after preprocessing
-        predicted_label = predict_chili_variety(image.stream)
+        # Rewind the stream before reusing
+        image_stream.seek(0)
 
-        # Return the prediction result as JSON
+        # Preprocess and predict using the same image_stream
+        preprocessed_image = preprocess_image(image_stream)
+        image_stream.seek(0)  # Rewind again before prediction
+        predicted_label = predict_chili_variety(image_stream)
+
         return jsonify({'prediction': predicted_label})
 
     except (IOError, SyntaxError) as e:
@@ -185,7 +194,7 @@ def upload_image():
     except Exception as e:
         print(f"Error processing the image: {str(e)}")
         return jsonify({'error': 'Error processing the image. Please try again.'}), 500
-
+    
 @app.route('/')
 def index():
     user_id = session.get('user_id')
