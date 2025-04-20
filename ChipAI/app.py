@@ -1,12 +1,12 @@
-    from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
-    import psycopg2
-    import tensorflow as tf
-    import numpy as np
-    import os
-    from PIL import Image
-    import io
-    import pymysql.cursors
-    from dotenv import load_dotenv
+ from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
+import psycopg2
+import tensorflow as tf
+import numpy as np
+import os
+from PIL import Image
+import io
+import pymysql.cursors
+from dotenv import load_dotenv
 
     app = Flask(__name__)
     app.secret_key = os.getenv('FLASK_SECRET_KEY', 'your_default_secret')  # Change for production
