@@ -21,6 +21,7 @@ upload_folder = 'uploads'
 if not os.path.exists(upload_folder):
     os.makedirs(upload_folder)
 
+load_dotenv()
 def get_db_connection():
     try:
         connection = psycopg2.connect(
