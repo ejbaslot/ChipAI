@@ -5,7 +5,6 @@ import numpy as np
 import os
 from PIL import Image
 import io
-import pymysql.cursors
 from dotenv import load_dotenv
 from psycopg2 import OperationalError
 from psycopg2.extras import RealDictCursor
