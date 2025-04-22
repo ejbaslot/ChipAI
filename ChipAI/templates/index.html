@@ -50,8 +50,20 @@ header {
     padding: 20px;
     color: white;
     text-shadow: 0 0 8px #ff3333;
-    flex-wrap: wrap;
+    flex-wrap: nowrap; /* keeps everything in one row unless on small screens */
 }
+
+.header-left {
+    display: flex;
+    align-items: center;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* space between toggle and nav */
+}
+
 
 header h1 {
     margin: 0;
@@ -359,20 +371,25 @@ footer {
 <body>
     <!-- Header -->
     <header>
-        <h1>ChipAI</h1>
-        <input id="checkbox" type="checkbox">
-        <label class="toggle" for="checkbox">
-            <div id="bar1" class="bars"></div>
-            <div id="bar2" class="bars"></div>
-            <div id="bar3" class="bars"></div>
-        </label>
-        <nav>
-            <ul>
-                <li><a href="{{ url_for('about') }}" id="about">About</a></li>
-                <li><a href="#" id="loginBtn">Login</a></li>
-            </ul>
-        </nav>
+        <div class="header-left">
+            <h1>ChipAI</h1>
+        </div>
+        <div class="header-right">
+            <input id="checkbox" type="checkbox">
+            <label class="toggle" for="checkbox">
+                <div id="bar1" class="bars"></div>
+                <div id="bar2" class="bars"></div>
+                <div id="bar3" class="bars"></div>
+            </label>
+            <nav>
+                <ul>
+                    <li><a href="{{ url_for('about') }}" id="about">About</a></li>
+                    <li><a href="#" id="loginBtn">Login</a></li>
+                </ul>
+            </nav>
+        </div>
     </header>
+    
     
     <!-- Main content of the page -->
     <div class="content">
