@@ -280,10 +280,10 @@ footer {
 
 /* Neon Form */
 .form {
-    background-color: #15172b;
+    background-color: #2E7D32;
     border-radius: 20px;
     padding: 20px;
-    box-shadow: 0 0 15px #08d;
+    box-shadow: 0 0 15px rgb(221, 223, 224);
 }
 
 .input-container {
@@ -299,7 +299,7 @@ footer {
     font-size: 18px;
     width: 100%;
     padding: 14px 10px;
-    box-shadow: 0 0 10px #08d;
+    box-shadow: 0 0 10px rgb(255, 255, 255);
     border: none;
     outline: none;
 }
@@ -320,23 +320,31 @@ footer {
     top: 8px;
     left: 10px;
     font-size: 14px;
-    color: #dc2f55;
+    color: #2E7D32;
 }
 
 .submit {
-    background-color: #08d;
+    background-color: #028d09;
     color: white;
     padding: 10px 20px;
     border: none;
     cursor: pointer;
     border-radius: 4px;
-    box-shadow: 0 0 15px #08d;
+    box-shadow: 0 0 15px #04800a;
     transition: all 0.3s ease-in-out;
 }
 
 .submit:active {
-    background-color: #06b;
-    box-shadow: 0 0 25px #08d, 0 0 40px #06b;
+    background-color: #2E7D32;
+    box-shadow: 0 0 25px #2E7D32, 0 0 40px #2E7D32;
+}
+
+/* Header Logo */
+.logo {
+    width: 50px; /* Adjust size as needed */
+    height: 50px;
+    margin-right: 10px; /* Space between logo and title */
+    vertical-align: middle; /* Align with the h1 text */
 }
 
 
@@ -385,6 +393,7 @@ footer {
     <!-- Header -->
     <header>
         <div class="header-left">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="ChipAI Logo" class="logo">
             <h1>ChipAI</h1>
         </div>
         <div class="header-right">
@@ -426,7 +435,7 @@ footer {
 <div id="loginModal" class="modal">
     <div class="modal-content form">
         <span class="close" id="closeLoginModal">&times;</span>
-        <h2 class="title">Login</h2>
+        <h1 class="title">Login</h1>
         <form action="/login" method="POST">
             <div class="input-container">
                 <input type="text" class="input" id="loginUsername" name="username" required>
