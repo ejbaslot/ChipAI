@@ -28,9 +28,22 @@ body {
     text-shadow: 0 0 5px #2E7D32;
 }
 
-h1, h2 {
-    color: #2E7D32;
+h1, h2, h3 {
     text-align: center;
+}
+
+h1 {
+    color: #FFFFFF;
+    text-shadow: 0 0 10px #FFFFFF, 0 0 20px #e0dede;
+}
+
+h2 {
+    color: #2E7D32;
+    text-shadow: 0 0 10px #2E7D32, 0 0 20px #26802b;
+}
+
+h3 {
+    color: #2E7D32;
     text-shadow: 0 0 10px #2E7D32, 0 0 20px #26802b;
 }
 
@@ -398,7 +411,7 @@ footer {
                 <h2>Welcome, User {{ user_id }}!</h2>
             {% else %}
                 <h2>Welcome to ChipAI!</h2>
-                <p>Identify different chili pepper varieties with ease!</p>
+                <h3>Identify different chili pepper varieties with ease!</h3>
             {% endif %}
         </div>
     </div>
