@@ -9,22 +9,20 @@
     <!-- Add custom CSS for the chili theme -->
     <style>
         html, body {
-            height: 100%;
             margin: 0;
-            overflow-y: hidden;
-        }
-
-        main {
-            overflow-y: auto;
-            height: calc(100vh - 50px);
+            min-height: 100vh;
         }
 
         body {
             font-family: 'Roboto', sans-serif;
             background-color: #FFFFFF;
             color: #333333;
-            margin: 0;
             padding: 0;
+        }
+
+        main {
+            overflow-y: auto;
+            min-height: calc(100vh - 50px);
         }
 
         h1, h2, h3 {
@@ -51,8 +49,7 @@
             padding: 20px;
             margin: 20px;
             text-align: center;
-            height: auto;
-            min-height: calc(100vh - 50px);
+            min-height: auto;
         }
 
         /* Header */
@@ -249,8 +246,6 @@
 
         /* Footer */
         footer {
-            position: fixed;
-            bottom: 0;
             width: 100%;
             height: 50px;
             background-color: #2E7D32;
@@ -442,7 +437,6 @@
             .content {
                 margin: 10px;
                 padding: 10px;
-                min-height: calc(100vh - 50px);
             }
 
             .card, .card-trivia {
@@ -464,7 +458,6 @@
             }
 
             footer {
-                position: static;
                 height: 60px;
                 line-height: 60px;
             }
