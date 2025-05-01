@@ -6,64 +6,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ChipAI - Home</title>
     
-    <!-- Add custom CSS for the chili theme -->
     <style>
+        /* General Styles */
         html, body {
-            height: 100%;
             margin: 0;
-            overflow-y: hidden;
+            min-height: 100vh;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #FFFFFF;
+            color: #333333;
+            padding: 0;
         }
 
         main {
             overflow-y: auto;
-            height: calc(100vh - 50px);
-        }
-
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #FFFFFF;
-            color: #333333;
-            margin: 0;
-            padding: 0;
+            min-height: calc(100vh - 50px);
         }
 
         h1, h2, h3 {
+            color: #2E7D32;
             text-align: center;
-            color: #FFFFFF;
         }
 
         h1 {
-            font-size: 2rem;
+            font-size: 2.5rem;
             margin: 0;
         }
 
         h2 {
             font-size: 1.75rem;
-            color: #2E7D32;
         }
 
         h3 {
             font-size: 1.5rem;
-            color: #2E7D32;
         }
 
         .content {
             padding: 20px;
             margin: 20px;
             text-align: center;
-            height: auto;
-            min-height: calc(100vh - 50px);
+            min-height: auto;
         }
 
-        /* Header */
+        /* Header Styles */
         header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             background-color: #2E7D32;
-            padding: 15px;
+            padding: 20px;
             color: #FFFFFF;
-            flex-wrap: wrap;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
 
         .header-left {
@@ -78,7 +73,14 @@
             gap: 10px;
         }
 
-        /* Burger Menu */
+        .logo {
+            width: 80px;
+            height: 80px;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        /* Burger Menu Styles */
         #checkbox {
             display: none;
         }
@@ -93,6 +95,7 @@
             justify-content: center;
             gap: 8px;
             padding: 5px;
+            transition: transform 0.3s ease;
         }
 
         .bars {
@@ -149,78 +152,14 @@
             display: flex;
         }
 
-        /* Card */
-        .card {
-            color: #1b1b1b;
-            width: 200px;
-            max-width: 90%;
-            height: auto;
-            border: 1px solid #f5f5f5;
-            border-radius: 8px;
-            padding: 16px;
-            background: linear-gradient(to top, #ff930f, #ffcc33);
-            box-shadow: 0 0 10px #ffcc33;
-            transition: box-shadow 0.3s;
+        /* Content Card */
+        .content-card {
+            background-color: #FFFFFF;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
             margin: 20px auto;
-        }
-
-        .card:hover {
-            box-shadow: 0 0 15px #ff930f;
-        }
-
-        .card-front, .card-back {
-            text-align: center;
-        }
-
-        .card-back {
-            display: none;
-        }
-
-        .title {
-            font-size: 1.3rem;
-            font-weight: bold;
-            color: #1b1b1b;
-        }
-
-        .title::after {
-            content: "";
-            display: block;
-            width: 50%;
-            height: 2px;
-            margin: 5px auto;
-            background-color: #1b1b1b;
-        }
-
-        /* Footer */
-        footer {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            height: 50px;
-            background-color: #2E7D32;
-            color: #FFFFFF;
-            text-align: center;
-            line-height: 50px;
-        }
-
-        /* Buttons */
-        .btn {
-            background-color: #2E7D32;
-            color: #FFFFFF;
-            padding: 12px 24px;
-            border: none;
-            cursor: pointer;
-            border-radius: 4px;
-            margin: 10px 0;
-            font-size: 1rem;
-            box-shadow: 0 0 5px #26802b;
-            transition: background-color 0.3s ease, box-shadow 0.3s ease;
-            touch-action: manipulation;
-        }
-
-        .btn:hover {
-            background-color: #197e1e;
-            box-shadow: 0 0 10px #26802b;
+            max-width: 600px;
         }
 
         /* Modal */
@@ -326,12 +265,192 @@
             box-shadow: 0 0 10px #04800a;
         }
 
-        /* Header Logo */
-        .logo {
-            width: 80px;
-            height: 80px;
-            margin-right: 10px;
-            vertical-align: middle;
+        .title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #1b1b1b;
+        }
+
+        .title::after {
+            content: "";
+            display: block;
+            width: 50%;
+            height: 2px;
+            margin: 5px auto;
+            background-color: #1b1b1b;
+        }
+
+        /* Footer */
+        footer {
+            width: 100%;
+            height: 50px;
+            background-color: #2E7D32;
+            color: #FFFFFF;
+            text-align: center;
+            line-height: 50px;
+        }
+
+        /* Card Styles (Unused but retained for future use) */
+        .card {
+            position: relative;
+            width: 300px;
+            min-height: 50vh;
+            background: linear-gradient(to top, #ff930f, #ffcc33);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            transition: all 0.6s cubic-bezier(0.23, 1, 0.320, 1);
+        }
+
+        .card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 10px;
+            transition: all 0.6s cubic-bezier(0.23, 1, 0.320, 1);
+        }
+
+        .card:hover {
+            transform: rotate(-5deg) scale(1.1);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .card__content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+            background-color: #FFFFFF;
+            opacity: 0;
+            transition: all 0.6s cubic-bezier(0.23, 1, 0.320, 1);
+            border-radius: 10px;
+        }
+
+        .card:hover .card__content {
+            transform: translate(-50%, -50%) rotate(0deg);
+            opacity: 1;
+        }
+
+        .card__title {
+            margin: 0;
+            font-size: 24px;
+            color: #333333;
+            font-weight: 700;
+        }
+
+        .card__description {
+            margin: 10px 0 0;
+            font-size: 14px;
+            color: #1b1b1b;
+            line-height: 1.4;
+        }
+
+        /* Trivia Card (Unused but retained) */
+        .card-trivia {
+            width: 190px;
+            min-height: 25vh;
+            padding: 0.5rem;
+            background: linear-gradient(to top, #ff930f, #ffcc33);
+            border-radius: 8px;
+            box-shadow: 0 0 10px #ffcc33;
+            transition: box-shadow 0.3s;
+            margin: 20px auto;
+            color: #1b1b1b;
+        }
+
+        .card-trivia:hover {
+            box-shadow: 0 0 15px #ff930f;
+        }
+
+        .align-trivia {
+            padding: 1rem;
+            display: flex;
+            flex-direction: row;
+            gap: 5px;
+            align-self: flex-start;
+        }
+
+        .red-trivia, .yellow-trivia, .green-trivia {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            box-shadow: -5px 5px 5px rgba(0, 0, 0, 0.280);
+        }
+
+        .red-trivia { background-color: #ff930f; }
+        .yellow-trivia { background-color: #ffcc33; }
+        .green-trivia { background-color: #2E7D32; }
+
+        .card-trivia h1 {
+            text-align: center;
+            margin: 1.3rem;
+            color: #1b1b1b;
+            font-size: 1.3rem;
+        }
+
+        .card-trivia p {
+            padding: 0.5rem;
+            font-size: 0.9rem;
+            line-height: 1.2;
+            text-align: center;
+            color: #1b1b1b;
+        }
+
+        /* Section Styles (Unused but retained) */
+        .library-section {
+            text-align: center;
+            padding: 20px;
+            min-height: auto;
+        }
+
+        .variety-cards, .developer-cards {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        /* Trivia Section (Unused but retained) */
+        #trivia {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 50vh;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .trivia-container, .trivia-section {
+            padding: 20px;
+            border: 1px solid #2E7D32;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #FFFFFF;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .trivia-text {
+            font-size: 1.2em;
+            color: #2E7D32;
+            font-weight: bold;
+        }
+
+        /* Video Styles (Unused but retained) */
+        video {
+            display: none;
+            width: 100%;
+            max-width: 600px;
+            border: 2px solid #2E7D32;
+            margin-top: 20px;
         }
 
         /* Responsive Styles */
@@ -377,37 +496,24 @@
                 font-size: 1.1rem;
             }
 
+            .content {
+                margin: 10px;
+                padding: 10px;
+            }
+
+            .content-card {
+                width: 90%;
+                padding: 15px;
+            }
+
             .modal-content {
                 width: 90%;
                 margin-top: 20%;
                 padding: 15px;
             }
 
-            .content {
-                margin: 10px;
-                padding: 10px;
-                min-height: calc(100vh - 50px);
-            }
-
-            .card {
-                width: 90%;
-                max-width: 300px;
-                padding: 12px;
-            }
-
-            .title {
-                font-size: 1.1rem;
-            }
-
-            footer {
-                position: static;
-                height: 60px;
-                line-height: 60px;
-            }
-
-            .btn, .submit {
-                padding: 10px 20px;
-                font-size: 0.9rem;
+            .form {
+                padding: 15px;
             }
 
             .input {
@@ -424,25 +530,72 @@
                 font-size: 10px;
             }
 
+            .submit {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+
+            .card {
+                width: 90%;
+                max-width: 300px;
+                padding: 12px;
+            }
+
+            .card__title {
+                font-size: 1.1rem;
+            }
+
+            .card__description {
+                font-size: 0.9rem;
+            }
+
+            .card-trivia {
+                width: 90%;
+                max-width: 300px;
+                padding: 12px;
+            }
+
+            .card-trivia h1 {
+                font-size: 1.1rem;
+            }
+
+            .card-trivia p {
+                font-size: 0.9rem;
+            }
+
+            .red-trivia, .yellow-trivia, .green-trivia {
+                width: 8px;
+                height: 8px;
+            }
+
+            .library-section {
+                padding: 10px;
+            }
+
+            .trivia-container, .trivia-section {
+                width: 90%;
+                padding: 15px;
+            }
+
+            footer {
+                position: static;
+                height: 60px;
+                line-height: 60px;
+            }
+
             .logo {
                 width: 50px;
-                height:conic-gradient(270deg, #FFFFFF 0%, #FFFFFF 0%);
+                height: 50px;
+            }
+
+            video {
+                max-width: 90%;
             }
         }
 
         @media only screen and (max-width: 480px) {
             header h1 {
                 font-size: 1.2rem;
-            }
-
-            nav ul {
-                top: 100px;
-                padding: 10px;
-            }
-
-            nav ul li a {
-                font-size: 0.9rem;
-                padding: 10px;
             }
 
             .toggle {
@@ -455,25 +608,30 @@
                 height: 3px;
             }
 
-            .card {
-                width: 100%;
-                max-width: 250px;
+            nav ul {
+                top: 100px;
                 padding: 10px;
             }
 
-            .title {
-                font-size: 1rem;
-            }
-
-            .modal-content {
-                width: 95%;
-                margin-top: 30%;
+            nav ul li a {
+                font-size: 0.9rem;
                 padding: 10px;
             }
 
             .content {
                 margin: 5px;
                 padding: 5px;
+            }
+
+            .content-card {
+                width: 95%;
+                padding: 10px;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin-top: 30%;
+                padding: 10px;
             }
 
             .form {
@@ -484,9 +642,61 @@
                 margin-top: 15px;
             }
 
-            .btn, .submit {
+            .input {
+                font-size: 12px;
+                padding: 8px;
+            }
+
+            .iLabel {
+                font-size: 12px;
+            }
+
+            .input:focus ~ .iLabel,
+            .input:not(:placeholder-shown) ~ .iLabel {
+                font-size: 8px;
+            }
+
+            .submit {
                 padding: 8px 16px;
                 font-size: 0.8rem;
+            }
+
+            .card {
+                width: 100%;
+                max-width: 250px;
+                padding: 10px;
+            }
+
+            .card__title {
+                font-size: 1rem;
+            }
+
+            .card__description {
+                font-size: 0.8rem;
+            }
+
+            .card-trivia {
+                width: 100%;
+                max-width: 250px;
+                padding: 10px;
+            }
+
+            .card-trivia h1 {
+                font-size: 1rem;
+            }
+
+            .card-trivia p {
+                font-size: 0.8rem;
+            }
+
+            .red-trivia, .yellow-trivia, .green-trivia {
+                width: 6px;
+                height: 6px;
+            }
+
+            .trivia-container, .trivia-section {
+                width: 95%;
+                padding: 10px;
             }
 
             footer {
@@ -498,6 +708,10 @@
             .logo {
                 width: 40px;
                 height: 40px;
+            }
+
+            video {
+                max-width: 95%;
             }
         }
     </style>
@@ -524,203 +738,163 @@
             </nav>
         </div>
     </header>
-    
-    
-    <!-- Main content of the page -->
-    <div class="content">
-        <div class="content-card">
-            {% if user_id %}
-                <h2>Welcome, User {{ user_id }}!</h2>
-            {% else %}
-                <h2>Welcome to ChipAI!</h2>
-                <h3>Identify different chili pepper varieties with ease!</h3>
-            {% endif %}
+
+    <main>
+        <!-- Main content of the page -->
+        <div class="content">
+            <div class="content-card">
+                {% if user_id %}
+                    <h2>Welcome, User {{ user_id }}!</h2>
+                {% else %}
+                    <h2>Welcome to ChipAI!</h2>
+                    <h3>Identify different chili pepper varieties with ease!</h3>
+                {% endif %}
+            </div>
         </div>
-    </div>
+    </main>
 
     <!-- Footer -->
     <footer>
-        <p>&copy; 2024 ChipAI. All rights reserved.</p>
+        <p>© 2024 ChipAI. All rights reserved.</p>
     </footer>
 
-    <!-- The Modal -->
-<!-- Login Modal -->
-<div id="loginModal" class="modal">
-    <div class="modal-content form">
-        <span class="close" id="closeLoginModal">&times;</span>
-        <h1 class="title">Login</h1>
-        <form action="/login" method="POST">
-            <div class="input-container">
-                <input type="text" class="input" id="loginUsername" name="username" required>
-                <div class="cut"></div>
-                <label class="iLabel" for="loginUsername">Username</label>
-            </div>
-            <div class="input-container">
-                <input type="password" class="input" id="loginPassword" name="password" required>
-                <div class="cut"></div>
-                <label class="iLabel" for="loginPassword">Password</label>
-            </div>
-            <button type="submit" class="submit">Login</button>
-        </form>
-        <p>Don't have an account? <a href="#" id="openSignupLink">Sign up</a></p>
-    </div>
-</div>
-
-<!-- Signup Modal -->
-<div id="signupModal" class="modal">
-    <div class="modal-content form">
-        <span class="close" id="closeSignupModal">&times;</span>
-        <h2 class="title">Signup</h2>
-        <form id="signupForm" action="/signup" method="POST">
-            <div class="input-container">
-                <input type="text" id="signupUsername" name="username" class="input" required>
-                <div class="cut"></div>
-                <label for="signupUsername" class="iLabel">Username</label>
-            </div>
-            <div class="input-container">
-                <input type="password" id="signupPassword" name="password" class="input" required>
-                <div class="cut"></div>
-                <label for="signupPassword" class="iLabel">Password</label>
-            </div>
-            <div class="input-container">
-                <input type="password" id="confirmPassword" name="confirm_password" class="input" required>
-                <div class="cut"></div>
-                <label for="confirmPassword" class="iLabel">Confirm Password</label>
-            </div>
-            <button type="submit" class="submit">Sign Up</button>
-        </form>
-    </div>
-</div>
-
-<!-- Success Modal -->
-<div id="successModal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeModal()">&times;</span>
-        <p id="modalMessage"></p>
-    </div>
-</div>
-
-{% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-        <div id="flashMessage">
-            {% for category, message in messages %}
-                <div class="alert alert-{{ category }}">
-                    {{ message }}
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content form">
+            <span class="close" id="closeLoginModal">×</span>
+            <h1 class="title">Login</h1>
+            <form action="/login" method="POST">
+                <div class="input-container">
+                    <input type="text" class="input" id="loginUsername" name="username" placeholder=" " required>
+                    <label class="iLabel" for="loginUsername">Username</label>
                 </div>
-                {% if 'success' in category %}
-                    <script>
-                        document.getElementById('successModal').style.display = 'block';
-                    </script>
-                {% endif %}
-            {% endfor %}
+                <div class="input-container">
+                    <input type="password" class="input" id="loginPassword" name="password" placeholder=" " required>
+                    <label class="iLabel" for="loginPassword">Password</label>
+                </div>
+                <button type="submit" class="submit">Login</button>
+            </form>
+            <p>Don't have an account? <a href="#" id="openSignupLink">Sign up</a></p>
         </div>
-    {% endif %}
-{% endwith %}
+    </div>
+
+    <!-- Signup Modal -->
+    <div id="signupModal" class="modal">
+        <div class="modal-content form">
+            <span class="close" id="closeSignupModal">×</span>
+            <h2 class="title">Signup</h2>
+            <form id="signupForm" action="/signup" method="POST">
+                <div class="input-container">
+                    <input type="text" id="signupUsername" name="username" class="input" placeholder=" " required>
+                    <label for="signupUsername" class="iLabel">Username</label>
+                </div>
+                <div class="input-container">
+                    <input type="password" id="signupPassword" name="password" class="input" placeholder=" " required>
+                    <label for="signupPassword" class="iLabel">Password</label>
+                </div>
+                <div class="input-container">
+                    <input type="password" id="confirmPassword" name="confirm_password" class="input" placeholder=" " required>
+                    <label for="confirmPassword" class="iLabel">Confirm Password</label>
+                </div>
+                <button type="submit" class="submit">Sign Up</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeSuccessModal">×</span>
+            <p id="modalMessage"></p>
+        </div>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div id="flashMessage">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
+                    </div>
+                    {% if 'success' in category %}
+                        <script>
+                            document.getElementById('successModal').style.display = 'block';
+                        </script>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
 
     <!-- JavaScript to control the modal -->
     <script>
         // Elements for login, signup, and success modals
-        var loginModal = document.getElementById("loginModal");
-        var signupModal = document.getElementById("signupModal");
-        var successModal = document.getElementById("successModal");
-    
+        const loginModal = document.getElementById("loginModal");
+        const signupModal = document.getElementById("signupModal");
+        const successModal = document.getElementById("successModal");
+
         // Buttons to open modals
-        var loginBtn = document.getElementById("loginBtn");
-        var openSignupLink = document.getElementById("openSignupLink");
-    
+        const loginBtn = document.getElementById("loginBtn");
+        const openSignupLink = document.getElementById("openSignupLink");
+
         // Close buttons for modals
-        var closeLoginModal = document.getElementById("closeLoginModal");
-        var closeSignupModal = document.getElementById("closeSignupModal");
-        var closeSuccessModal = document.getElementById("closeSuccessModal");
-    
+        const closeLoginModal = document.getElementById("closeLoginModal");
+        const closeSignupModal = document.getElementById("closeSignupModal");
+        const closeSuccessModal = document.getElementById("closeSuccessModal");
+
         // Open the login modal
         if (loginBtn) {
-            loginBtn.onclick = function() {
+            loginBtn.onclick = () => {
                 loginModal.style.display = "block";
-            }
+            };
         }
-    
+
         // Switch from login modal to signup modal
         if (openSignupLink) {
-            openSignupLink.onclick = function() {
+            openSignupLink.onclick = () => {
                 signupModal.style.display = "block";
                 loginModal.style.display = "none";
-            }
+            };
         }
-    
+
         // Close modal actions
         if (closeLoginModal) {
-            closeLoginModal.onclick = function() {
+            closeLoginModal.onclick = () => {
                 loginModal.style.display = "none";
-            }
+            };
         }
-        
+
         if (closeSignupModal) {
-            closeSignupModal.onclick = function() {
+            closeSignupModal.onclick = () => {
                 signupModal.style.display = "none";
-            }
+            };
         }
-        
+
         if (closeSuccessModal) {
-            closeSuccessModal.onclick = function() {
+            closeSuccessModal.onclick = () => {
                 successModal.style.display = "none";
-            }
+            };
         }
-    
-        // Close modals when clicking outside of them
-        window.onclick = function(event) {
-            if (event.target == loginModal) {
+
+        // Close modals when clicking outside
+        window.onclick = (event) => {
+            if (event.target === loginModal) {
                 loginModal.style.display = "none";
             }
-            if (event.target == signupModal) {
+            if (event.target === signupModal) {
                 signupModal.style.display = "none";
             }
-            if (event.target == successModal) {
+            if (event.target === successModal) {
                 successModal.style.display = "none";
             }
-        }
-    
-        // Display the success modal if a success message is present
+        };
+
+        // Display success modal for flash messages
         window.addEventListener('DOMContentLoaded', () => {
-            var flashMessage = document.getElementById('flashMessage');
+            const flashMessage = document.getElementById('flashMessage');
             if (flashMessage && flashMessage.textContent.includes('success')) {
                 successModal.style.display = 'block';
             }
-        });
-    
-        // Add 'filled' class to inputs if they are not empty (for label animation)
-        document.querySelectorAll('.input').forEach((input) => {
-            if (input.value !== '') {
-                input.classList.add('filled');
-            }
-            input.addEventListener('blur', () => {
-                if (input.value !== '') {
-                    input.classList.add('filled');
-                } else {
-                    input.classList.remove('filled');
-                }
-            });
-        });
-    
-        // Hide label when user types in the input field
-        document.addEventListener("DOMContentLoaded", function () {
-            const inputs = document.querySelectorAll(".input");
-    
-            inputs.forEach(input => {
-                input.addEventListener("input", function () {
-                    const label = this.nextElementSibling; // Get the label element
-                    if (this.value.trim() !== "") {
-                        label.style.display = "none";
-                    } else {
-                        label.style.display = "block";
-                    }
-                });
-    
-                // Hide label if input is pre-filled (e.g., after reload)
-                if (input.value.trim() !== "") {
-                    input.nextElementSibling.style.display = "none";
-                }
-            });
         });
     </script>
 </body>
