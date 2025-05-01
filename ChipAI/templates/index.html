@@ -11,39 +11,45 @@
         html, body {
             margin: 0;
             padding: 0;
-            height: 100%;
-            overflow: hidden; /* Prevent scrolling */
+            min-height: 100vh;
             font-family: 'Poppins', sans-serif;
             background-color: #FFFFFF;
             color: #333333;
         }
-
+    
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+    
         /* Fixed Layout Container */
         .container {
             display: flex;
             flex-direction: column;
-            height: 100vh;
+            min-height: 100vh;
         }
-
+    
         h1, h2, h3 {
-            color: #2E7D32;
             text-align: center;
             margin: 10px 0;
         }
-
+    
         h1 {
+            color: #FFFFFF;
             font-size: 2.5rem;
             margin: 0;
         }
-
+    
         h2 {
+            color: #2E7D32;
             font-size: 1.75rem;
         }
-
+    
         h3 {
+            color: #2E7D32;
             font-size: 1.5rem;
         }
-
+    
         /* Header Styles */
         header {
             display: flex;
@@ -54,30 +60,31 @@
             color: #FFFFFF;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
         }
-
+    
         .header-left {
             display: flex;
             align-items: center;
+            flex: 1;
         }
-
+    
         .header-right {
             display: flex;
             align-items: center;
             gap: 10px;
         }
-
+    
         .logo {
             width: 60px;
             height: 60px;
             margin-right: 10px;
             vertical-align: middle;
         }
-
+    
         /* Burger Menu Styles */
         #checkbox {
             display: none;
         }
-
+    
         .toggle {
             width: 40px;
             height: 40px;
@@ -90,7 +97,7 @@
             padding: 5px;
             transition: transform 0.3s ease;
         }
-
+    
         .bars {
             width: 100%;
             height: 4px;
@@ -98,19 +105,19 @@
             border-radius: 2px;
             transition: transform 0.3s ease, opacity 0.3s ease;
         }
-
+    
         #checkbox:checked + .toggle #bar1 {
             transform: translateY(12px) rotate(45deg);
         }
-
+    
         #checkbox:checked + .toggle #bar2 {
             opacity: 0;
         }
-
+    
         #checkbox:checked + .toggle #bar3 {
             transform: translateY(-12px) rotate(-45deg);
         }
-
+    
         nav ul {
             list-style: none;
             display: none;
@@ -126,7 +133,7 @@
             width: 180px;
             box-shadow: 0 0 10px #26802b;
         }
-
+    
         nav ul li a {
             color: #FFFFFF;
             text-decoration: none;
@@ -136,15 +143,15 @@
             transition: background 0.2s;
             font-size: 1rem;
         }
-
+    
         nav ul li a:hover {
             background-color: #197e1e;
         }
-
+    
         #checkbox:checked ~ nav ul {
             display: flex;
         }
-
+    
         /* Main Content Area */
         main {
             flex: 1;
@@ -156,8 +163,9 @@
                               url('/api/placeholder/800/600');
             background-size: cover;
             background-position: center;
+            overflow-y: auto;
         }
-
+    
         /* Content Card */
         .content-card {
             background-color: #FFFFFF;
@@ -169,12 +177,16 @@
             text-align: center;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
-
+    
+        .content-card h1 {
+            color: #2E7D32;
+        }
+    
         .content-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 6px 25px rgba(46, 125, 50, 0.35);
         }
-
+    
         /* Modal */
         .modal {
             display: none;
@@ -188,7 +200,7 @@
             background-color: rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(4px);
         }
-
+    
         .modal-content {
             background-color: #FFFFFF;
             margin: 10% auto;
@@ -201,7 +213,7 @@
             transform: translateY(0);
             animation: modalFade 0.3s ease;
         }
-
+    
         @keyframes modalFade {
             from {
                 opacity: 0;
@@ -212,7 +224,7 @@
                 transform: translateY(0);
             }
         }
-
+    
         .close {
             color: #666666;
             float: right;
@@ -221,12 +233,12 @@
             cursor: pointer;
             transition: color 0.2s;
         }
-
+    
         .close:hover,
         .close:focus {
             color: #1b1b1b;
         }
-
+    
         /* Form */
         .form {
             background-color: #2E7D32;
@@ -235,17 +247,17 @@
             box-shadow: 0 0 15px rgba(38, 128, 43, 0.5);
             color: #FFFFFF;
         }
-
+    
         .form h1 {
             color: #FFFFFF;
         }
-
+    
         .input-container {
             position: relative;
             margin: 20px 0;
             width: 100%;
         }
-
+    
         .input {
             background-color: rgba(255, 255, 255, 0.9);
             border-radius: 6px;
@@ -259,12 +271,12 @@
             box-shadow: 0 0 5px rgba(38, 128, 43, 0.5);
             transition: all 0.3s ease;
         }
-
+    
         .input:focus {
             border-color: #FFFFFF;
             box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
         }
-
+    
         .iLabel {
             position: absolute;
             left: 15px;
@@ -275,7 +287,7 @@
             pointer-events: none;
             transition: all 0.3s ease;
         }
-
+    
         .input:focus ~ .iLabel,
         .input:not(:placeholder-shown) ~ .iLabel {
             top: -10px;
@@ -285,7 +297,7 @@
             background: #2E7D32;
             padding: 0 5px;
         }
-
+    
         .submit {
             background-color: #028d09;
             color: #FFFFFF;
@@ -299,13 +311,13 @@
             margin-top: 10px;
             width: 100%;
         }
-
+    
         .submit:hover {
             background-color: #197e1e;
             box-shadow: 0 0 10px rgba(4, 128, 10, 0.7);
             transform: translateY(-2px);
         }
-
+    
         .title {
             font-size: 1.4rem;
             font-weight: bold;
@@ -313,7 +325,7 @@
             margin-top: 0;
             margin-bottom: 20px;
         }
-
+    
         .title::after {
             content: "";
             display: block;
@@ -322,7 +334,7 @@
             margin: 8px auto;
             background-color: #FFFFFF;
         }
-
+    
         /* Footer */
         footer {
             background-color: #2E7D32;
@@ -331,125 +343,245 @@
             padding: 15px;
             box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.2);
         }
-
+    
         footer p {
             margin: 0;
+            font-size: 1rem;
         }
-
+    
         /* Form Link Styles */
         .form p {
             margin-top: 15px;
             text-align: center;
         }
-
+    
         .form a {
             color: #FFFFFF;
             text-decoration: underline;
             transition: color 0.2s;
         }
-
+    
         .form a:hover {
             color: #b3ffb6;
         }
-
+    
         /* Alert Styles */
         .alert {
             padding: 10px;
             margin: 10px 0;
             border-radius: 5px;
             text-align: center;
+            font-size: 1rem;
         }
-
+    
         .alert-success {
             background-color: #c8e6c9;
             color: #2e7d32;
             border: 1px solid #a5d6a7;
         }
-
+    
         .alert-error {
             background-color: #ffcdd2;
             color: #c62828;
             border: 1px solid #ef9a9a;
         }
-
+    
         /* Responsive Styles */
         @media only screen and (max-width: 768px) {
             header {
+                flex-direction: column;
+                align-items: flex-start;
                 padding: 10px;
             }
-
+    
+            .header-left {
+                width: 100%;
+                justify-content: space-between;
+            }
+    
+            .header-right {
+                width: 100%;
+                justify-content: flex-end;
+            }
+    
             .header-left h1 {
                 font-size: 1.8rem;
             }
-
+    
             .logo {
                 width: 50px;
                 height: 50px;
             }
-
-            nav ul {
-                top: 70px;
-                width: 160px;
+    
+            .toggle {
+                align-self: flex-end;
+                margin-top: 10px;
             }
-
+    
+            nav ul {
+                top: 100px;
+                width: 100%;
+                right: 0;
+                left: 0;
+                border-radius: 0;
+                padding: 15px;
+                box-shadow: none;
+            }
+    
+            nav ul li a {
+                padding: 12px;
+                font-size: 1.1rem;
+            }
+    
             main {
                 padding: 10px;
             }
-
+    
             .content-card {
+                width: 90%;
+                max-width: 500px;
                 padding: 20px;
             }
-
+    
             .modal-content {
                 margin: 15% auto;
                 padding: 20px;
+                width: 90%;
+                max-width: 400px;
+            }
+    
+            .input {
+                font-size: 14px;
+                padding: 10px 12px;
+            }
+    
+            .iLabel {
+                font-size: 14px;
+            }
+    
+            .input:focus ~ .iLabel,
+            .input:not(:placeholder-shown) ~ .iLabel {
+                font-size: 10px;
+            }
+    
+            .submit {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+    
+            .title {
+                font-size: 1.3rem;
+            }
+    
+            .alert {
+                padding: 8px;
+                font-size: 0.9rem;
+            }
+    
+            footer {
+                padding: 12px;
+                position: static;
+            }
+    
+            footer p {
+                font-size: 0.9rem;
             }
         }
-
+    
         @media only screen and (max-width: 480px) {
+            header {
+                padding: 8px 10px;
+            }
+    
             .header-left h1 {
                 font-size: 1.5rem;
             }
-
+    
             .logo {
                 width: 40px;
                 height: 40px;
             }
-
+    
+            .toggle {
+                width: 35px;
+                height: 35px;
+                gap: 6px;
+            }
+    
+            .bars {
+                height: 3px;
+            }
+    
+            nav ul {
+                top: 80px;
+                padding: 10px;
+                width: 100%;
+            }
+    
+            nav ul li a {
+                font-size: 0.9rem;
+                padding: 10px;
+            }
+    
+            main {
+                padding: 5px;
+            }
+    
             .content-card {
+                width: 95%;
+                max-width: 450px;
                 padding: 15px;
             }
-
+    
             .content-card h2 {
                 font-size: 1.5rem;
             }
-
+    
             .content-card h3 {
                 font-size: 1.2rem;
             }
-
+    
             .modal-content {
                 margin: 20% auto;
                 padding: 15px;
-                width: 85%;
+                width: 95%;
+                max-width: 350px;
             }
-
+    
             .title {
                 font-size: 1.2rem;
             }
-
+    
             .input {
-                padding: 10px;
-                font-size: 14px;
+                padding: 8px 10px;
+                font-size: 12px;
             }
-
+    
             .iLabel {
-                font-size: 14px;
+                font-size: 12px;
             }
-
+    
+            .input:focus ~ .iLabel,
+            .input:not(:placeholder-shown) ~ .iLabel {
+                font-size: 8px;
+            }
+    
             .submit {
+                padding: 8px 16px;
+                font-size: 0.8rem;
+            }
+    
+            .alert {
+                padding: 6px;
+                font-size: 0.8rem;
+            }
+    
+            footer {
                 padding: 10px;
-                font-size: 0.9rem;
+            }
+    
+            footer p {
+                font-size: 0.8rem;
             }
         }
     </style>
