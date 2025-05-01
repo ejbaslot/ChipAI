@@ -21,7 +21,7 @@
 
         body {
             font-family: 'Roboto', sans-serif;
-            background-color: #F5F5F5;
+            background-color: #FFFFFF;
             color: #333333;
             margin: 0;
             padding: 0;
@@ -29,7 +29,8 @@
 
         h1, h2, h3 {
             text-align: center;
-            color: #1A3C5A;
+            color: #FFFFFF;
+            text-shadow: 0 0 5px #2E7D32;
         }
 
         h1 {
@@ -39,10 +40,14 @@
 
         h2 {
             font-size: 1.75rem;
+            color: #2E7D32;
+            text-shadow: 0 0 5px #26802b;
         }
 
         h3 {
             font-size: 1.5rem;
+            color: #2E7D32;
+            text-shadow: 0 0 5px #26802b;
         }
 
         .content {
@@ -58,9 +63,10 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background-color: #1A3C5A;
+            background-color: #2E7D32;
             padding: 15px;
             color: #FFFFFF;
+            text-shadow: 0 0 5px #FFFFFF;
             flex-wrap: wrap;
         }
 
@@ -121,12 +127,12 @@
             position: absolute;
             top: 60px;
             right: 10px;
-            background-color: #1A3C5A;
+            background-color: #2E7D32;
             padding: 10px;
             border-radius: 5px;
             z-index: 100;
             width: 200px;
-            border: 1px solid #D3D3D3;
+            box-shadow: 0 0 10px #26802b;
         }
 
         nav ul li a {
@@ -137,10 +143,11 @@
             display: block;
             transition: background 0.2s;
             font-size: 1rem;
+            text-shadow: 0 0 3px #FFFFFF;
         }
 
         nav ul li a:hover {
-            background-color: #2A5A8A;
+            background-color: #197e1e;
         }
 
         #checkbox:checked ~ nav ul {
@@ -149,20 +156,21 @@
 
         /* Card */
         .card {
-            color: #333333;
+            color: #1b1b1b;
             width: 200px;
             max-width: 90%;
             height: auto;
-            border: 1px solid #D3D3D3;
+            border: 1px solid #f5f5f5;
             border-radius: 8px;
             padding: 16px;
-            background: #FFFFFF;
-            transition: border-color 0.3s;
+            background: linear-gradient(to top, #ff930f, #ffcc33);
+            box-shadow: 0 0 10px #ffcc33;
+            transition: box-shadow 0.3s;
             margin: 20px auto;
         }
 
         .card:hover {
-            border-color: #1A3C5A;
+            box-shadow: 0 0 15px #ff930f;
         }
 
         .card-front, .card-back {
@@ -176,7 +184,7 @@
         .title {
             font-size: 1.3rem;
             font-weight: bold;
-            color: #1A3C5A;
+            color: #1b1b1b;
         }
 
         .title::after {
@@ -185,7 +193,7 @@
             width: 50%;
             height: 2px;
             margin: 5px auto;
-            background-color: #D3D3D3;
+            background-color: #1b1b1b;
         }
 
         /* Footer */
@@ -194,15 +202,16 @@
             bottom: 0;
             width: 100%;
             height: 50px;
-            background-color: #1A3C5A;
+            background-color: #2E7D32;
             color: #FFFFFF;
             text-align: center;
             line-height: 50px;
+            text-shadow: 0 0 5px #FFFFFF;
         }
 
         /* Buttons */
         .btn {
-            background-color: #1A3C5A;
+            background-color: #2E7D32;
             color: #FFFFFF;
             padding: 12px 24px;
             border: none;
@@ -210,12 +219,15 @@
             border-radius: 4px;
             margin: 10px 0;
             font-size: 1rem;
-            transition: background-color 0.3s ease;
+            box-shadow: 0 0 5px #26802b;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
             touch-action: manipulation;
+            text-shadow: 0 0 3px #FFFFFF;
         }
 
         .btn:hover {
-            background-color: #2A5A8A;
+            background-color: #197e1e;
+            box-shadow: 0 0 10px #26802b;
         }
 
         /* Modal */
@@ -236,10 +248,11 @@
             background-color: #FFFFFF;
             margin: auto;
             padding: 20px;
-            border: 1px solid #D3D3D3;
+            border: 1px solid #f5f5f5;
             width: 80%;
             max-width: 500px;
             border-radius: 8px;
+            box-shadow: 0 0 10px #2E7D32;
         }
 
         .close {
@@ -252,15 +265,15 @@
 
         .close:hover,
         .close:focus {
-            color: #333333;
+            color: #1b1b1b;
         }
 
         /* Form */
         .form {
-            background-color: #FFFFFF;
+            background-color: #2E7D32;
             border-radius: 8px;
             padding: 20px;
-            border: 1px solid #D3D3D3;
+            box-shadow: 0 0 10px #26802b;
         }
 
         .input-container {
@@ -270,15 +283,16 @@
         }
 
         .input {
-            background-color: #F5F5F5;
+            background-color: #FFFFFF;
             border-radius: 4px;
-            color: #333333;
+            color: #1b1b1b;
             font-size: 16px;
             width: 100%;
             padding: 12px 10px;
-            border: 1px solid #D3D3D3;
+            border: 1px solid #f5f5f5;
             outline: none;
             box-sizing: border-box;
+            box-shadow: 0 0 5px #26802b;
         }
 
         .iLabel {
@@ -286,10 +300,11 @@
             left: 10px;
             top: 50%;
             transform: translateY(-50%);
-            color: #666666;
+            color: #FFFFFF;
             font-size: 16px;
             pointer-events: none;
             transition: all 0.3s ease;
+            text-shadow: 0 0 3px #26802b;
         }
 
         .input:focus ~ .iLabel,
@@ -297,24 +312,28 @@
             top: -10px;
             left: 10px;
             font-size: 12px;
-            color: #1A3C5A;
-            background: #FFFFFF;
+            color: #FFFFFF;
+            background: #2E7D32;
             padding: 0 5px;
+            text-shadow: none;
         }
 
         .submit {
-            background-color: #1A3C5A;
+            background-color: #028d09;
             color: #FFFFFF;
             padding: 12px 24px;
             border: none;
             cursor: pointer;
             border-radius: 4px;
             font-size: 1rem;
-            transition: background-color 0.3s ease;
+            box-shadow: 0 0 5px #04800a;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            text-shadow: 0 0 3px #FFFFFF;
         }
 
         .submit:hover {
-            background-color: #2A5A8A;
+            background-color: #197e1e;
+            box-shadow: 0 0 10px #04800a;
         }
 
         /* Header Logo */
@@ -360,6 +379,7 @@
                 left: 0;
                 border-radius: 0;
                 padding: 15px;
+                box-shadow: none;
             }
 
             nav ul li a {
@@ -713,9 +733,5 @@
             });
         });
     </script>
-    
-    
-
-
 </body>
 </html>
