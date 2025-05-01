@@ -10,24 +10,25 @@
         /* General Styles */
         html, body {
             margin: 0;
-            min-height: 100vh;
-        }
-
-        body {
+            padding: 0;
+            height: 100%;
+            overflow: hidden; /* Prevent scrolling */
             font-family: 'Poppins', sans-serif;
             background-color: #FFFFFF;
             color: #333333;
-            padding: 0;
         }
 
-        main {
-            overflow-y: auto;
-            min-height: calc(100vh - 50px);
+        /* Fixed Layout Container */
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
         }
 
         h1, h2, h3 {
             color: #2E7D32;
             text-align: center;
+            margin: 10px 0;
         }
 
         h1 {
@@ -43,28 +44,20 @@
             font-size: 1.5rem;
         }
 
-        .content {
-            padding: 20px;
-            margin: 20px;
-            text-align: center;
-            min-height: auto;
-        }
-
         /* Header Styles */
         header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             background-color: #2E7D32;
-            padding: 20px;
+            padding: 10px 20px;
             color: #FFFFFF;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
         }
 
         .header-left {
             display: flex;
             align-items: center;
-            flex: 1;
         }
 
         .header-right {
@@ -74,8 +67,8 @@
         }
 
         .logo {
-            width: 80px;
-            height: 80px;
+            width: 60px;
+            height: 60px;
             margin-right: 10px;
             vertical-align: middle;
         }
@@ -124,13 +117,13 @@
             flex-direction: column;
             gap: 10px;
             position: absolute;
-            top: 60px;
-            right: 10px;
+            top: 80px;
+            right: 20px;
             background-color: #2E7D32;
             padding: 10px;
             border-radius: 5px;
             z-index: 100;
-            width: 200px;
+            width: 180px;
             box-shadow: 0 0 10px #26802b;
         }
 
@@ -152,39 +145,72 @@
             display: flex;
         }
 
+        /* Main Content Area */
+        main {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background-image: linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)), 
+                              url('/api/placeholder/800/600');
+            background-size: cover;
+            background-position: center;
+        }
+
         /* Content Card */
         .content-card {
             background-color: #FFFFFF;
             border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
-            margin: 20px auto;
-            max-width: 600px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(46, 125, 50, 0.25);
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .content-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 25px rgba(46, 125, 50, 0.35);
         }
 
         /* Modal */
         .modal {
             display: none;
             position: fixed;
-            z-index: 1;
-            padding-top: 100px;
+            z-index: 1000;
             left: 0;
             top: 0;
             width: 100%;
             height: 100%;
-            overflow: auto;
+            overflow: hidden;
             background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
         }
 
         .modal-content {
             background-color: #FFFFFF;
-            margin: auto;
-            padding: 20px;
+            margin: 10% auto;
+            padding: 25px;
             border: 1px solid #f5f5f5;
-            width: 80%;
-            max-width: 500px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px #2E7D32;
+            width: 90%;
+            max-width: 400px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(46, 125, 50, 0.5);
+            transform: translateY(0);
+            animation: modalFade 0.3s ease;
+        }
+
+        @keyframes modalFade {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .close {
@@ -193,6 +219,7 @@
             font-size: 24px;
             font-weight: bold;
             cursor: pointer;
+            transition: color 0.2s;
         }
 
         .close:hover,
@@ -203,36 +230,47 @@
         /* Form */
         .form {
             background-color: #2E7D32;
-            border-radius: 8px;
+            border-radius: 10px;
             padding: 20px;
-            box-shadow: 0 0 10px #26802b;
+            box-shadow: 0 0 15px rgba(38, 128, 43, 0.5);
+            color: #FFFFFF;
+        }
+
+        .form h1 {
+            color: #FFFFFF;
         }
 
         .input-container {
             position: relative;
-            margin-top: 20px;
+            margin: 20px 0;
             width: 100%;
         }
 
         .input {
-            background-color: #FFFFFF;
-            border-radius: 4px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 6px;
             color: #1b1b1b;
             font-size: 16px;
             width: 100%;
-            padding: 12px 10px;
-            border: 1px solid #f5f5f5;
+            padding: 12px 15px;
+            border: 1px solid transparent;
             outline: none;
             box-sizing: border-box;
-            box-shadow: 0 0 5px #26802b;
+            box-shadow: 0 0 5px rgba(38, 128, 43, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .input:focus {
+            border-color: #FFFFFF;
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
         }
 
         .iLabel {
             position: absolute;
-            left: 10px;
+            left: 15px;
             top: 50%;
             transform: translateY(-50%);
-            color: #FFFFFF;
+            color: #1b1b1b;
             font-size: 16px;
             pointer-events: none;
             transition: all 0.3s ease;
@@ -254,21 +292,26 @@
             padding: 12px 24px;
             border: none;
             cursor: pointer;
-            border-radius: 4px;
+            border-radius: 6px;
             font-size: 1rem;
-            box-shadow: 0 0 5px #04800a;
-            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 0 5px rgba(4, 128, 10, 0.5);
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            width: 100%;
         }
 
         .submit:hover {
             background-color: #197e1e;
-            box-shadow: 0 0 10px #04800a;
+            box-shadow: 0 0 10px rgba(4, 128, 10, 0.7);
+            transform: translateY(-2px);
         }
 
         .title {
-            font-size: 1.3rem;
+            font-size: 1.4rem;
             font-weight: bold;
-            color: #1b1b1b;
+            color: #FFFFFF;
+            margin-top: 0;
+            margin-bottom: 20px;
         }
 
         .title::after {
@@ -276,311 +319,67 @@
             display: block;
             width: 50%;
             height: 2px;
-            margin: 5px auto;
-            background-color: #1b1b1b;
+            margin: 8px auto;
+            background-color: #FFFFFF;
         }
 
         /* Footer */
         footer {
-            width: 100%;
-            height: 50px;
             background-color: #2E7D32;
             color: #FFFFFF;
             text-align: center;
-            line-height: 50px;
+            padding: 15px;
+            box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.2);
         }
 
-        /* Card Styles (Unused but retained for future use) */
-        .card {
-            position: relative;
-            width: 300px;
-            min-height: 50vh;
-            background: linear-gradient(to top, #ff930f, #ffcc33);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            transition: all 0.6s cubic-bezier(0.23, 1, 0.320, 1);
-        }
-
-        .card img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 10px;
-            transition: all 0.6s cubic-bezier(0.23, 1, 0.320, 1);
-        }
-
-        .card:hover {
-            transform: rotate(-5deg) scale(1.1);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-        }
-
-        .card__content {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) rotate(-45deg);
-            width: 100%;
-            height: 100%;
-            padding: 20px;
-            box-sizing: border-box;
-            background-color: #FFFFFF;
-            opacity: 0;
-            transition: all 0.6s cubic-bezier(0.23, 1, 0.320, 1);
-            border-radius: 10px;
-        }
-
-        .card:hover .card__content {
-            transform: translate(-50%, -50%) rotate(0deg);
-            opacity: 1;
-        }
-
-        .card__title {
+        footer p {
             margin: 0;
-            font-size: 24px;
-            color: #333333;
-            font-weight: 700;
         }
 
-        .card__description {
-            margin: 10px 0 0;
-            font-size: 14px;
-            color: #1b1b1b;
-            line-height: 1.4;
-        }
-
-        /* Trivia Card (Unused but retained) */
-        .card-trivia {
-            width: 190px;
-            min-height: 25vh;
-            padding: 0.5rem;
-            background: linear-gradient(to top, #ff930f, #ffcc33);
-            border-radius: 8px;
-            box-shadow: 0 0 10px #ffcc33;
-            transition: box-shadow 0.3s;
-            margin: 20px auto;
-            color: #1b1b1b;
-        }
-
-        .card-trivia:hover {
-            box-shadow: 0 0 15px #ff930f;
-        }
-
-        .align-trivia {
-            padding: 1rem;
-            display: flex;
-            flex-direction: row;
-            gap: 5px;
-            align-self: flex-start;
-        }
-
-        .red-trivia, .yellow-trivia, .green-trivia {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            box-shadow: -5px 5px 5px rgba(0, 0, 0, 0.280);
-        }
-
-        .red-trivia { background-color: #ff930f; }
-        .yellow-trivia { background-color: #ffcc33; }
-        .green-trivia { background-color: #2E7D32; }
-
-        .card-trivia h1 {
+        /* Form Link Styles */
+        .form p {
+            margin-top: 15px;
             text-align: center;
-            margin: 1.3rem;
-            color: #1b1b1b;
-            font-size: 1.3rem;
         }
 
-        .card-trivia p {
-            padding: 0.5rem;
-            font-size: 0.9rem;
-            line-height: 1.2;
+        .form a {
+            color: #FFFFFF;
+            text-decoration: underline;
+            transition: color 0.2s;
+        }
+
+        .form a:hover {
+            color: #b3ffb6;
+        }
+
+        /* Alert Styles */
+        .alert {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
             text-align: center;
-            color: #1b1b1b;
         }
 
-        /* Section Styles (Unused but retained) */
-        .library-section {
-            text-align: center;
-            padding: 20px;
-            min-height: auto;
+        .alert-success {
+            background-color: #c8e6c9;
+            color: #2e7d32;
+            border: 1px solid #a5d6a7;
         }
 
-        .variety-cards, .developer-cards {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-
-        /* Trivia Section (Unused but retained) */
-        #trivia {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            min-height: 50vh;
-            text-align: center;
-            padding: 20px;
-        }
-
-        .trivia-container, .trivia-section {
-            padding: 20px;
-            border: 1px solid #2E7D32;
-            border-radius: 8px;
-            width: 100%;
-            max-width: 600px;
-            margin: 0 auto;
-            background-color: #FFFFFF;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-        }
-
-        .trivia-text {
-            font-size: 1.2em;
-            color: #2E7D32;
-            font-weight: bold;
-        }
-
-        /* Video Styles (Unused but retained) */
-        video {
-            display: none;
-            width: 100%;
-            max-width: 600px;
-            border: 2px solid #2E7D32;
-            margin-top: 20px;
+        .alert-error {
+            background-color: #ffcdd2;
+            color: #c62828;
+            border: 1px solid #ef9a9a;
         }
 
         /* Responsive Styles */
         @media only screen and (max-width: 768px) {
             header {
-                flex-direction: column;
-                align-items: flex-start;
                 padding: 10px;
             }
 
-            header h1 {
-                font-size: 1.5rem;
-            }
-
-            .header-left {
-                width: 100%;
-                justify-content: space-between;
-            }
-
-            .header-right {
-                width: 100%;
-                justify-content: flex-end;
-            }
-
-            .toggle {
-                align-self: flex-end;
-                margin-top: 10px;
-                padding: 10px;
-            }
-
-            nav ul {
-                top: 120px;
-                width: 100%;
-                right: 0;
-                left: 0;
-                border-radius: 0;
-                padding: 15px;
-                box-shadow: none;
-            }
-
-            nav ul li a {
-                padding: 12px;
-                font-size: 1.1rem;
-            }
-
-            .content {
-                margin: 10px;
-                padding: 10px;
-            }
-
-            .content-card {
-                width: 90%;
-                padding: 15px;
-            }
-
-            .modal-content {
-                width: 90%;
-                margin-top: 20%;
-                padding: 15px;
-            }
-
-            .form {
-                padding: 15px;
-            }
-
-            .input {
-                font-size: 14px;
-                padding: 10px;
-            }
-
-            .iLabel {
-                font-size: 14px;
-            }
-
-            .input:focus ~ .iLabel,
-            .input:not(:placeholder-shown) ~ .iLabel {
-                font-size: 10px;
-            }
-
-            .submit {
-                padding: 10px 20px;
-                font-size: 0.9rem;
-            }
-
-            .card {
-                width: 90%;
-                max-width: 300px;
-                padding: 12px;
-            }
-
-            .card__title {
-                font-size: 1.1rem;
-            }
-
-            .card__description {
-                font-size: 0.9rem;
-            }
-
-            .card-trivia {
-                width: 90%;
-                max-width: 300px;
-                padding: 12px;
-            }
-
-            .card-trivia h1 {
-                font-size: 1.1rem;
-            }
-
-            .card-trivia p {
-                font-size: 0.9rem;
-            }
-
-            .red-trivia, .yellow-trivia, .green-trivia {
-                width: 8px;
-                height: 8px;
-            }
-
-            .library-section {
-                padding: 10px;
-            }
-
-            .trivia-container, .trivia-section {
-                width: 90%;
-                padding: 15px;
-            }
-
-            footer {
-                position: static;
-                height: 60px;
-                line-height: 60px;
+            .header-left h1 {
+                font-size: 1.8rem;
             }
 
             .logo {
@@ -588,121 +387,28 @@
                 height: 50px;
             }
 
-            video {
-                max-width: 90%;
+            nav ul {
+                top: 70px;
+                width: 160px;
+            }
+
+            main {
+                padding: 10px;
+            }
+
+            .content-card {
+                padding: 20px;
+            }
+
+            .modal-content {
+                margin: 15% auto;
+                padding: 20px;
             }
         }
 
         @media only screen and (max-width: 480px) {
-            header h1 {
-                font-size: 1.2rem;
-            }
-
-            .toggle {
-                width: 35px;
-                height: 35px;
-                gap: 6px;
-            }
-
-            .bars {
-                height: 3px;
-            }
-
-            nav ul {
-                top: 100px;
-                padding: 10px;
-            }
-
-            nav ul li a {
-                font-size: 0.9rem;
-                padding: 10px;
-            }
-
-            .content {
-                margin: 5px;
-                padding: 5px;
-            }
-
-            .content-card {
-                width: 95%;
-                padding: 10px;
-            }
-
-            .modal-content {
-                width: 95%;
-                margin-top: 30%;
-                padding: 10px;
-            }
-
-            .form {
-                padding: 15px;
-            }
-
-            .input-container {
-                margin-top: 15px;
-            }
-
-            .input {
-                font-size: 12px;
-                padding: 8px;
-            }
-
-            .iLabel {
-                font-size: 12px;
-            }
-
-            .input:focus ~ .iLabel,
-            .input:not(:placeholder-shown) ~ .iLabel {
-                font-size: 8px;
-            }
-
-            .submit {
-                padding: 8px 16px;
-                font-size: 0.8rem;
-            }
-
-            .card {
-                width: 100%;
-                max-width: 250px;
-                padding: 10px;
-            }
-
-            .card__title {
-                font-size: 1rem;
-            }
-
-            .card__description {
-                font-size: 0.8rem;
-            }
-
-            .card-trivia {
-                width: 100%;
-                max-width: 250px;
-                padding: 10px;
-            }
-
-            .card-trivia h1 {
-                font-size: 1rem;
-            }
-
-            .card-trivia p {
-                font-size: 0.8rem;
-            }
-
-            .red-trivia, .yellow-trivia, .green-trivia {
-                width: 6px;
-                height: 6px;
-            }
-
-            .trivia-container, .trivia-section {
-                width: 95%;
-                padding: 10px;
-            }
-
-            footer {
-                font-size: 0.9rem;
-                height: 50px;
-                line-height: 50px;
+            .header-left h1 {
+                font-size: 1.5rem;
             }
 
             .logo {
@@ -710,38 +416,70 @@
                 height: 40px;
             }
 
-            video {
-                max-width: 95%;
+            .content-card {
+                padding: 15px;
+            }
+
+            .content-card h2 {
+                font-size: 1.5rem;
+            }
+
+            .content-card h3 {
+                font-size: 1.2rem;
+            }
+
+            .modal-content {
+                margin: 20% auto;
+                padding: 15px;
+                width: 85%;
+            }
+
+            .title {
+                font-size: 1.2rem;
+            }
+
+            .input {
+                padding: 10px;
+                font-size: 14px;
+            }
+
+            .iLabel {
+                font-size: 14px;
+            }
+
+            .submit {
+                padding: 10px;
+                font-size: 0.9rem;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <header>
-        <div class="header-left">
-            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="ChipAI Logo" class="logo">
-            <h1>ChipAI</h1>
-        </div>
-        <div class="header-right">
-            <input id="checkbox" type="checkbox">
-            <label class="toggle" for="checkbox">
-                <div id="bar1" class="bars"></div>
-                <div id="bar2" class="bars"></div>
-                <div id="bar3" class="bars"></div>
-            </label>
-            <nav>
-                <ul>
-                    <li><a href="{{ url_for('about') }}" id="about">About</a></li>
-                    <li><a href="#" id="loginBtn">Login</a></li>
-                </ul>
-            </nav>
-        </div>
-    </header>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="header-left">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="ChipAI Logo" class="logo">
+                <h1>ChipAI</h1>
+            </div>
+            <div class="header-right">
+                <input id="checkbox" type="checkbox">
+                <label class="toggle" for="checkbox">
+                    <div id="bar1" class="bars"></div>
+                    <div id="bar2" class="bars"></div>
+                    <div id="bar3" class="bars"></div>
+                </label>
+                <nav>
+                    <ul>
+                        <li><a href="{{ url_for('about') }}" id="about">About</a></li>
+                        <li><a href="#" id="loginBtn">Login</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
 
-    <main>
-        <!-- Main content of the page -->
-        <div class="content">
+        <!-- Main content area -->
+        <main>
             <div class="content-card">
                 {% if user_id %}
                     <h2>Welcome, User {{ user_id }}!</h2>
@@ -750,13 +488,13 @@
                     <h3>Identify different chili pepper varieties with ease!</h3>
                 {% endif %}
             </div>
-        </div>
-    </main>
+        </main>
 
-    <!-- Footer -->
-    <footer>
-        <p>© 2024 ChipAI. All rights reserved.</p>
-    </footer>
+        <!-- Footer -->
+        <footer>
+            <p>© 2024 ChipAI. All rights reserved.</p>
+        </footer>
+    </div>
 
     <!-- Login Modal -->
     <div id="loginModal" class="modal">
@@ -819,6 +557,7 @@
                     {% if 'success' in category %}
                         <script>
                             document.getElementById('successModal').style.display = 'block';
+                            document.getElementById('modalMessage').textContent = "{{ message }}";
                         </script>
                     {% endif %}
                 {% endfor %}
@@ -844,14 +583,16 @@
 
         // Open the login modal
         if (loginBtn) {
-            loginBtn.onclick = () => {
+            loginBtn.onclick = (e) => {
+                e.preventDefault();
                 loginModal.style.display = "block";
             };
         }
 
         // Switch from login modal to signup modal
         if (openSignupLink) {
-            openSignupLink.onclick = () => {
+            openSignupLink.onclick = (e) => {
+                e.preventDefault();
                 signupModal.style.display = "block";
                 loginModal.style.display = "none";
             };
@@ -889,11 +630,22 @@
             }
         };
 
+        // Handle escape key to close modals
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                loginModal.style.display = "none";
+                signupModal.style.display = "none";
+                successModal.style.display = "none";
+            }
+        });
+
         // Display success modal for flash messages
         window.addEventListener('DOMContentLoaded', () => {
             const flashMessage = document.getElementById('flashMessage');
             if (flashMessage && flashMessage.textContent.includes('success')) {
                 successModal.style.display = 'block';
+                const message = document.querySelector('.alert-success').textContent.trim();
+                document.getElementById('modalMessage').textContent = message;
             }
         });
     </script>
