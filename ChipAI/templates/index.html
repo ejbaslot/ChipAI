@@ -15,6 +15,11 @@
             font-family: 'Poppins', sans-serif;
             background-color: #FFFFFF;
             color: #333333;
+            box-sizing: border-box;
+        }
+    
+        *, *:before, *:after {
+            box-sizing: inherit;
         }
     
         body {
@@ -29,6 +34,15 @@
             min-height: 100vh;
         }
     
+        main {
+            flex: 1;
+            overflow-y: auto;
+            background-image: linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)), 
+                              url('/api/placeholder/800/600');
+            background-size: cover;
+            background-position: center;
+        }
+    
         h1, h2, h3 {
             text-align: center;
             margin: 10px 0;
@@ -36,21 +50,21 @@
     
         h1 {
             color: #FFFFFF;
-            font-size: 2.5rem;
+            font-size: clamp(2rem, 5vw, 2.5rem);
             margin: 0;
         }
     
         h2 {
             color: #2E7D32;
-            font-size: 1.75rem;
+            font-size: clamp(1.5rem, 4vw, 1.75rem);
         }
     
         h3 {
             color: #2E7D32;
-            font-size: 1.5rem;
+            font-size: clamp(1.2rem, 3.5vw, 1.5rem);
         }
     
-        /* Header Styles */
+        /* Header */
         header {
             display: flex;
             justify-content: space-between;
@@ -59,6 +73,9 @@
             padding: 10px 20px;
             color: #FFFFFF;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
     
         .header-left {
@@ -74,13 +91,13 @@
         }
     
         .logo {
-            width: 60px;
-            height: 60px;
+            width: clamp(40px, 10vw, 60px);
+            height: clamp(40px, 10vw, 60px);
             margin-right: 10px;
             vertical-align: middle;
         }
     
-        /* Burger Menu Styles */
+        /* Burger Menu */
         #checkbox {
             display: none;
         }
@@ -129,9 +146,9 @@
             background-color: #2E7D32;
             padding: 10px;
             border-radius: 5px;
+            box-shadow: 0 0 10px #26802b;
             z-index: 100;
             width: 180px;
-            box-shadow: 0 0 10px #26802b;
         }
     
         nav ul li a {
@@ -152,34 +169,180 @@
             display: flex;
         }
     
-        /* Main Content Area */
-        main {
-            flex: 1;
+        /* Content */
+        .content {
+            padding: clamp(20px, 5vw, 40px) clamp(10px, 3vw, 20px);
+            text-align: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+    
+        /* Sections */
+        section {
+            padding: clamp(20px, 5vw, 40px) clamp(10px, 3vw, 20px);
+            margin: 0 auto;
+            max-width: 1200px;
+            min-height: auto;
+        }
+    
+        .library-section {
+            text-align: center;
+            padding: clamp(30px, 7vw, 60px) clamp(10px, 3vw, 20px);
+            min-height: auto;
+        }
+    
+        .variety-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            justify-content: center;
+            gap: clamp(15px, 4vw, 30px);
+            margin-top: clamp(20px, 5vw, 40px);
+        }
+    
+        /* Cards */
+        .card {
+            position: relative;
+            width: 100%;
+            max-width: 280px;
+            height: 350px;
+            background: linear-gradient(to top, #028d09, #2E7D32);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            transition: all 0.6s cubic-bezier(0.23, 1, 0.320, 1);
+            box-shadow: 0 4px 20px rgba(46, 125, 50, 0.25);
+            margin: 0 auto;
+        }
+    
+        .card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 10px;
+            transition: all 0.6s cubic-bezier(0.23, 1, 0.320, 1);
+        }
+    
+        .card:hover {
+            transform: rotate(-3deg) scale(1.05);
+            box-shadow: 0 6px 25px rgba(46, 125, 50, 0.35);
+        }
+    
+        .card__content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+            background-color: #FFFFFF;
+            opacity: 0;
+            transition: all 0.6s cubic-bezier(0.23, 1, 0.320, 1);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+    
+        .card:hover .card__content {
+            transform: translate(-50%, -50%) rotate(0deg);
+            opacity: 1;
+        }
+    
+        .card__title {
+            margin: 0 0 10px 0;
+            font-size: clamp(18px, 4vw, 22px);
+            color: #2E7D32;
+            font-weight: 700;
+        }
+    
+        .card__description {
+            margin: 0;
+            font-size: clamp(12px, 3vw, 14px);
+            color: #333333;
+            line-height: 1.5;
+        }
+    
+        /* Trivia Section */
+        .trivia-section {
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
-            background-image: linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)), 
-                              url('/api/placeholder/800/600');
-            background-size: cover;
-            background-position: center;
-            overflow-y: auto;
+            padding: clamp(30px, 7vw, 60px) clamp(10px, 3vw, 20px);
+            min-height: auto;
+        }
+    
+        .card-trivia {
+            width: 100%;
+            max-width: 400px;
+            min-height: 250px;
+            padding: 1rem;
+            background: linear-gradient(to top, #028d09, #2E7D32);
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(46, 125, 50, 0.25);
+            transition: 0.4s;
+            overflow: hidden;
+            color: #FFFFFF;
+            display: flex;
+            flex-direction: column;
+            transform: skewX(5deg);
+        }
+    
+        .card-trivia:hover {
+            transform: skew(0deg);
+            box-shadow: 0 6px 25px rgba(46, 125, 50, 0.35);
+        }
+    
+        .align-trivia {
+            padding: 0.5rem;
+            display: flex;
+            flex-direction: row;
+            gap: 5px;
+            align-self: flex-start;
+        }
+    
+        .red-trivia, .yellow-trivia, .green-trivia {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            box-shadow: -2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+    
+        .red-trivia { background-color: #c62828; }
+        .yellow-trivia { background-color: #b3ffb6; }
+        .green-trivia { background-color: #197e1e; }
+    
+        .card-trivia h1 {
+            text-align: center;
+            margin: 1rem 0;
+            color: #FFFFFF;
+            font-size: clamp(1.4rem, 4vw, 1.8rem);
+        }
+    
+        .card-trivia p {
+            padding: 1rem;
+            font-size: clamp(0.9rem, 3vw, 1rem);
+            line-height: 1.5;
+            text-align: center;
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
     
         /* Content Card */
         .content-card {
             background-color: #FFFFFF;
             border-radius: 10px;
-            padding: 30px;
+            padding: clamp(15px, 4vw, 30px);
             box-shadow: 0 4px 20px rgba(46, 125, 50, 0.25);
-            max-width: 500px;
-            width: 100%;
-            text-align: center;
+            margin: clamp(15px, 4vw, 30px) auto;
+            max-width: 800px;
+            border: 1px solid #f5f5f5;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-    
-        .content-card h1 {
-            color: #2E7D32;
         }
     
         .content-card:hover {
@@ -187,152 +350,27 @@
             box-shadow: 0 6px 25px rgba(46, 125, 50, 0.35);
         }
     
-        /* Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background-color: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(4px);
-        }
-    
-        .modal-content {
-            background-color: #FFFFFF;
-            margin: 10% auto;
-            padding: 25px;
-            border: 1px solid #f5f5f5;
-            width: 90%;
-            max-width: 400px;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(46, 125, 50, 0.5);
-            transform: translateY(0);
-            animation: modalFade 0.3s ease;
-        }
-    
-        @keyframes modalFade {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-    
-        .close {
-            color: #666666;
-            float: right;
-            font-size: 24px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: color 0.2s;
-        }
-    
-        .close:hover,
-        .close:focus {
-            color: #1b1b1b;
-        }
-    
-        /* Form */
-        .form {
-            background-color: #2E7D32;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 0 15px rgba(38, 128, 43, 0.5);
-            color: #FFFFFF;
-        }
-    
-        .form h1 {
-            color: #FFFFFF;
-        }
-    
-        .input-container {
-            position: relative;
-            margin: 20px 0;
-            width: 100%;
-        }
-    
-        .input {
-            background-color: rgba(255, 255, 255, 0.9);
-            border-radius: 6px;
-            color: #1b1b1b;
-            font-size: 16px;
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid transparent;
-            outline: none;
-            box-sizing: border-box;
-            box-shadow: 0 0 5px rgba(38, 128, 43, 0.5);
-            transition: all 0.3s ease;
-        }
-    
-        .input:focus {
-            border-color: #FFFFFF;
-            box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
-        }
-    
-        .iLabel {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #1b1b1b;
-            font-size: 16px;
-            pointer-events: none;
-            transition: all 0.3s ease;
-        }
-    
-        .input:focus ~ .iLabel,
-        .input:not(:placeholder-shown) ~ .iLabel {
-            top: -10px;
-            left: 10px;
-            font-size: 12px;
-            color: #FFFFFF;
-            background: #2E7D32;
-            padding: 0 5px;
-        }
-    
-        .submit {
+        /* Buttons */
+        .btn {
             background-color: #028d09;
             color: #FFFFFF;
-            padding: 12px 24px;
+            padding: clamp(8px, 2.5vw, 12px) clamp(16px, 4vw, 24px);
             border: none;
             cursor: pointer;
             border-radius: 6px;
-            font-size: 1rem;
-            box-shadow: 0 0 5px rgba(4, 128, 10, 0.5);
             transition: all 0.3s ease;
-            margin-top: 10px;
-            width: 100%;
+            margin: 15px 0;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: clamp(0.8rem, 2.5vw, 1rem);
+            box-shadow: 0 0 5px rgba(4, 128, 10, 0.5);
         }
     
-        .submit:hover {
+        .btn:hover {
             background-color: #197e1e;
-            box-shadow: 0 0 10px rgba(4, 128, 10, 0.7);
             transform: translateY(-2px);
-        }
-    
-        .title {
-            font-size: 1.4rem;
-            font-weight: bold;
-            color: #FFFFFF;
-            margin-top: 0;
-            margin-bottom: 20px;
-        }
-    
-        .title::after {
-            content: "";
-            display: block;
-            width: 50%;
-            height: 2px;
-            margin: 8px auto;
-            background-color: #FFFFFF;
+            box-shadow: 0 0 10px rgba(4, 128, 10, 0.7);
         }
     
         /* Footer */
@@ -340,38 +378,23 @@
             background-color: #2E7D32;
             color: #FFFFFF;
             text-align: center;
-            padding: 15px;
+            padding: clamp(10px, 3vw, 15px);
             box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.2);
+            margin-top: auto;
         }
     
         footer p {
             margin: 0;
-            font-size: 1rem;
-        }
-    
-        /* Form Link Styles */
-        .form p {
-            margin-top: 15px;
-            text-align: center;
-        }
-    
-        .form a {
-            color: #FFFFFF;
-            text-decoration: underline;
-            transition: color 0.2s;
-        }
-    
-        .form a:hover {
-            color: #b3ffb6;
+            font-size: clamp(0.8rem, 2.5vw, 1rem);
         }
     
         /* Alert Styles */
         .alert {
-            padding: 10px;
+            padding: clamp(6px, 2vw, 10px);
             margin: 10px 0;
             border-radius: 5px;
             text-align: center;
-            font-size: 1rem;
+            font-size: clamp(0.8rem, 2.5vw, 1rem);
         }
     
         .alert-success {
@@ -389,37 +412,35 @@
         /* Responsive Styles */
         @media only screen and (max-width: 768px) {
             header {
-                flex-direction: column;
-                align-items: flex-start;
-                padding: 10px;
+                flex-direction: row;
+                align-items: center;
+                padding: clamp(8px, 2vw, 10px);
             }
     
             .header-left {
-                width: 100%;
+                flex: 1;
                 justify-content: space-between;
             }
     
             .header-right {
-                width: 100%;
-                justify-content: flex-end;
+                flex: 0;
             }
     
-            .header-left h1 {
-                font-size: 1.8rem;
+            header h1 {
+                font-size: clamp(1.5rem, 4vw, 1.8rem);
             }
     
             .logo {
-                width: 50px;
-                height: 50px;
+                width: clamp(40px, 8vw, 50px);
+                height: clamp(40px, 8vw, 50px);
             }
     
             .toggle {
-                align-self: flex-end;
-                margin-top: 10px;
+                align-self: center;
             }
     
             nav ul {
-                top: 100px;
+                top: 100%;
                 width: 100%;
                 right: 0;
                 left: 0;
@@ -430,76 +451,41 @@
     
             nav ul li a {
                 padding: 12px;
-                font-size: 1.1rem;
+                font-size: clamp(1rem, 3vw, 1.1rem);
             }
     
-            main {
-                padding: 10px;
+            .variety-cards {
+                grid-template-columns: 1fr;
+                gap: 20px;
             }
     
-            .content-card {
-                width: 90%;
-                max-width: 500px;
-                padding: 20px;
+            .card {
+                width: 100%;
+                max-width: 300px;
+                height: 300px;
             }
     
-            .modal-content {
-                margin: 15% auto;
-                padding: 20px;
-                width: 90%;
-                max-width: 400px;
+            .card-trivia {
+                width: 100%;
+                max-width: 350px;
+                min-height: 200px;
+                padding: 0.8rem;
+                transform: none;
             }
     
-            .input {
-                font-size: 14px;
-                padding: 10px 12px;
-            }
-    
-            .iLabel {
-                font-size: 14px;
-            }
-    
-            .input:focus ~ .iLabel,
-            .input:not(:placeholder-shown) ~ .iLabel {
-                font-size: 10px;
-            }
-    
-            .submit {
-                padding: 10px 20px;
-                font-size: 0.9rem;
-            }
-    
-            .title {
-                font-size: 1.3rem;
-            }
-    
-            .alert {
-                padding: 8px;
-                font-size: 0.9rem;
-            }
-    
-            footer {
-                padding: 12px;
-                position: static;
-            }
-    
-            footer p {
-                font-size: 0.9rem;
+            .red-trivia, .yellow-trivia, .green-trivia {
+                width: 8px;
+                height: 8px;
             }
         }
     
         @media only screen and (max-width: 480px) {
             header {
-                padding: 8px 10px;
+                padding: clamp(6px, 2vw, 8px);
             }
     
-            .header-left h1 {
-                font-size: 1.5rem;
-            }
-    
-            .logo {
-                width: 40px;
-                height: 40px;
+            header h1 {
+                font-size: clamp(1.2rem, 3.5vw, 1.5rem);
             }
     
             .toggle {
@@ -513,75 +499,77 @@
             }
     
             nav ul {
-                top: 80px;
+                top: 100%;
                 padding: 10px;
-                width: 100%;
             }
     
             nav ul li a {
-                font-size: 0.9rem;
+                font-size: clamp(0.8rem, 2.5vw, 0.9rem);
                 padding: 10px;
             }
     
-            main {
-                padding: 5px;
+            .content {
+                padding: clamp(5px, 2vw, 10px);
             }
     
             .content-card {
                 width: 95%;
                 max-width: 450px;
-                padding: 15px;
+                padding: clamp(10px, 3vw, 15px);
+                margin: clamp(10px, 3vw, 15px) auto;
             }
     
-            .content-card h2 {
-                font-size: 1.5rem;
+            .library-section {
+                padding: clamp(10px, 3vw, 20px);
             }
     
-            .content-card h3 {
-                font-size: 1.2rem;
+            .variety-cards {
+                gap: 15px;
             }
     
-            .modal-content {
-                margin: 20% auto;
-                padding: 15px;
-                width: 95%;
-                max-width: 350px;
+            .card {
+                max-width: 250px;
+                height: 250px;
             }
     
-            .title {
-                font-size: 1.2rem;
+            .trivia-section {
+                padding: clamp(10px, 3vw, 20px);
             }
     
-            .input {
-                padding: 8px 10px;
-                font-size: 12px;
+            .card-trivia {
+                max-width: 300px;
+                min-height: 180px;
+                padding: 0.6rem;
             }
     
-            .iLabel {
-                font-size: 12px;
+            .card-trivia h1 {
+                font-size: clamp(1rem, 3vw, 1.2rem);
+                margin: clamp(0.6rem, 2vw, 0.8rem) 0;
             }
     
-            .input:focus ~ .iLabel,
-            .input:not(:placeholder-shown) ~ .iLabel {
-                font-size: 8px;
+            .card-trivia p {
+                font-size: clamp(0.7rem, 2.5vw, 0.8rem);
+                padding: clamp(0.6rem, 2vw, 0.8rem);
             }
     
-            .submit {
-                padding: 8px 16px;
-                font-size: 0.8rem;
+            .red-trivia, .yellow-trivia, .green-trivia {
+                width: 6px;
+                height: 6px;
             }
     
-            .alert {
-                padding: 6px;
-                font-size: 0.8rem;
+            .btn {
+                padding: clamp(6px, 2vw, 8px) clamp(12px, 3vw, 16px);
+                font-size: clamp(0.7rem, 2vw, 0.8rem);
             }
     
             footer {
-                padding: 10px;
+                font-size: clamp(0.7rem, 2vw, 0.9rem);
+                padding: clamp(8px, 2vw, 10px) 0;
             }
     
-            footer p {
-                font-size: 0.8rem;
+            .alert {
+                padding: clamp(4px, 1.5vw, 6px);
+                font-size: clamp(0.7rem, 2vw, 0.8rem);
             }
         }
     </style>
@@ -613,12 +601,8 @@
         <!-- Main content area -->
         <main>
             <div class="content-card">
-                {% if user_id %}
-                    <h2>Welcome, User {{ user_id }}!</h2>
-                {% else %}
                     <h2>Welcome to ChipAI!</h2>
                     <h3>Identify different chili pepper varieties with ease!</h3>
-                {% endif %}
             </div>
         </main>
 
