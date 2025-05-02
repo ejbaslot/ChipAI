@@ -377,7 +377,7 @@
             }
     
             .header-left {
-                width: 100%;
+                flex: 1;
                 justify-content: space-between;
             }
     
@@ -603,7 +603,10 @@
 <body>
 <!-- Header -->
 <header>
-    <h1>ChipAI</h1>
+    <div class="header-left">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="ChipAI Logo" class="logo">
+        <h1>ChipAI</h1>
+    </div>
     <input id="checkbox" type="checkbox">
     <label class="toggle" for="checkbox">
         <div id="bar1" class="bars"></div>
@@ -676,9 +679,8 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 </script>
 
-
-<body-trivia>
-    <div class="card-trivia" id="trivia">
+<div class="trivia-section" id="trivia">
+    <div class="card-trivia">
         <div class="align-trivia">
             <span class="red-trivia"></span>
             <span class="yellow-trivia"></span>
@@ -706,11 +708,11 @@ document.addEventListener("DOMContentLoaded", function () {
         
         fetchTrivia();
     </script>
-</body-trivia>
+</div>
 
     <!-- Footer -->
     <footer>
-        <p>&copy; 2024 ChipAI. All rights reserved.</p>
+        <p>© 2024 ChipAI. All rights reserved.</p>
     </footer>
 
 </body>
