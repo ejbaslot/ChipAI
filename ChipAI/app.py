@@ -49,7 +49,8 @@ IMAGE_MAPPING = {
     "Siling Labuyo": "siling_labuyo.jpg",
     "Siling Atsal": "bell_pepper.jpg",
     "Siling Espada": "siling_haba.jpg",
-    "Siling Demonyo": "siling_demonyo.jpg"
+    "Siling Demonyo": "siling_demonyo.jpg",
+    "Siling Habanero": "siling_habanero.jpg"
 }
 
 # Image preprocessing function (handling both in-memory and file path)
@@ -85,7 +86,7 @@ def predict_chili_variety(image_stream):
 
         print("Prediction raw output (TFLite):", output_data)
 
-        class_labels = ["Siling Atsal", "Siling Labuyo", "Siling Espada", "Siling Demonyo"]
+        class_labels = ["Siling Atsal", "Siling Labuyo", "Siling Espada", "Siling Demonyo", "Siling Habanero"]
         predicted_prob = np.max(output_data)
         predicted_label = class_labels[np.argmax(output_data)]
 
