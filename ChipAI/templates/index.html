@@ -423,17 +423,17 @@
                 <div class="modal-content form">
                     <span class="close" id="closeLoginModal">×</span>
                     <h1 class="title">Login</h1>
-                    <form action="/login" method="POST">
+                    <div class="login-form">
                         <div class="input-container">
-                            <input type="text" class="input" id="loginUsername" name="username" placeholder=" " required>
+                            <input type="text" class="input" id="loginUsername" placeholder=" " required>
                             <label class="iLabel" for="loginUsername">Username</label>
                         </div>
                         <div class="input-container">
-                            <input type="password" class="input" id="loginPassword" name="password" placeholder=" " required>
+                            <input type="password" class="input" id="loginPassword" placeholder=" " required>
                             <label class="iLabel" for="loginPassword">Password</label>
                         </div>
-                        <button type="submit" class="submit">Login</button>
-                    </form>
+                        <button id="submitLoginBtn" class="submit">Login</button>
+                    </div>
                     <p>Don't have an account? <a href="#" id="openSignupLink">Sign up</a></p>
                 </div>
             </div>
@@ -443,21 +443,21 @@
                 <div class="modal-content form">
                     <span class="close" id="closeSignupModal">×</span>
                     <h2 class="title">Signup</h2>
-                    <form id="signupForm" action="/signup" method="POST">
+                    <div class="signup-form">
                         <div class="input-container">
-                            <input type="text" id="signupUsername" name="username" class="input" placeholder=" " required>
+                            <input type="text" id="signupUsername" class="input" placeholder=" " required>
                             <label for="signupUsername" class="iLabel">Username</label>
                         </div>
                         <div class="input-container">
-                            <input type="password" id="signupPassword" name="password" class="input" placeholder=" " required>
+                            <input type="password" id="signupPassword" class="input" placeholder=" " required>
                             <label for="signupPassword" class="iLabel">Password</label>
                         </div>
                         <div class="input-container">
-                            <input type="password" id="confirmPassword" name="confirm_password" class="input" placeholder=" " required>
+                            <input type="password" id="confirmPassword" class="input" placeholder=" " required>
                             <label for="confirmPassword" class="iLabel">Confirm Password</label>
                         </div>
-                        <button type="submit" class="submit">Sign Up</button>
-                    </form>
+                        <button id="submitSignupBtn" class="submit">Sign Up</button>
+                    </div>
                 </div>
             </div>
 
@@ -483,10 +483,15 @@
             const loginModal = document.getElementById("loginModal");
             const signupModal = document.getElementById("signupModal");
             const successModal = document.getElementById("successModal");
+            const modalMessage = document.getElementById("modalMessage");
 
             // Buttons to open modals
             const loginBtn = document.getElementById("loginBtn");
             const openSignupLink = document.getElementById("openSignupLink");
+
+            // Submit buttons
+            const submitLoginBtn = document.getElementById("submitLoginBtn");
+            const submitSignupBtn = document.getElementById("submitSignupBtn");
 
             // Close buttons for modals
             const closeLoginModal = document.getElementById("closeLoginModal");
@@ -512,6 +517,92 @@
                     e.preventDefault();
                     signupModal.style.display = "flex";
                     loginModal.style.display = "none";
+                };
+            }
+
+            // Handle login submission
+            if (submitLoginBtn) {
+                submitLoginBtn.onclick = async (e) => {
+                    e.preventDefault();
+
+                    const username = document.getElementById("loginUsername").value;
+                    const password = document.getElementById("loginPassword").value;
+
+                    if (!username || !password) {
+                        modalMessage.textContent = "Please fill in all fields.";
+                        successModal.style.display = "flex";
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch('/login', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ username, password }),
+                        });
+
+                        const result = await response.json();
+
+                        if (response.ok && result.success) {
+                            window.location.href = '/'; // Redirect to index on successful login
+                        } else {
+                            modalMessage.textContent = result.message || "Login failed.";
+                            successModal.style.display = "flex";
+                        }
+                    } catch (error) {
+                        modalMessage.textContent = "An error occurred. Please try again.";
+                        successModal.style.display = "flex";
+                    }
+                };
+            }
+
+            // Handle signup submission
+            if (submitSignupBtn) {
+                submitSignupBtn.onclick = async (e) => {
+                    e.preventDefault();
+
+                    const username = document.getElementById("signupUsername").value;
+                    const password = document.getElementById("signupPassword").value;
+                    const confirmPassword = document.getElementById("confirmPassword").value;
+
+                    if (!username || !password || !confirmPassword) {
+                        modalMessage.textContent = "Please fill in all fields.";
+                        successModal.style.display = "flex";
+                        return;
+                    }
+
+                    if (password !== confirmPassword) {
+                        modalMessage.textContent = "Passwords do not match.";
+                        successModal.style.display = "flex";
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch('/signup', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ username, password, confirm_password: confirmPassword }),
+                        });
+
+                        const result = await response.json();
+
+                        if (response.ok && result.success) {
+                            modalMessage.textContent = result.message || "Signup successful! Please log in.";
+                            successModal.style.display = "flex";
+                            signupModal.style.display = "none";
+                            loginModal.style.display = "flex";
+                        } else {
+                            modalMessage.textContent = result.message || "Signup failed.";
+                            successModal.style.display = "flex";
+                        }
+                    } catch (error) {
+                        modalMessage.textContent = "An error occurred. Please try again.";
+                        successModal.style.display = "flex";
+                    }
                 };
             }
 

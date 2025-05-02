@@ -10,7 +10,6 @@ from psycopg2 import OperationalError
 from psycopg2.extras import RealDictCursor
 from io import BytesIO
 
-
 app = Flask(__name__)
 app.secret_key = os.getenv('FLASK_SECRET_KEY', 'your_default_secret')  # Change for production
 
@@ -21,7 +20,6 @@ interpreter.allocate_tensors()
 # Get input and output details for reuse
 input_details = interpreter.get_input_details()
 output_details = interpreter.get_output_details()
-
 
 # Ensure the uploads directory exists
 upload_folder = 'uploads'
@@ -98,17 +96,19 @@ def predict_chili_variety(image_stream):
         print(f"Error in TFLite prediction: {str(e)}")
         return "Error processing the image."
 
-
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        confirm_password = request.form['confirm_password']
+        data = request.get_json()
+        username = data.get('username')
+        password = data.get('password')
+        confirm_password = data.get('confirm_password')
+
+        if not username or not password or not confirm_password:
+            return jsonify({'success': False, 'message': 'All fields are required.'}), 400
 
         if password != confirm_password:
-            flash('Passwords do not match.', 'error')
-            return redirect(url_for('signup'))
+            return jsonify({'success': False, 'message': 'Passwords do not match.'}), 400
 
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -119,25 +119,26 @@ def signup():
             signup_status = result[0] if result else "Unknown error."
 
             if "success" in signup_status.lower():
-                flash(signup_status, 'success')
-                return redirect(url_for('login'))
+                conn.commit()
+                return jsonify({'success': True, 'message': signup_status}), 200
             else:
-                flash(signup_status, 'error')
+                return jsonify({'success': False, 'message': signup_status}), 400
         except Exception as e:
-            flash(str(e), 'error')
+            return jsonify({'success': False, 'message': str(e)}), 500
         finally:
-            conn.commit()
             conn.close()
-
-        return redirect(url_for('signup'))
 
     return render_template('login.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
+        data = request.get_json()
+        username = data.get('username')
+        password = data.get('password')
+
+        if not username or not password:
+            return jsonify({'success': False, 'message': 'Username and password are required.'}), 400
 
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -147,24 +148,22 @@ def login():
             cursor.execute("SELECT * FROM sp_login(%s, %s)", (username, password))
             result = cursor.fetchone()
 
-            if result:
-                p_user_id, _, p_status = result  # Ignore p_stored_password using "_"
-                if p_status == 'User found' and p_user_id is not None:
-                    session['user_id'] = p_user_id
-                    flash('Login successful!', 'success')
-                    return redirect(url_for('index'))
-                flash(p_status, 'error')
+            if not result:
+                return jsonify({'success': False, 'message': 'Login failed: No result returned.'}), 401
+
+            p_user_id, _, p_status = result  # Ignore p_stored_password using "_"
+
+            if p_status == 'User found' and p_user_id is not None:
+                session['user_id'] = p_user_id
+                return jsonify({'success': True, 'message': 'Login successful!'}), 200
             else:
-                flash("Login failed: No result returned", 'error')
+                return jsonify({'success': False, 'message': p_status}), 401
         except Exception as e:
-            flash(f"Database error: {e}", 'error')
+            return jsonify({'success': False, 'message': f"Database error: {e}"}), 500
         finally:
             conn.close()
 
-        return redirect(url_for('login'))
-
     return render_template('login.html')
-
 
 @app.route('/upload', methods=['POST'])
 def upload_image():
@@ -218,7 +217,7 @@ def index():
 
 @app.route('/ai')
 def ai_model():
-    return render_template('AI.html')  # Ensure this matches the file name exactly
+    return render_template('AI.html')
 
 @app.route('/about')
 def about():
@@ -228,22 +227,18 @@ def about():
 def faqs():
     return render_template('faqs.html')
 
-
 @app.route('/add_user', methods=['POST'])
 def add_user():
-    # Your code to add the user
-    success = True  # Assuming the user is added successfully
+    success = True
     if success:
         flash('User added successfully!', 'success')
     return redirect('/index.html')
 
-# Route for logout
 @app.route('/logout')
 def logout():
     session.pop('user_id', None)
     flash('You have been logged out.', 'success')
     return redirect(url_for('login'))
-
 
 @app.route('/get_chili_info', methods=['GET'])
 def get_chili_info():
