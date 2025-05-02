@@ -477,76 +477,83 @@
 
     <!-- JavaScript to control the modal -->
     <script>
-        // Elements for login, signup, and success modals
-        const loginModal = document.getElementById("loginModal");
-        const signupModal = document.getElementById("signupModal");
-        const successModal = document.getElementById("successModal");
+        document.addEventListener('DOMContentLoaded', () => {
+            // Elements for login, signup, and success modals
+            const loginModal = document.getElementById("loginModal");
+            const signupModal = document.getElementById("signupModal");
+            const successModal = document.getElementById("successModal");
 
-        // Buttons to open modals
-        const loginBtn = document.getElementById("loginBtn");
-        const openSignupLink = document.getElementById("openSignupLink");
+            // Buttons to open modals
+            const loginBtn = document.getElementById("loginBtn");
+            const openSignupLink = document.getElementById("openSignupLink");
 
-        // Close buttons for modals
-        const closeLoginModal = document.getElementById("closeLoginModal");
-        const closeSignupModal = document.getElementById("closeSignupModal");
-        const closeSuccessModal = document.getElementById("closeSuccessModal");
+            // Close buttons for modals
+            const closeLoginModal = document.getElementById("closeLoginModal");
+            const closeSignupModal = document.getElementById("closeSignupModal");
+            const closeSuccessModal = document.getElementById("closeSuccessModal");
 
-        // Open the login modal
-        if (loginBtn) {
-            loginBtn.onclick = (e) => {
-                e.preventDefault();
-                loginModal.style.display = "flex";
-            };
-        }
+            // Ensure modals are hidden on load
+            loginModal.style.display = "none";
+            signupModal.style.display = "none";
+            successModal.style.display = "none";
 
-        // Switch from login modal to signup modal
-        if (openSignupLink) {
-            openSignupLink.onclick = (e) => {
-                e.preventDefault();
-                signupModal.style.display = "flex";
-                loginModal.style.display = "none";
-            };
-        }
-
-        // Close modal actions
-        if (closeLoginModal) {
-            closeLoginModal.onclick = () => {
-                loginModal.style.display = "none";
-            };
-        }
-
-        if (closeSignupModal) {
-            closeSignupModal.onclick = () => {
-                signupModal.style.display = "none";
-            };
-        }
-
-        if (closeSuccessModal) {
-            closeSuccessModal.onclick = () => {
-                successModal.style.display = "none";
-            };
-        }
-
-        // Close modals when clicking outside
-        window.onclick = (event) => {
-            if (event.target === loginModal) {
-                loginModal.style.display = "none";
+            // Open the login modal
+            if (loginBtn) {
+                loginBtn.onclick = (e) => {
+                    e.preventDefault();
+                    loginModal.style.display = "flex";
+                };
             }
-            if (event.target === signupModal) {
-                signupModal.style.display = "none";
-            }
-            if (event.target === successModal) {
-                successModal.style.display = "none";
-            }
-        };
 
-        // Handle escape key to close modals
-        document.addEventListener('keydown', (event) => {
-            if (event.key === 'Escape') {
-                loginModal.style.display = "none";
-                signupModal.style.display = "none";
-                successModal.style.display = "none";
+            // Switch from login modal to signup modal
+            if (openSignupLink) {
+                openSignupLink.onclick = (e) => {
+                    e.preventDefault();
+                    signupModal.style.display = "flex";
+                    loginModal.style.display = "none";
+                };
             }
+
+            // Close modal actions
+            if (closeLoginModal) {
+                closeLoginModal.onclick = () => {
+                    loginModal.style.display = "none";
+                };
+            }
+
+            if (closeSignupModal) {
+                closeSignupModal.onclick = () => {
+                    signupModal.style.display = "none";
+                };
+            }
+
+            if (closeSuccessModal) {
+                closeSuccessModal.onclick = () => {
+                    successModal.style.display = "none";
+                };
+            }
+
+            // Close modals when clicking outside
+            window.onclick = (event) => {
+                if (event.target === loginModal) {
+                    loginModal.style.display = "none";
+                }
+                if (event.target === signupModal) {
+                    signupModal.style.display = "none";
+                }
+                if (event.target === successModal) {
+                    successModal.style.display = "none";
+                }
+            };
+
+            // Handle escape key to close modals
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape') {
+                    loginModal.style.display = "none";
+                    signupModal.style.display = "none";
+                    successModal.style.display = "none";
+                }
+            });
         });
     </script>
 </body>

@@ -26,7 +26,7 @@
     
         main {
             overflow-y: auto;
-            min-height: calc(100vh - 50px);
+            min-height: calc(100vh - 130px); /* 80px (header) + 50px (footer) */
             flex: 1;
         }
     
@@ -62,12 +62,13 @@
             justify-content: space-between;
             align-items: center;
             background-color: #2E7D32;
-            padding: 15px 20px;
+            padding: 10px 20px; /* Adjusted to ~80px total height */
             color: #FFFFFF;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             position: sticky;
             top: 0;
             z-index: 100;
+            min-height: 80px; /* Ensure consistent height */
         }
     
         header h1 {
@@ -89,8 +90,8 @@
         }
     
         .logo {
-            width: 80px;
-            height: 80px;
+            width: 60px; /* Adjusted to fit ~80px height */
+            height: 60px;
             margin-right: 10px;
             vertical-align: middle;
         }
@@ -360,8 +361,9 @@
             background-color: #2E7D32;
             color: #FFFFFF;
             text-align: center;
-            padding: 20px 0;
+            padding: 15px 0; /* Adjusted to ~50px total height */
             margin-top: auto;
+            min-height: 50px; /* Ensure consistent height */
         }
     
         /* Responsive Styles */
@@ -369,7 +371,8 @@
             header {
                 flex-direction: column;
                 align-items: flex-start;
-                padding: 10px 15px;
+                padding: 8px 15px; /* Adjusted to ~66px total height */
+                min-height: 66px;
             }
     
             header h1 {
@@ -406,6 +409,10 @@
             nav ul li a {
                 padding: 12px;
                 font-size: 1.1rem;
+            }
+    
+            main {
+                min-height: calc(100vh - 114px); /* 66px (header) + 48px (footer) */
             }
     
             .content {
@@ -478,7 +485,8 @@
     
             footer {
                 position: static;
-                padding: 15px 0;
+                padding: 15px 0; /* Adjusted to ~48px total height */
+                min-height: 48px;
             }
     
             .logo {
@@ -489,7 +497,8 @@
     
         @media only screen and (max-width: 480px) {
             header {
-                padding: 8px 10px;
+                padding: 6px 10px; /* Adjusted to ~52px total height */
+                min-height: 52px;
             }
     
             header h1 {
@@ -517,6 +526,10 @@
             nav ul li a {
                 font-size: 0.9rem;
                 padding: 10px;
+            }
+    
+            main {
+                min-height: calc(100vh - 88px); /* 52px (header) + 36px (footer) */
             }
     
             .content {
@@ -590,7 +603,8 @@
     
             footer {
                 font-size: 0.9rem;
-                padding: 10px 0;
+                padding: 10px 0; /* Adjusted to ~36px total height */
+                min-height: 36px;
             }
     
             .logo {
