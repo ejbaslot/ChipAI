@@ -252,7 +252,7 @@ def add_user():
 def logout():
     session.pop('user_id', None)
     flash('You have been logged out.', 'success')
-    return redirect(url_for('index'))
+    return redirect('/index.html')
 
 @app.route('/get_chili_info', methods=['GET'])
 def get_chili_info():
