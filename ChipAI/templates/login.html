@@ -9,609 +9,577 @@
     <!-- Add custom CSS for the chili theme -->
     <style>
         /* General Styles */
-        html, body {
-            margin: 0;
-            min-height: 100vh;
-        }
-    
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #FFFFFF;
-            color: #333333;
-            padding: 0;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-        }
-    
-        main {
-            overflow-y: auto;
-            min-height: calc(100vh - 130px); /* 80px (header) + 50px (footer) */
-            flex: 1;
-        }
-    
-        h1, h2, h3 {
-            color: #2E7D32;
-            text-align: center;
-        }
-    
-        h1 {
-            font-size: 2.5rem;
-            margin: 0;
-        }
-    
-        h2 {
-            font-size: 1.75rem;
-        }
-    
-        h3 {
-            font-size: 1.5rem;
-        }
-    
-        /* Content */
-        .content {
-            padding: 40px 20px;
-            text-align: center;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-    
-        /* Header */
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: #2E7D32;
-            padding: 10px 20px; /* Adjusted to ~80px total height */
-            color: #FFFFFF;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            min-height: 80px; /* Ensure consistent height */
-        }
-    
-        header h1 {
-            margin: 0;
-            font-size: 2.5rem;
-            color: #FFFFFF;
-        }
-    
-        .header-left {
-            display: flex;
-            align-items: center;
-            flex: 1;
-        }
-    
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-    
-        .logo {
-            width: 60px; /* Adjusted to fit ~80px height */
-            height: 60px;
-            margin-right: 10px;
-            vertical-align: middle;
-        }
-    
-        /* Burger Menu */
-        #checkbox {
-            display: none;
-        }
-    
-        .toggle {
-            width: 40px;
-            height: 40px;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 5px;
-            transition: transform 0.3s ease;
-        }
-    
-        .bars {
-            width: 100%;
-            height: 4px;
-            background-color: #FFFFFF;
-            border-radius: 2px;
-            transition: transform 0.3s ease, opacity 0.3s ease;
-        }
-    
-        #checkbox:checked + .toggle #bar1 {
-            transform: translateY(12px) rotate(45deg);
-        }
-    
-        #checkbox:checked + .toggle #bar2 {
-            opacity: 0;
-        }
-    
-        #checkbox:checked + .toggle #bar3 {
-            transform: translateY(-12px) rotate(-45deg);
-        }
-    
-        nav ul {
-            list-style: none;
-            display: none;
-            flex-direction: column;
-            gap: 10px;
-            position: absolute;
-            top: 70px;
-            right: 20px;
-            background-color: #2E7D32;
-            padding: 15px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px #26802b;
-            z-index: 100;
-            width: 200px;
-        }
-    
-        nav ul li a {
-            color: #FFFFFF;
-            text-decoration: none;
-            padding: 10px;
-            border-radius: 5px;
-            display: block;
-            transition: background 0.2s;
-            font-size: 1rem;
-        }
-    
-        nav ul li a:hover {
-            background-color: #197e1e;
-        }
-    
-        #checkbox:checked ~ nav ul {
-            display: flex;
-        }
-    
-        /* Sections */
-        section {
-            padding: 40px 20px;
-            margin: 0 auto;
-            max-width: 1200px;
-            min-height: auto;
-        }
-    
-        .library-section {
-            text-align: center;
-            padding: 60px 20px;
-            min-height: auto;
-        }
-    
-        .variety-cards {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 30px;
-            margin-top: 40px;
-        }
-    
-        /* Cards */
-        .card {
-            position: relative;
-            width: 280px;
-            height: 350px;
-            background: linear-gradient(to top, #ff930f, #ffcc33);
-            border-radius: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            transition: all 0.6s cubic-bezier(0.23, 1, 0.320, 1);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-        }
-    
-        .card img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 15px;
-            transition: all 0.6s cubic-bezier(0.23, 1, 0.320, 1);
-        }
-    
-        .card:hover {
-            transform: rotate(-3deg) scale(1.05);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
-        }
-    
-        .card__content {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) rotate(-45deg);
-            width: 100%;
-            height: 100%;
-            padding: 20px;
-            box-sizing: border-box;
-            background-color: #FFFFFF;
-            opacity: 0;
-            transition: all 0.6s cubic-bezier(0.23, 1, 0.320, 1);
-            border-radius: 15px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-    
-        .card:hover .card__content {
-            transform: translate(-50%, -50%) rotate(0deg);
-            opacity: 1;
-        }
-    
-        .card__title {
-            margin: 0 0 10px 0;
-            font-size: 22px;
-            color: #2E7D32;
-            font-weight: 700;
-        }
-    
-        .card__description {
-            margin: 0;
-            font-size: 14px;
-            color: #333333;
-            line-height: 1.5;
-        }
-    
-        /* Trivia Section */
-        .trivia-section {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 60px 20px;
-            min-height: auto;
-        }
-    
-        .card-trivia {
-            width: 90%;
-            max-width: 400px;
-            min-height: 250px;
-            padding: 1rem;
-            background: linear-gradient(to top, #ff930f, #ffcc33);
-            border-radius: 15px;
-            box-shadow: 0 0 10px #ffcc33;
-            transition: 0.4s;
-            overflow: hidden;
-            color: #333333;
-            display: flex;
-            flex-direction: column;
-            transform: skewX(5deg);
-        }
-    
-        .card-trivia:hover {
-            transform: skew(0deg);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-        }
-    
-        .align-trivia {
-            padding: 0.5rem;
-            display: flex;
-            flex-direction: row;
-            gap: 5px;
-            align-self: flex-start;
-        }
-    
-        .red-trivia, .yellow-trivia, .green-trivia {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            box-shadow: -2px 2px 4px rgba(0, 0, 0, 0.3);
-        }
-    
-        .red-trivia { background-color: #ff930f; }
-        .yellow-trivia { background-color: #ffcc33; }
-        .green-trivia { background-color: #2E7D32; }
-    
-        .card-trivia h1 {
-            text-align: center;
-            margin: 1rem 0;
-            color: #333333;
-            font-size: 1.8rem;
-        }
-    
-        .card-trivia p {
-            padding: 1rem;
-            font-size: 1rem;
-            line-height: 1.5;
-            text-align: center;
-            flex-grow: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-    
-        /* Content Card */
-        .content-card {
-            background-color: #FFFFFF;
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-            margin: 30px auto;
-            max-width: 800px;
-            border: 1px solid #f5f5f5;
-        }
-    
-        /* Buttons */
-        .btn {
-            background-color: #2E7D32;
-            color: #FFFFFF;
-            padding: 12px 24px;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-            transition: background 0.3s, transform 0.3s;
-            margin: 15px 0;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-size: 1rem;
-        }
-    
-        .btn:hover {
-            background-color: #197e1e;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        }
-    
-        /* Footer */
-        footer {
-            width: 100%;
-            background-color: #2E7D32;
-            color: #FFFFFF;
-            text-align: center;
-            padding: 15px 0; /* Adjusted to ~50px total height */
-            margin-top: auto;
-            min-height: 50px; /* Ensure consistent height */
-        }
-    
-        /* Responsive Styles */
-        @media only screen and (max-width: 768px) {
-            header {
-                flex-direction: column;
-                align-items: flex-start;
-                padding: 8px 15px; /* Adjusted to ~66px total height */
-                min-height: 66px;
-            }
-    
-            header h1 {
-                font-size: 1.8rem;
-            }
-    
-            .header-left {
-                flex: 1;
-                justify-content: space-between;
-            }
-    
-            .header-right {
-                width: 100%;
-                justify-content: flex-end;
-            }
-    
-            .toggle {
-                align-self: flex-end;
-                margin-top: 10px;
-                top: 15px;
-                right: 15px;
-            }
-    
-            nav ul {
-                top: 100px;
-                width: 100%;
-                right: 0;
-                left: 0;
-                border-radius: 0;
-                padding: 15px;
-                box-shadow: none;
-            }
-    
-            nav ul li a {
-                padding: 12px;
-                font-size: 1.1rem;
-            }
-    
-            main {
-                min-height: calc(100vh - 114px); /* 66px (header) + 48px (footer) */
-            }
-    
-            .content {
-                padding: 20px 10px;
-                margin: 10px auto;
-            }
-    
-            .content-card {
-                width: 90%;
-                max-width: 600px;
-                padding: 20px;
-                margin: 20px auto;
-            }
-    
-            section {
-                padding: 30px 15px;
-            }
-    
-            .library-section {
-                padding: 30px 15px;
-            }
-    
-            .variety-cards {
-                gap: 20px;
-            }
-    
-            .card {
-                width: 90%;
-                max-width: 300px;
-                height: 300px;
-            }
-    
-            .card__title {
-                font-size: 18px;
-            }
-    
-            .card__description {
-                font-size: 12px;
-            }
-    
-            .trivia-section {
-                padding: 30px 15px;
-            }
-    
-            .card-trivia {
-                width: 90%;
-                max-width: 350px;
-                min-height: 200px;
-                padding: 0.8rem;
-                transform: none;
-            }
-    
-            .card-trivia h1 {
-                font-size: 1.4rem;
-            }
-    
-            .card-trivia p {
-                font-size: 0.9rem;
-            }
-    
-            .red-trivia, .yellow-trivia, .green-trivia {
-                width: 8px;
-                height: 8px;
-            }
-    
-            .btn {
-                padding: 10px 20px;
-                font-size: 0.9rem;
-            }
-    
-            footer {
-                position: static;
-                padding: 15px 0; /* Adjusted to ~48px total height */
-                min-height: 48px;
-            }
-    
-            .logo {
-                width: 50px;
-                height: 50px;
-            }
-        }
-    
-        @media only screen and (max-width: 480px) {
-            header {
-                padding: 6px 10px; /* Adjusted to ~52px total height */
-                min-height: 52px;
-            }
-    
-            header h1 {
-                font-size: 1.5rem;
-            }
-    
-            .toggle {
-                width: 35px;
-                height: 35px;
-                gap: 6px;
-                top: 12px;
-                right: 12px;
-            }
-    
-            .bars {
-                height: 3px;
-            }
-    
-            nav ul {
-                top: 80px;
-                padding: 10px;
-                width: 100%;
-            }
-    
-            nav ul li a {
-                font-size: 0.9rem;
-                padding: 10px;
-            }
-    
-            main {
-                min-height: calc(100vh - 88px); /* 52px (header) + 36px (footer) */
-            }
-    
-            .content {
-                padding: 10px 5px;
-                margin: 5px auto;
-            }
-    
-            .content-card {
-                width: 95%;
-                max-width: 500px;
-                padding: 15px;
-                margin: 15px auto;
-            }
-    
-            section {
-                padding: 20px 10px;
-            }
-    
-            .library-section {
-                padding: 20px 10px;
-            }
-    
-            .variety-cards {
-                gap: 15px;
-            }
-    
-            .card {
-                width: 100%;
-                max-width: 250px;
-                height: 250px;
-            }
-    
-            .card__title {
-                font-size: 16px;
-            }
-    
-            .card__description {
-                font-size: 10px;
-            }
-    
-            .trivia-section {
-                padding: 20px 10px;
-            }
-    
-            .card-trivia {
-                width: 95%;
-                max-width: 300px;
-                min-height: 180px;
-                padding: 0.6rem;
-            }
-    
-            .card-trivia h1 {
-                font-size: 1.2rem;
-                margin: 0.8rem 0;
-            }
-    
-            .card-trivia p {
-                font-size: 0.8rem;
-                padding: 0.8rem;
-            }
-    
-            .red-trivia, .yellow-trivia, .green-trivia {
-                width: 6px;
-                height: 6px;
-            }
-    
-            .btn {
-                padding: 8px 16px;
-                font-size: 0.8rem;
-            }
-    
-            footer {
-                font-size: 0.9rem;
-                padding: 10px 0; /* Adjusted to ~36px total height */
-                min-height: 36px;
-            }
-    
-            .logo {
-                width: 40px;
-                height: 40px;
-            }
-        }
+html, body {
+    margin: 0;
+    min-height: 100vh;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #FFFFFF;
+    color: #333333;
+    padding: 0;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    overflow-y: auto;
+    min-height: calc(100vh - 130px);
+    flex: 1;
+}
+
+h1, h2, h3 {
+    color: #2E7D32;
+    text-align: center;
+}
+
+h1 {
+    font-size: clamp(2rem, 5vw, 2.5rem);
+    margin: 0;
+}
+
+h2 {
+    font-size: clamp(1.5rem, 4vw, 1.75rem);
+}
+
+h3 {
+    font-size: clamp(1.2rem, 3.5vw, 1.5rem);
+}
+
+/* Content */
+.content {
+    padding: clamp(20px, 5vw, 40px) clamp(10px, 3vw, 20px);
+    text-align: center;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Header */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #2E7D32;
+    padding: clamp(10px, 2vw, 20px);
+    color: #FFFFFF;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    min-height: clamp(60px, 8vw, 80px);
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    flex: 1;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: clamp(5px, 1.5vw, 10px);
+}
+
+.logo {
+    width: clamp(40px, 6vw, 60px);
+    height: clamp(40px, 6vw, 60px);
+    margin-right: clamp(5px, 1.5vw, 10px);
+    vertical-align: middle;
+}
+
+/* Burger Menu */
+#checkbox {
+    display: none;
+}
+
+.toggle {
+    width: clamp(30px, 5vw, 40px);
+    height: clamp(30px, 5vw, 40px);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(4px, 1vw, 8px);
+    padding: clamp(3px, 1vw, 5px);
+    transition: transform 0.3s ease;
+}
+
+.bars {
+    width: 100%;
+    height: clamp(2px, 0.5vw, 4px);
+    background-color: #FFFFFF;
+    border-radius: 2px;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+#checkbox:checked + .toggle #bar1 {
+    transform: translateY(clamp(8px, 2vw, 12px)) rotate(45deg);
+}
+
+#checkbox:checked + .toggle #bar2 {
+    opacity: 0;
+}
+
+#checkbox:checked + .toggle #bar3 {
+    transform: translateY(clamp(-8px, -2vw, -12px)) rotate(-45deg);
+}
+
+nav ul {
+    list-style: none;
+    display: none;
+    flex-direction: column;
+    gap: clamp(5px, 1.5vw, 10px);
+    position: absolute;
+    top: clamp(60px, 8vw, 80px);
+    right: clamp(10px, 2vw, 20px);
+    background-color: #2E7D32;
+    padding: clamp(8px, 2vw, 15px);
+    border-radius: 5px;
+    box-shadow: 0 0 10px #26802b;
+    z-index: 100;
+    width: clamp(150px, 25vw, 200px);
+}
+
+nav ul li a {
+    color: #FFFFFF;
+    text-decoration: none;
+    padding: clamp(8px, 2vw, 10px);
+    border-radius: 3px;
+    display: block;
+    transition: background 0.2s;
+    font-size: clamp(0.9rem, 2vw, 1rem);
+}
+
+nav ul li a:hover {
+    background-color: #197e1e;
+}
+
+#checkbox:checked ~ nav ul {
+    display: flex;
+}
+
+/* Sections */
+section {
+    padding: clamp(20px, 5vw, 40px) clamp(10px, 3vw, 20px);
+    margin: 0 auto;
+    max-width: 1200px;
+    min-height: auto;
+}
+
+.library-section {
+    text-align: center;
+    padding: clamp(30px, 7.5vw, 60px) clamp(10px, 3vw, 20px);
+    min-height: auto;
+}
+
+.variety-cards {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: clamp(15px, 3vw, 30px);
+    margin-top: clamp(20px, 5vw, 40px);
+}
+
+/* Cards */
+.card {
+    position: relative;
+    width: clamp(200px, 25vw, 280px);
+    height: clamp(250px, 35vw, 350px);
+    background: linear-gradient(to top, #ff930f, #ffcc33);
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    transition: all 0.6s cubic-bezier(0.23, 1, 0.320, 1);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+.card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 15px;
+    transition: all 0.6s cubic-bezier(0.23, 1, 0.320, 1);
+}
+
+.card:hover {
+    transform: rotate(-3deg) scale(1.05);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+}
+
+.card__content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-45deg);
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+    background-color: #FFFFFF;
+    opacity: 0;
+    transition: all 0.6s cubic-bezier(0.23, 1, 0.320, 1);
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.card:hover .card__content {
+    transform: translate(-50%, -50%) rotate(0deg);
+    opacity: 1;
+}
+
+.card__title {
+    margin: 0 0 10px 0;
+    font-size: clamp(16px, 3vw, 22px);
+    color: #2E7D32;
+    font-weight: 700;
+}
+
+.card__description {
+    margin: 0;
+    font-size: clamp(10px, 2vw, 14px);
+    color: #333333;
+    line-height: 1.5;
+}
+
+/* Trivia Section */
+.trivia-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: clamp(30px, 7.5vw, 60px) clamp(10px, 3vw, 20px);
+    min-height: auto;
+}
+
+.card-trivia {
+    width: clamp(80%, 20vw, 90%);
+    max-width: clamp(300px, 50vw, 400px);
+    min-height: clamp(180px, 25vw, 250px);
+    padding: clamp(0.5rem, 1vw, 1rem);
+    background: linear-gradient(to top, #ff930f, #ffcc33);
+    border-radius: 15px;
+    box-shadow: 0 0 10px #ffcc33;
+    transition: 0.4s;
+    overflow: hidden;
+    color: #333333;
+    display: flex;
+    flex-direction: column;
+    transform: skewX(5deg);
+}
+
+.card-trivia:hover {
+    transform: skew(0deg);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+.align-trivia {
+    padding: clamp(0.3rem, 0.8vw, 0.5rem);
+    display: flex;
+    flex-direction: row;
+    gap: clamp(3px, 1vw, 5px);
+    align-self: flex-start;
+}
+
+.red-trivia, .yellow-trivia, .green-trivia {
+    width: clamp(6px, 1.5vw, 12px);
+    height: clamp(6px, 1.5vw, 12px);
+    border-radius: 50%;
+    box-shadow: -2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.red-trivia { background-color: #ff930f; }
+.yellow-trivia { background-color: #ffcc33; }
+.green-trivia { background-color: #2E7D32; }
+
+.card-trivia h1 {
+    text-align: center;
+    margin: clamp(0.5rem, 1.5vw, 1rem) 0;
+    color: #333333;
+    font-size: clamp(1.2rem, 3vw, 1.8rem);
+}
+
+.card-trivia p {
+    padding: clamp(0.5rem, 1.5vw, 1rem);
+    font-size: clamp(0.8rem, 2vw, 1rem);
+    line-height: 1.5;
+    text-align: center;
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Content Card */
+.content-card {
+    background-color: #FFFFFF;
+    border-radius: 15px;
+    padding: clamp(15px, 4vw, 30px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    margin: clamp(15px, 4vw, 30px) auto;
+    max-width: 800px;
+    border: 1px solid #f5f5f5;
+}
+
+/* Buttons */
+.btn {
+    background-color: #2E7D32;
+    color: #FFFFFF;
+    padding: clamp(8px, 2vw, 12px) clamp(16px, 4vw, 24px);
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background 0.3s, transform 0.3s;
+    margin: clamp(10px, 2.5vw, 15px) 0;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: clamp(0.8rem, 2vw, 1rem);
+}
+
+.btn:hover {
+    background-color: #197e1e;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Footer */
+footer {
+    width: 100%;
+    background-color: #2E7D32;
+    color: #FFFFFF;
+    text-align: center;
+    padding: clamp(10px, 3vw, 15px);
+    margin-top: auto;
+    min-height: clamp(40px, 5vw, 50px);
+}
+
+/* Responsive Styles */
+@media only screen and (max-width: 768px) {
+    header {
+        flex-direction: row;
+        align-items: center;
+        padding: clamp(8px, 2vw, 10px);
+        min-height: clamp(50px, 6vw, 66px);
+    }
+
+    .header-left {
+        flex: 1;
+        justify-content: flex-start;
+        align-items: center;
+    }
+
+    .header-right {
+        flex: 0;
+    }
+
+    .logo {
+        width: clamp(30px, 5vw, 50px);
+        height: clamp(30px, 5vw, 50px);
+    }
+
+    .toggle {
+        width: clamp(25px, 4vw, 35px);
+        height: clamp(25px, 4vw, 35px);
+        gap: clamp(3px, 1vw, 6px);
+    }
+
+    .bars {
+        height: clamp(2px, 0.5vw, 3px);
+    }
+
+    nav ul {
+        top: 100%;
+        width: 100%;
+        right: 0;
+        left: 0;
+        border-radius: 0;
+        padding: clamp(10px, 2vw, 15px);
+    }
+
+    nav ul li a {
+        padding: clamp(8px, 2vw, 12px);
+        font-size: clamp(0.8rem, 2vw, 1.1rem);
+    }
+
+    main {
+        min-height: calc(100vh - 114px);
+    }
+
+    .content {
+        padding: clamp(15px, 3.5vw, 20px) clamp(5px, 2vw, 10px);
+    }
+
+    .content-card {
+        width: 90%;
+        max-width: 600px;
+        padding: clamp(15px, 3.5vw, 20px);
+    }
+
+    section {
+        padding: clamp(20px, 5vw, 30px) clamp(10px, 2.5vw, 15px);
+    }
+
+    .library-section {
+        padding: clamp(20px, 5vw, 30px) clamp(10px, 2.5vw, 15px);
+    }
+
+    .variety-cards {
+        gap: clamp(15px, 3vw, 20px);
+    }
+
+    .card {
+        width: clamp(80%, 20vw, 90%);
+        max-width: clamp(250px, 35vw, 300px);
+    }
+
+    .card__title {
+        font-size: clamp(14px, 2.5vw, 18px);
+    }
+
+    .card__description {
+        font-size: clamp(10px, 1.8vw, 12px);
+    }
+
+    .trivia-section {
+        padding: clamp(20px, 5vw, 30px) clamp(10px, 2.5vw, 15px);
+    }
+
+    .card-trivia {
+        width: clamp(85%, 20vw, 90%);
+        max-width: clamp(300px, 45vw, 350px);
+    }
+
+    .card-trivia h1 {
+        font-size: clamp(1.2rem, 2.5vw, 1.4rem);
+    }
+
+    .card-trivia p {
+        font-size: clamp(0.8rem, 1.8vw, 0.9rem);
+    }
+
+    .red-trivia, .yellow-trivia, .green-trivia {
+        width: clamp(6px, 1.2vw, 8px);
+        height: clamp(6px, 1.2vw, 8px);
+    }
+
+    .btn {
+        padding: clamp(8px, 2vw, 10px) clamp(15px, 3.5vw, 20px);
+    }
+
+    footer {
+        padding: clamp(10px, 2.5vw, 15px);
+        min-height: clamp(40px, 5vw, 48px);
+    }
+}
+
+@media only screen and (max-width: 480px) {
+    header {
+        padding: clamp(6px, 1.5vw, 8px);
+        min-height: clamp(40px, 5vw, 52px);
+    }
+
+    .logo {
+        width: clamp(25px, 4vw, 40px);
+        height: clamp(25px, 4vw, 40px);
+    }
+
+    .toggle {
+        width: clamp(20px, 3.5vw, 35px);
+        height: clamp(20px, 3.5vw, 35px);
+        gap: clamp(2px, 0.8vw, 6px);
+    }
+
+    .bars {
+        height: clamp(1.5px, 0.4vw, 3px);
+    }
+
+    nav ul {
+        padding: clamp(8px, 1.5vw, 10px);
+    }
+
+    nav ul li a {
+        font-size: clamp(0.7rem, 1.8vw, 0.9rem);
+        padding: clamp(6px, 1.5vw, 10px);
+    }
+
+    main {
+        min-height: calc(100vh - 88px);
+    }
+
+    .content {
+        padding: clamp(5px, 1.5vw, 10px) clamp(5px, 1.5vw, 5px);
+    }
+
+    .content-card {
+        width: 95%;
+        max-width: 500px;
+        padding: clamp(10px, 2.5vw, 15px);
+    }
+
+    section {
+        padding: clamp(15px, 3.5vw, 20px) clamp(5px, 1.5vw, 10px);
+    }
+
+    .library-section {
+        padding: clamp(15px, 3.5vw, 20px) clamp(5px, 1.5vw, 10px);
+    }
+
+    .variety-cards {
+        gap: clamp(10px, 2.5vw, 15px);
+    }
+
+    .card {
+        width: 100%;
+        max-width: clamp(200px, 30vw, 250px);
+    }
+
+    .card__title {
+        font-size: clamp(12px, 2vw, 16px);
+    }
+
+    .card__description {
+        font-size: clamp(8px, 1.5vw, 10px);
+    }
+
+    .trivia-section {
+        padding: clamp(15px, 3.5vw, 20px) clamp(5px, 1.5vw, 10px);
+    }
+
+    .card-trivia {
+        width: 95%;
+        max-width: clamp(250px, 40vw, 300px);
+    }
+
+    .card-trivia h1 {
+        font-size: clamp(1rem, 2vw, 1.2rem);
+    }
+
+    .card-trivia p {
+        font-size: clamp(0.7rem, 1.5vw, 0.8rem);
+    }
+
+    .red-trivia, .yellow-trivia, .green-trivia {
+        width: clamp(5px, 1vw, 6px);
+        height: clamp(5px, 1vw, 6px);
+    }
+
+    .btn {
+        padding: clamp(6px, 1.5vw, 8px) clamp(12px, 2.5vw, 16px);
+    }
+
+    footer {
+        font-size: clamp(0.8rem, 2vw, 0.9rem);
+        padding: clamp(8px, 2vw, 10px);
+        min-height: clamp(30px, 4vw, 36px);
+    }
+}
     </style>
 </head>
 <body>
