@@ -591,10 +591,13 @@
                         const result = await response.json();
 
                         if (response.ok && result.success) {
-                            modalMessage.textContent = result.message || "Signup successful! Please log in.";
+                            // Show success message briefly, then redirect to /login
+                            modalMessage.textContent = result.message || "Signup successful! Redirecting to login...";
                             successModal.style.display = "flex";
                             signupModal.style.display = "none";
-                            loginModal.style.display = "flex";
+                            setTimeout(() => {
+                                window.location.href = '/login'; // Redirect to login page after 2 seconds
+                            }, 2000);
                         } else {
                             modalMessage.textContent = result.message || "Signup failed.";
                             successModal.style.display = "flex";
