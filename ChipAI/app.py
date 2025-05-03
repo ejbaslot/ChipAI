@@ -168,9 +168,6 @@ def login():
         finally:
             conn.close()
 
-    # For GET requests, check if user is logged in
-    if 'user_id' in session:
-        return render_template('login.html')  # Render dashboard
     return redirect(url_for('index'))  # Redirect to login page if not logged in
 
 @app.route('/upload', methods=['POST'])
