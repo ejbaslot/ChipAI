@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ChipAI - Login</title>
+    <title>ChipAI - Dashboard</title>
     
     <!-- Add custom CSS for the chili theme -->
     <style>
@@ -633,22 +633,21 @@
             <li><a href="{{ url_for('ai_model') }}" id="AIModel">AI Model</a></li>
             <li><a href="#library">Library</a></li>
             <li><a href="#trivia">Trivia</a></li>
-            <li><a href="https://chipai.onrender.com/#"logoutLink">Logout</a></li>
+            <li><a href="{{ url_for('logout') }}" id="logoutLink">Logout</a></li>
         </ul>
     </nav>
 </header>
 
-    <div class="content">
-        <h1>Welcome to ChipAI System</h1>
-        <h2>Know Your Chili: The Smart Way to Spice!</h2>
-        <p>
-            The ChipAI System helps you identify different chili pepper varieties using AI technology. 
-            Whether you're a farmer or a cooking enthusiast, discover the unique features and uses of chilies 
-            to enhance your knowledge about chili!
-        </p>
-    </div>
+<div class="content">
+    <h1>Welcome to ChipAI System</h1>
+    <h2>Know Your Chili: The Smart Way to Spice!</h2>
+    <p>
+        The ChipAI System helps you identify different chili pepper varieties using AI technology. 
+        Whether you're a farmer or a cooking enthusiast, discover the unique features and uses of chilies 
+        to enhance your knowledge about chili!
+    </p>
+</div>
 
-    
 <!-- Updated Library Section -->
 <div class="library-section" id="library">
     <h2>Chili Varieties</h2>
@@ -724,10 +723,10 @@ document.addEventListener("DOMContentLoaded", function () {
     </script>
 </div>
 
-    <!-- Footer -->
-    <footer>
-        <p>© 2024 ChipAI. All rights reserved.</p>
-    </footer>
+<!-- Footer -->
+<footer>
+    <p>© 2024 ChipAI. All rights reserved.</p>
+</footer>
 
 </body>
 </html>

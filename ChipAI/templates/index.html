@@ -546,7 +546,8 @@
                         const result = await response.json();
 
                         if (response.ok && result.success) {
-                            window.location.href = '/'; // Redirect to index on successful login
+                            loginModal.style.display = "none";
+                            window.location.href = '/login'; // Redirect to dashboard
                         } else {
                             modalMessage.textContent = result.message || "Login failed.";
                             successModal.style.display = "flex";
@@ -589,15 +590,36 @@
                         });
 
                         const result = await response.json();
+                        console.log('Signup response:', result);
 
                         if (response.ok && result.success) {
-                            // Show success message briefly, then redirect to /login
-                            modalMessage.textContent = result.message || "Signup successful! Redirecting to login...";
+                            // Show success message and redirect to login page
+                            modalMessage.textContent = "Signup successful! Please log in to continue.";
                             successModal.style.display = "flex";
                             signupModal.style.display = "none";
-                            setTimeout(() => {
-                                window.location.href = '/login'; // Redirect to login page after 2 seconds
-                            }, 2000);
+
+                            // Perform login automatically after signup
+                            const loginResponse = await fetch('/login', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({ username, password }),
+                            });
+
+                            const loginResult = await loginResponse.json();
+                            console.log('Auto-login response:', loginResult);
+
+                            if (loginResponse.ok && loginResult.success) {
+                                setTimeout(() => {
+                                    console.log('Redirecting to /login');
+                                    successModal.style.display = "none";
+                                    window.location.replace('/login'); // Redirect to dashboard
+                                }, 2000);
+                            } else {
+                                modalMessage.textContent = "Signup successful, but auto-login failed. Please log in manually.";
+                                successModal.style.display = "flex";
+                            }
                         } else {
                             modalMessage.textContent = result.message || "Signup failed.";
                             successModal.style.display = "flex";
@@ -605,6 +627,7 @@
                     } catch (error) {
                         modalMessage.textContent = "An error occurred. Please try again.";
                         successModal.style.display = "flex";
+                        console.error('Signup error:', error);
                     }
                 };
             }

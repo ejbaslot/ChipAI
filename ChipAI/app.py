@@ -120,7 +120,12 @@ def signup():
 
             if "success" in signup_status.lower():
                 conn.commit()
-                return jsonify({'success': True, 'message': signup_status}), 200
+                # Set session to log the user in
+                cursor.execute("SELECT * FROM sp_login(%s, %s)", (username, password))
+                login_result = cursor.fetchone()
+                if login_result and login_result[0]:  # p_user_id exists
+                    session['user_id'] = login_result[0]
+                return jsonify({'success': True, 'message': signup_status.lower()}), 200
             else:
                 return jsonify({'success': False, 'message': signup_status}), 400
         except Exception as e:
@@ -128,7 +133,7 @@ def signup():
         finally:
             conn.close()
 
-    return render_template('login.html')
+    return redirect(url_for('index'))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -155,7 +160,7 @@ def login():
 
             if p_status == 'User found' and p_user_id is not None:
                 session['user_id'] = p_user_id
-                return jsonify({'success': True, 'message': 'Login successful!'}), 200
+                return jsonify({'success': True, 'message': 'login successful'}), 200
             else:
                 return jsonify({'success': False, 'message': p_status}), 401
         except Exception as e:
@@ -163,7 +168,10 @@ def login():
         finally:
             conn.close()
 
-    return render_template('login.html')
+    # For GET requests, check if user is logged in
+    if 'user_id' in session:
+        return render_template('login.html')  # Render dashboard
+    return redirect(url_for('index'))  # Redirect to login page if not logged in
 
 @app.route('/upload', methods=['POST'])
 def upload_image():
@@ -213,10 +221,14 @@ def upload_image():
 @app.route('/')
 def index():
     user_id = session.get('user_id')
+    if user_id:
+        return redirect(url_for('login'))  # Redirect to dashboard if logged in
     return render_template('index.html', user_id=user_id)
 
 @app.route('/ai')
 def ai_model():
+    if 'user_id' not in session:
+        return redirect(url_for('index'))
     return render_template('AI.html')
 
 @app.route('/about')
@@ -225,6 +237,8 @@ def about():
 
 @app.route('/FAQs')
 def faqs():
+    if 'user_id' not in session:
+        return redirect(url_for('index'))
     return render_template('faqs.html')
 
 @app.route('/add_user', methods=['POST'])
@@ -238,7 +252,7 @@ def add_user():
 def logout():
     session.pop('user_id', None)
     flash('You have been logged out.', 'success')
-    return redirect(url_for('login'))
+    return redirect(url_for('index'))
 
 @app.route('/get_chili_info', methods=['GET'])
 def get_chili_info():
