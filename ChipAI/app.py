@@ -51,9 +51,9 @@ def get_db_connection():
 IMAGE_MAPPING = {
     "Siling Labuyo": "siling_labuyo.jpg",
     "Siling Atsal": "bell_pepper.jpg",
-    "Siling Espada": "siling_haba.jpg",
-    "Siling Demonyo": "siling_demonyo.jpg",
-    "Siling Habanero": "siling_habanero.jpg"
+    "Siling Espada": "siling_haba.jpg", 
+    "Habanero": "siling_habanero.jpg",
+    "Scotch Bonnet": "scotch_bonnet.jpg"
 }
 
 # Image preprocessing function
@@ -79,7 +79,7 @@ def predict_chili_variety(image_stream):
         interpreter.invoke()
         output_data = interpreter.get_tensor(output_details[0]['index'])
         logger.info("Prediction raw output (TFLite): %s", output_data)
-        class_labels = ["Siling Atsal", "Siling Labuyo", "Siling Espada", "Siling Demonyo", "Siling Habanero"]
+        class_labels = ["Siling Atsal", "Siling Labuyo", "Siling Espada", "Habanero", "Scotch Bonnet"]
         predicted_prob = np.max(output_data)
         predicted_label = class_labels[np.argmax(output_data)]
         if predicted_prob < 0.50:
