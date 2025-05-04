@@ -7,321 +7,321 @@
     <title>ChipAI - About</title>
 
     <style>
-    /* General Styles */
-        html, body {
-            margin: 0;
-            min-height: 100vh;
-        }
-        
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #FFFFFF;
-            color: #333333;
-            padding: 0;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        main {
-            overflow-y: auto;
-            min-height: calc(100vh - 130px);
-            flex: 1;
-        }
-        
-        h2, h3 {
-            color: #2E7D32;
-            text-align: center;
-        }
-        
-        h1 {
-            font-size: clamp(2rem, 5vw, 2.5rem);
-            margin: 0;
-            color: #FFFFFF;
-        }
-        
-        h2 {
-            font-size: clamp(1.5rem, 4vw, 1.75rem);
-        }
-        
-        h3 {
-            font-size: clamp(1.2rem, 3.5vw, 1.5rem);
-        }
-        
-        /* Content */
-        .content {
-            padding: clamp(20px, 5vw, 40px) clamp(10px, 3vw, 20px);
-            text-align: center;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        
-        /* Header */
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: #2E7D32;
-            padding: clamp(10px, 2vw, 20px);
-            color: #FFFFFF;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            min-height: clamp(60px, 8vw, 80px);
-        }
-        
-        .header-left {
-            display: flex;
-            align-items: center;
-            flex: 1;
-        }
-        
-        .logo {
-            width: clamp(40px, 6vw, 60px);
-            height: clamp(40px, 6vw, 60px);
-            margin-right: clamp(5px, 1.5vw, 10px);
-            vertical-align: middle;
-        }
-        
-        /* Burger Menu */
-        #checkbox {
-            display: none;
-        }
-        
-        .toggle {
-            width: clamp(30px, 5vw, 40px);
-            height: clamp(30px, 5vw, 40px);
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: clamp(4px, 1vw, 8px);
-            padding: clamp(3px, 1vw, 5px);
-            transition: transform 0.3s ease;
-        }
-        
-        .bars {
-            width: 100%;
-            height: clamp(2px, 0.5vw, 4px);
-            background-color: #FFFFFF;
-            border-radius: 2px;
-            transition: transform 0.3s ease, opacity 0.3s ease;
-        }
-        
-        #checkbox:checked + .toggle #bar1 {
-            transform: translateY(clamp(8px, 2vw, 12px)) rotate(45deg);
-        }
-        
-        #checkbox:checked + .toggle #bar2 {
-            opacity: 0;
-        }
-        
-        #checkbox:checked + .toggle #bar3 {
-            transform: translateY(clamp(-8px, -2vw, -12px)) rotate(-45deg);
-        }
-        
-        nav ul {
-            list-style: none;
-            display: none;
-            flex-direction: column;
-            gap: clamp(5px, 1.5vw, 10px);
-            position: absolute;
-            top: clamp(60px, 8vw, 80px);
-            right: clamp(10px, 2vw, 20px);
-            background-color: #2E7D32;
-            padding: clamp(8px, 2vw, 15px);
-            border-radius: 5px;
-            box-shadow: 0 0 10px #26802b;
-            z-index: 100;
-            width: clamp(150px, 25vw, 200px);
-        }
-        
-        nav ul li a {
-            color: #FFFFFF;
-            text-decoration: none;
-            padding: clamp(8px, 2vw, 10px);
-            border-radius: 3px;
-            display: block;
-            transition: background 0.2s;
-            font-size: clamp(0.9rem, 2vw, 1rem);
-        }
-        
-        nav ul li a:hover {
-            background-color: #197e1e;
-        }
-        
-        #checkbox:checked ~ nav ul {
-            display: flex;
-        }
-        
-        /* Accordion */
-        .accordion {
-            background-color: #2E7D32;
-            color: #FFFFFF;
-            cursor: pointer;
-            padding: clamp(10px, 2.5vw, 15px);
-            width: 100%;
-            border: none;
-            text-align: left;
-            outline: none;
-            transition: background 0.3s;
-            margin-top: clamp(5px, 1.5vw, 10px);
-            font-size: clamp(0.9rem, 2vw, 1rem);
-            font-weight: 600;
-            border-radius: 5px;
-        }
-        
-        .accordion.active, .accordion:hover {
-            background-color: #197e1e;
-        }
-        
-        .panel {
-            padding: clamp(10px, 2.5vw, 15px);
-            display: none;
-            background-color: #FFFFFF;
-            border: 1px solid #f5f5f5;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            border-radius: 5px;
-            margin-bottom: clamp(5px, 1.5vw, 10px);
-        }
-        
-        .panel p {
-            margin: 0;
-            font-size: clamp(0.9rem, 2vw, 1rem);
-            color: #333333;
-            text-align: justify;
-        }
-        
-        /* Footer */
-        footer {
-            width: 100%;
-            background-color: #2E7D32;
-            color: #FFFFFF;
-            text-align: center;
-            padding: clamp(10px, 3vw, 15px);
-            margin-top: auto;
-            min-height: clamp(40px, 5vw, 50px);
-        }
-        
-        /* Responsive Styles */
-        @media only screen and (max-width: 768px) {
-            header {
-                flex-direction: row;
-                align-items: center;
-                padding: clamp(8px, 2vw, 10px);
-                min-height: clamp(50px, 6vw, 66px);
+        /* General Styles */
+            html, body {
+                margin: 0;
+                min-height: 100vh;
             }
-        
-            .header-left {
+            
+            body {
+                font-family: 'Poppins', sans-serif;
+                background-color: #FFFFFF;
+                color: #333333;
+                padding: 0;
+                position: relative;
+                display: flex;
+                flex-direction: column;
+            }
+            
+            main {
+                overflow-y: auto;
+                min-height: calc(100vh - 130px);
                 flex: 1;
-                justify-content: flex-start;
-                align-items: center;
             }
-        
-            .logo {
-                width: clamp(30px, 5vw, 50px);
-                height: clamp(30px, 5vw, 50px);
+            
+            h2, h3 {
+                color: #2E7D32;
+                text-align: center;
             }
-        
-            .toggle {
-                width: clamp(25px, 4vw, 35px);
-                height: clamp(25px, 4vw, 35px);
-                gap: clamp(3px, 1vw, 6px);
+            
+            h1 {
+                font-size: clamp(2rem, 5vw, 2.5rem);
+                margin: 0;
+                color: #FFFFFF;
             }
-        
-            .bars {
-                height: clamp(2px, 0.5vw, 3px);
+            
+            h2 {
+                font-size: clamp(1.5rem, 4vw, 1.75rem);
             }
-        
-            nav ul {
-                top: 100%;
-                width: 100%;
-                right: 0;
-                left: 0;
-                border-radius: 0;
-                padding: clamp(10px, 2vw, 15px);
+            
+            h3 {
+                font-size: clamp(1.2rem, 3.5vw, 1.5rem);
             }
-        
-            nav ul li a {
-                padding: clamp(8px, 2vw, 12px);
-                font-size: clamp(0.8rem, 2vw, 1.1rem);
-            }
-        
+            
+            /* Content */
             .content {
-                padding: clamp(15px, 3.5vw, 20px) clamp(5px, 2vw, 10px);
+                padding: clamp(20px, 5vw, 40px) clamp(10px, 3vw, 20px);
+                text-align: center;
+                max-width: 1200px;
+                margin: 0 auto;
             }
-        
-            .accordion {
-                font-size: clamp(0.8rem, 1.8vw, 0.9rem);
-            }
-        
-            .panel {
-                padding: clamp(10px, 2.5vw, 12px);
-            }
-        
-            .panel p {
-                font-size: clamp(0.8rem, 1.8vw, 0.9rem);
-            }
-        
-            footer {
-                padding: clamp(10px, 2.5vw, 15px);
-                min-height: clamp(40px, 5vw, 48px);
-            }
-        }
-        
-        @media only screen and (max-width: 480px) {
+            
+            /* Header */
             header {
-                padding: clamp(6px, 1.5vw, 8px);
-                min-height: clamp(40px, 5vw, 52px);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                background-color: #2E7D32;
+                padding: clamp(10px, 2vw, 20px);
+                color: #FFFFFF;
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+                position: sticky;
+                top: 0;
+                z-index: 100;
+                min-height: clamp(70px, 8vw, 90px); /* Increased min-height to accommodate larger logo */
             }
-        
+            
+            .header-left {
+                display: flex;
+                align-items: center;
+                flex: 1;
+            }
+            
             .logo {
-                width: clamp(25px, 4vw, 40px);
-                height: clamp(25px, 4vw, 40px);
+                width: clamp(60px, 8vw, 100px); /* Increased minimum and maximum sizes */
+                height: clamp(60px, 8vw, 100px); /* Increased minimum and maximum sizes */
+                margin-right: clamp(10px, 2vw, 15px); /* Adjusted margin for better spacing */
+                vertical-align: middle;
             }
-        
+            
+            /* Burger Menu */
+            #checkbox {
+                display: none;
+            }
+            
             .toggle {
-                width: clamp(20px, 3.5vw, 35px);
-                height: clamp(20px, 3.5vw, 35px);
-                gap: clamp(2px, 0.8vw, 6px);
+                width: clamp(30px, 5vw, 40px);
+                height: clamp(30px, 5vw, 40px);
+                cursor: pointer;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: clamp(4px, 1vw, 8px);
+                padding: clamp(3px, 1vw, 5px);
+                transition: transform 0.3s ease;
             }
-        
+            
             .bars {
-                height: clamp(1.5px, 0.4vw, 3px);
+                width: 100%;
+                height: clamp(2px, 0.5vw, 4px);
+                background-color: #FFFFFF;
+                border-radius: 2px;
+                transition: transform 0.3s ease, opacity 0.3s ease;
             }
-        
+            
+            #checkbox:checked + .toggle #bar1 {
+                transform: translateY(clamp(8px, 2vw, 12px)) rotate(45deg);
+            }
+            
+            #checkbox:checked + .toggle #bar2 {
+                opacity: 0;
+            }
+            
+            #checkbox:checked + .toggle #bar3 {
+                transform: translateY(clamp(-8px, -2vw, -12px)) rotate(-45deg);
+            }
+            
             nav ul {
-                padding: clamp(8px, 1.5vw, 10px);
+                list-style: none;
+                display: none;
+                flex-direction: column;
+                gap: clamp(5px, 1.5vw, 10px);
+                position: absolute;
+                top: clamp(70px, 8vw, 90px); /* Updated to match header min-height */
+                right: clamp(10px, 2vw, 20px);
+                background-color: #2E7D32;
+                padding: clamp(8px, 2vw, 15px);
+                border-radius: 5px;
+                box-shadow: 0 0 10px #26802b;
+                z-index: 100;
+                width: clamp(150px, 25vw, 200px);
             }
-        
+            
             nav ul li a {
-                font-size: clamp(0.7rem, 1.8vw, 0.9rem);
-                padding: clamp(6px, 1.5vw, 10px);
+                color: #FFFFFF;
+                text-decoration: none;
+                padding: clamp(8px, 2vw, 10px);
+                border-radius: 3px;
+                display: block;
+                transition: background 0.2s;
+                font-size: clamp(0.9rem, 2vw, 1rem);
             }
-        
-            .content {
-                padding: clamp(5px, 1.5vw, 10px) clamp(5px, 1.5vw, 5px);
+            
+            nav ul li a:hover {
+                background-color: #197e1e;
             }
-        
+            
+            #checkbox:checked ~ nav ul {
+                display: flex;
+            }
+            
+            /* Accordion */
             .accordion {
-                font-size: clamp(0.7rem, 1.5vw, 0.8rem);
+                background-color: #2E7D32;
+                color: #FFFFFF;
+                cursor: pointer;
+                padding: clamp(10px, 2.5vw, 15px);
+                width: 100%;
+                border: none;
+                text-align: left;
+                outline: none;
+                transition: background 0.3s;
+                margin-top: clamp(5px, 1.5vw, 10px);
+                font-size: clamp(0.9rem, 2vw, 1rem);
+                font-weight: 600;
+                border-radius: 5px;
             }
-        
+            
+            .accordion.active, .accordion:hover {
+                background-color: #197e1e;
+            }
+            
             .panel {
-                padding: clamp(8px, 2vw, 10px);
+                padding: clamp(10px, 2.5vw, 15px);
+                display: none;
+                background-color: #FFFFFF;
+                border: 1px solid #f5f5f5;
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+                border-radius: 5px;
+                margin-bottom: clamp(5px, 1.5vw, 10px);
             }
-        
+            
             .panel p {
-                font-size: clamp(0.7rem, 1.5vw, 0.8rem);
+                margin: 0;
+                font-size: clamp(0.9rem, 2vw, 1rem);
+                color: #333333;
+                text-align: justify;
             }
-        
+            
+            /* Footer */
             footer {
-                padding: clamp(8px, 2vw, 10px);
-                min-height: clamp(30px, 4vw, 36px);
+                width: 100%;
+                background-color: #2E7D32;
+                color: #FFFFFF;
+                text-align: center;
+                padding: clamp(10px, 3vw, 15px);
+                margin-top: auto;
+                min-height: clamp(40px, 5vw, 50px);
             }
-        }
+            
+            /* Responsive Styles */
+            @media only screen and (max-width: 768px) {
+                header {
+                    flex-direction: row;
+                    align-items: center;
+                    padding: clamp(8px, 2vw, 10px);
+                    min-height: clamp(60px, 6vw, 75px); /* Adjusted for larger logo */
+                }
+            
+                .header-left {
+                    flex: 1;
+                    justify-content: flex-start;
+                    align-items: center;
+                }
+            
+                .logo {
+                    width: clamp(50px, 7vw, 90px); /* Adjusted for responsiveness */
+                    height: clamp(50px, 7vw, 90px); /* Adjusted for responsiveness */
+                }
+            
+                .toggle {
+                    width: clamp(25px, 4vw, 35px);
+                    height: clamp(25px, 4vw, 35px);
+                    gap: clamp(3px, 1vw, 6px);
+                }
+            
+                .bars {
+                    height: clamp(2px, 0.5vw, 3px);
+                }
+            
+                nav ul {
+                    top: 100%;
+                    width: 100%;
+                    right: 0;
+                    left: 0;
+                    border-radius: 0;
+                    padding: clamp(10px, 2vw, 15px);
+                }
+            
+                nav ul li a {
+                    padding: clamp(8px, 2vw, 12px);
+                    font-size: clamp(0.8rem, 2vw, 1.1rem);
+                }
+            
+                .content {
+                    padding: clamp(15px, 3.5vw, 20px) clamp(5px, 2vw, 10px);
+                }
+            
+                .accordion {
+                    font-size: clamp(0.8rem, 1.8vw, 0.9rem);
+                }
+            
+                .panel {
+                    padding: clamp(10px, 2.5vw, 12px);
+                }
+            
+                .panel p {
+                    font-size: clamp(0.8rem, 1.8vw, 0.9rem);
+                }
+            
+                footer {
+                    padding: clamp(10px, 2.5vw, 15px);
+                    min-height: clamp(40px, 5vw, 48px);
+                }
+            }
+            
+            @media only screen and (max-width: 480px) {
+                header {
+                    padding: clamp(6px, 1.5vw, 8px);
+                    min-height: clamp(50px, 5vw, 65px); /* Adjusted for larger logo */
+                }
+            
+                .logo {
+                    width: clamp(40px, 6vw, 80px); /* Adjusted for responsiveness */
+                    height: clamp(40px, 6vw, 80px); /* Adjusted for responsiveness */
+                }
+            
+                .toggle {
+                    width: clamp(20px, 3.5vw, 35px);
+                    height: clamp(20px, 3.5vw, 35px);
+                    gap: clamp(2px, 0.8vw, 6px);
+                }
+            
+                .bars {
+                    height: clamp(1.5px, 0.4vw, 3px);
+                }
+            
+                nav ul {
+                    padding: clamp(8px, 1.5vw, 10px);
+                }
+            
+                nav ul li a {
+                    font-size: clamp(0.7rem, 1.8vw, 0.9rem);
+                    padding: clamp(6px, 1.5vw, 10px);
+                }
+            
+                .content {
+                    padding: clamp(5px, 1.5vw, 10px) clamp(5px, 1.5vw, 5px);
+                }
+            
+                .accordion {
+                    font-size: clamp(0.7rem, 1.5vw, 0.8rem);
+                }
+            
+                .panel {
+                    padding: clamp(8px, 2vw, 10px);
+                }
+            
+                .panel p {
+                    font-size: clamp(0.7rem, 1.5vw, 0.8rem);
+                }
+            
+                footer {
+                    padding: clamp(8px, 2vw, 10px);
+                    min-height: clamp(30px, 4vw, 36px);
+                }
+            }
         </style>
 </head>
 <body>

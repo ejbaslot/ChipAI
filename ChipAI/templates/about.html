@@ -8,400 +8,400 @@
 
     <style>
         /* General Styles */
-html, body {
-    margin: 0;
-    min-height: 100vh;
-}
+        html, body {
+            margin: 0;
+            min-height: 100vh;
+        }
 
-body {
-    font-family: 'Poppins', sans-serif;
-    background-color: #FFFFFF;
-    color: #333333;
-    padding: 0;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-}
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #FFFFFF;
+            color: #333333;
+            padding: 0;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
 
-main {
-    overflow-y: auto;
-    min-height: calc(100vh - 130px);
-    flex: 1;
-}
+        main {
+            overflow-y: auto;
+            min-height: calc(100vh - 130px);
+            flex: 1;
+        }
 
-h2, h3 {
-    color: #2E7D32;
-    text-align: center;
-}
+        h2, h3 {
+            color: #2E7D32;
+            text-align: center;
+        }
 
-h1 {
-    font-size: clamp(2rem, 5vw, 2.5rem);
-    margin: 0;
-    color: #FFFFFF;
-}
+        h1 {
+            font-size: clamp(2rem, 5vw, 2.5rem);
+            margin: 0;
+            color: #FFFFFF;
+        }
 
-h2 {
-    font-size: clamp(1.5rem, 4vw, 1.75rem);
-}
+        h2 {
+            font-size: clamp(1.5rem, 4vw, 1.75rem);
+        }
 
-h3 {
-    font-size: clamp(1.2rem, 3.5vw, 1.5rem);
-}
+        h3 {
+            font-size: clamp(1.2rem, 3.5vw, 1.5rem);
+        }
 
-/* Content */
-.content {
-    padding: clamp(20px, 5vw, 40px) clamp(10px, 3vw, 20px);
-    text-align: center;
-    max-width: 1200px;
-    margin: 0 auto;
-}
+        /* Content */
+        .content {
+            padding: clamp(20px, 5vw, 40px) clamp(10px, 3vw, 20px);
+            text-align: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
 
-/* Header */
-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #2E7D32;
-    padding: clamp(10px, 2vw, 20px);
-    color: #FFFFFF;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    min-height: clamp(60px, 8vw, 80px);
-}
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #2E7D32;
+            padding: clamp(10px, 2vw, 20px);
+            color: #FFFFFF;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            min-height: clamp(70px, 8vw, 90px); /* Increased min-height to accommodate larger logo */
+        }
 
-.header-left {
-    display: flex;
-    align-items: center;
-    flex: 1;
-}
+        .header-left {
+            display: flex;
+            align-items: center;
+            flex: 1;
+        }
 
-.logo {
-    width: clamp(40px, 6vw, 60px);
-    height: clamp(40px, 6vw, 60px);
-    margin-right: clamp(5px, 1.5vw, 10px);
-    vertical-align: middle;
-}
+        .logo {
+            width: clamp(60px, 8vw, 100px); /* Increased minimum and maximum sizes */
+            height: clamp(60px, 8vw, 100px); /* Increased minimum and maximum sizes */
+            margin-right: clamp(10px, 2vw, 15px); /* Adjusted margin for better spacing */
+            vertical-align: middle;
+        }
 
-/* Burger Menu */
-#checkbox {
-    display: none;
-}
+        /* Burger Menu */
+        #checkbox {
+            display: none;
+        }
 
-.toggle {
-    width: clamp(30px, 5vw, 40px);
-    height: clamp(30px, 5vw, 40px);
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: clamp(4px, 1vw, 8px);
-    padding: clamp(3px, 1vw, 5px);
-    transition: transform 0.3s ease;
-}
+        .toggle {
+            width: clamp(30px, 5vw, 40px);
+            height: clamp(30px, 5vw, 40px);
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: clamp(4px, 1vw, 8px);
+            padding: clamp(3px, 1vw, 5px);
+            transition: transform 0.3s ease;
+        }
 
-.bars {
-    width: 100%;
-    height: clamp(2px, 0.5vw, 4px);
-    background-color: #FFFFFF;
-    border-radius: 2px;
-    transition: transform 0.3s ease, opacity 0.3s ease;
-}
+        .bars {
+            width: 100%;
+            height: clamp(2px, 0.5vw, 4px);
+            background-color: #FFFFFF;
+            border-radius: 2px;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
 
-#checkbox:checked + .toggle #bar1 {
-    transform: translateY(clamp(8px, 2vw, 12px)) rotate(45deg);
-}
+        #checkbox:checked + .toggle #bar1 {
+            transform: translateY(clamp(8px, 2vw, 12px)) rotate(45deg);
+        }
 
-#checkbox:checked + .toggle #bar2 {
-    opacity: 0;
-}
+        #checkbox:checked + .toggle #bar2 {
+            opacity: 0;
+        }
 
-#checkbox:checked + .toggle #bar3 {
-    transform: translateY(clamp(-8px, -2vw, -12px)) rotate(-45deg);
-}
+        #checkbox:checked + .toggle #bar3 {
+            transform: translateY(clamp(-8px, -2vw, -12px)) rotate(-45deg);
+        }
 
-nav ul {
-    list-style: none;
-    display: none;
-    flex-direction: column;
-    gap: clamp(5px, 1.5vw, 10px);
-    position: absolute;
-    top: clamp(60px, 8vw, 80px);
-    right: clamp(10px, 2vw, 20px);
-    background-color: #2E7D32;
-    padding: clamp(8px, 2vw, 15px);
-    border-radius: 5px;
-    box-shadow: 0 0 10px #26802b;
-    z-index: 100;
-    width: clamp(150px, 25vw, 200px);
-}
+        nav ul {
+            list-style: none;
+            display: none;
+            flex-direction: column;
+            gap: clamp(5px, 1.5vw, 10px);
+            position: absolute;
+            top: clamp(70px, 8vw, 90px); /* Updated to match header min-height */
+            right: clamp(10px, 2vw, 20px);
+            background-color: #2E7D32;
+            padding: clamp(8px, 2vw, 15px);
+            border-radius: 5px;
+            box-shadow: 0 0 10px #26802b;
+            z-index: 100;
+            width: clamp(150px, 25vw, 200px);
+        }
 
-nav ul li a {
-    color: #FFFFFF;
-    text-decoration: none;
-    padding: clamp(8px, 2vw, 10px);
-    border-radius: 3px;
-    display: block;
-    transition: background 0.2s;
-    font-size: clamp(0.9rem, 2vw, 1rem);
-}
+        nav ul li a {
+            color: #FFFFFF;
+            text-decoration: none;
+            padding: clamp(8px, 2vw, 10px);
+            border-radius: 3px;
+            display: block;
+            transition: background 0.2s;
+            font-size: clamp(0.9rem, 2vw, 1rem);
+        }
 
-nav ul li a:hover {
-    background-color: #197e1e;
-}
+        nav ul li a:hover {
+            background-color: #197e1e;
+        }
 
-#checkbox:checked ~ nav ul {
-    display: flex;
-}
+        #checkbox:checked ~ nav ul {
+            display: flex;
+        }
 
-/* Developer Cards */
-.developer-cards {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: clamp(10px, 2.5vw, 20px);
-    margin-top: clamp(10px, 2.5vw, 20px);
-}
+        /* Developer Cards */
+        .developer-cards {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: clamp(10px, 2.5vw, 20px);
+            margin-top: clamp(10px, 2.5vw, 20px);
+        }
 
-.card {
-    background-color: #FFFFFF;
-    border: 2px solid #2E7D32;
-    border-radius: 8px;
-    padding: clamp(10px, 2.5vw, 16px);
-    width: clamp(150px, 20vw, 190px);
-    height: clamp(200px, 25vw, 254px);
-    position: relative;
-    overflow: hidden;
-    transition: background-color 0.5s ease-in-out;
-}
+        .card {
+            background-color: #FFFFFF;
+            border: 2px solid #2E7D32;
+            border-radius: 8px;
+            padding: clamp(10px, 2.5vw, 16px);
+            width: clamp(150px, 20vw, 190px);
+            height: clamp(200px, 25vw, 254px);
+            position: relative;
+            overflow: hidden;
+            transition: background-color 0.5s ease-in-out;
+        }
 
-.card-front {
-    position: absolute;
-    width: 100%;
-    text-align: center;
-    transition: transform 0.5s cubic-bezier(0.785, 0.135, 0.150, 0.860);
-    bottom: clamp(10px, 2.5vw, 16px);
-    left: 0;
-}
+        .card-front {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            transition: transform 0.5s cubic-bezier(0.785, 0.135, 0.150, 0.860);
+            bottom: clamp(10px, 2.5vw, 16px);
+            left: 0;
+        }
 
-.card-back {
-    position: absolute;
-    width: 100%;
-    text-align: center;
-    transform: translateX(120%);
-    transition: transform 0.5s cubic-bezier(0.785, 0.135, 0.150, 0.860);
-    top: clamp(10px, 2.5vw, 16px);
-    left: 0;
-}
+        .card-back {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            transform: translateX(120%);
+            transition: transform 0.5s cubic-bezier(0.785, 0.135, 0.150, 0.860);
+            top: clamp(10px, 2.5vw, 16px);
+            left: 0;
+        }
 
-.card:hover {
-    background-color: #f5f5f525;
-}
+        .card:hover {
+            background-color: #f5f5f525;
+        }
 
-.card:hover .card-front {
-    transform: translateX(-100%);
-}
+        .card:hover .card-front {
+            transform: translateX(-100%);
+        }
 
-.card:hover .card-back {
-    transform: translateX(0);
-}
+        .card:hover .card-back {
+            transform: translateX(0);
+        }
 
-.card-front img {
-    width: clamp(40px, 5vw, 60px);
-    height: clamp(40px, 5vw, 60px);
-    border-radius: 50%;
-    object-fit: cover;
-    margin-bottom: clamp(5px, 1.5vw, 10px);
-}
+        .card-front img {
+            width: clamp(40px, 5vw, 60px);
+            height: clamp(40px, 5vw, 60px);
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: clamp(5px, 1.5vw, 10px);
+        }
 
-.title {
-    font-size: clamp(1rem, 2.5vw, 1.3rem);
-    font-weight: bold;
-    color: #2E7D32;
-    margin-bottom: clamp(3px, 1vw, 5px);
-}
+        .title {
+            font-size: clamp(1rem, 2.5vw, 1.3rem);
+            font-weight: bold;
+            color: #2E7D32;
+            margin-bottom: clamp(3px, 1vw, 5px);
+        }
 
-.title::after {
-    content: "";
-    display: block;
-    width: 50%;
-    border-radius: 50%;
-    height: clamp(1px, 0.5vw, 2px);
-    margin: clamp(1px, 0.5vw, 2px) auto;
-    background-color: #2E7D32;
-}
+        .title::after {
+            content: "";
+            display: block;
+            width: 50%;
+            border-radius: 50%;
+            height: clamp(1px, 0.5vw, 2px);
+            margin: clamp(1px, 0.5vw, 2px) auto;
+            background-color: #2E7D32;
+        }
 
-.subtitle {
-    font-size: clamp(0.8rem, 2vw, 1rem);
-    color: #333333;
-    margin-bottom: clamp(5px, 1.5vw, 10px);
-}
+        .subtitle {
+            font-size: clamp(0.8rem, 2vw, 1rem);
+            color: #333333;
+            margin-bottom: clamp(5px, 1.5vw, 10px);
+        }
 
-.card-back p {
-    font-size: clamp(0.7rem, 1.5vw, 0.9rem);
-    margin: clamp(3px, 1vw, 5px) 0;
-    text-align: justify;
-}
+        .card-back p {
+            font-size: clamp(0.7rem, 1.5vw, 0.9rem);
+            margin: clamp(3px, 1vw, 5px) 0;
+            text-align: justify;
+        }
 
-.card-back a {
-    color: #2E7D32;
-    text-decoration: none;
-}
+        .card-back a {
+            color: #2E7D32;
+            text-decoration: none;
+        }
 
-.card-back a:hover {
-    text-decoration: underline;
-}
+        .card-back a:hover {
+            text-decoration: underline;
+        }
 
-/* Footer */
-footer {
-    width: 100%;
-    background-color: #2E7D32;
-    color: #FFFFFF;
-    text-align: center;
-    padding: clamp(10px, 3vw, 15px);
-    margin-top: auto;
-    min-height: clamp(40px, 5vw, 50px);
-}
+        /* Footer */
+        footer {
+            width: 100%;
+            background-color: #2E7D32;
+            color: #FFFFFF;
+            text-align: center;
+            padding: clamp(10px, 3vw, 15px);
+            margin-top: auto;
+            min-height: clamp(40px, 5vw, 50px);
+        }
 
-/* Responsive Styles */
-@media only screen and (max-width: 768px) {
-    header {
-        flex-direction: row;
-        align-items: center;
-        padding: clamp(8px, 2vw, 10px);
-        min-height: clamp(50px, 6vw, 66px);
-    }
+        /* Responsive Styles */
+        @media only screen and (max-width: 768px) {
+            header {
+                flex-direction: row;
+                align-items: center;
+                padding: clamp(8px, 2vw, 10px);
+                min-height: clamp(60px, 6vw, 75px); /* Adjusted for larger logo */
+            }
 
-    .header-left {
-        flex: 1;
-        justify-content: flex-start;
-        align-items: center;
-    }
+            .header-left {
+                flex: 1;
+                justify-content: flex-start;
+                align-items: center;
+            }
 
-    .logo {
-        width: clamp(30px, 5vw, 50px);
-        height: clamp(30px, 5vw, 50px);
-    }
+            .logo {
+                width: clamp(50px, 7vw, 90px); /* Adjusted for responsiveness */
+                height: clamp(50px, 7vw, 90px); /* Adjusted for responsiveness */
+            }
 
-    .toggle {
-        width: clamp(25px, 4vw, 35px);
-        height: clamp(25px, 4vw, 35px);
-        gap: clamp(3px, 1vw, 6px);
-    }
+            .toggle {
+                width: clamp(25px, 4vw, 35px);
+                height: clamp(25px, 4vw, 35px);
+                gap: clamp(3px, 1vw, 6px);
+            }
 
-    .bars {
-        height: clamp(2px, 0.5vw, 3px);
-    }
+            .bars {
+                height: clamp(2px, 0.5vw, 3px);
+            }
 
-    nav ul {
-        top: 100%;
-        width: 100%;
-        right: 0;
-        left: 0;
-        border-radius: 0;
-        padding: clamp(10px, 2vw, 15px);
-    }
+            nav ul {
+                top: 100%;
+                width: 100%;
+                right: 0;
+                left: 0;
+                border-radius: 0;
+                padding: clamp(10px, 2vw, 15px);
+            }
 
-    nav ul li a {
-        padding: clamp(8px, 2vw, 12px);
-        font-size: clamp(0.8rem, 2vw, 1.1rem);
-    }
+            nav ul li a {
+                padding: clamp(8px, 2vw, 12px);
+                font-size: clamp(0.8rem, 2vw, 1.1rem);
+            }
 
-    .content {
-        padding: clamp(15px, 3.5vw, 20px) clamp(5px, 2vw, 10px);
-    }
+            .content {
+                padding: clamp(15px, 3.5vw, 20px) clamp(5px, 2vw, 10px);
+            }
 
-    .card {
-        width: clamp(140px, 18vw, 160px);
-        height: clamp(180px, 22vw, 214px);
-    }
+            .card {
+                width: clamp(140px, 18vw, 160px);
+                height: clamp(180px, 22vw, 214px);
+            }
 
-    .card-front img {
-        width: clamp(40px, 5vw, 50px);
-        height: clamp(40px, 5vw, 50px);
-    }
+            .card-front img {
+                width: clamp(40px, 5vw, 50px);
+                height: clamp(40px, 5vw, 50px);
+            }
 
-    .title {
-        font-size: clamp(0.9rem, 2vw, 1.1rem);
-    }
+            .title {
+                font-size: clamp(0.9rem, 2vw, 1.1rem);
+            }
 
-    .subtitle {
-        font-size: clamp(0.7rem, 1.8vw, 0.9rem);
-    }
+            .subtitle {
+                font-size: clamp(0.7rem, 1.8vw, 0.9rem);
+            }
 
-    .card-back p {
-        font-size: clamp(0.7rem, 1.5vw, 0.8rem);
-    }
+            .card-back p {
+                font-size: clamp(0.7rem, 1.5vw, 0.8rem);
+            }
 
-    footer {
-        padding: clamp(10px, 2.5vw, 15px);
-        min-height: clamp(40px, 5vw, 48px);
-    }
-}
+            footer {
+                padding: clamp(10px, 2.5vw, 15px);
+                min-height: clamp(40px, 5vw, 48px);
+            }
+        }
 
-@media only screen and (max-width: 480px) {
-    header {
-        padding: clamp(6px, 1.5vw, 8px);
-        min-height: clamp(40px, 5vw, 52px);
-    }
+        @media only screen and (max-width: 480px) {
+            header {
+                padding: clamp(6px, 1.5vw, 8px);
+                min-height: clamp(50px, 5vw, 65px); /* Adjusted for larger logo */
+            }
 
-    .logo {
-        width: clamp(25px, 4vw, 40px);
-        height: clamp(25px, 4vw, 40px);
-    }
+            .logo {
+                width: clamp(40px, 6vw, 80px); /* Adjusted for responsiveness */
+                height: clamp(40px, 6vw, 80px); /* Adjusted for responsiveness */
+            }
 
-    .toggle {
-        width: clamp(20px, 3.5vw, 35px);
-        height: clamp(20px, 3.5vw, 35px);
-        gap: clamp(2px, 0.8vw, 6px);
-    }
+            .toggle {
+                width: clamp(20px, 3.5vw, 35px);
+                height: clamp(20px, 3.5vw, 35px);
+                gap: clamp(2px, 0.8vw, 6px);
+            }
 
-    .bars {
-        height: clamp(1.5px, 0.4vw, 3px);
-    }
+            .bars {
+                height: clamp(1.5px, 0.4vw, 3px);
+            }
 
-    nav ul {
-        padding: clamp(8px, 1.5vw, 10px);
-    }
+            nav ul {
+                padding: clamp(8px, 1.5vw, 10px);
+            }
 
-    nav ul li a {
-        font-size: clamp(0.7rem, 1.8vw, 0.9rem);
-        padding: clamp(6px, 1.5vw, 10px);
-    }
+            nav ul li a {
+                font-size: clamp(0.7rem, 1.8vw, 0.9rem);
+                padding: clamp(6px, 1.5vw, 10px);
+            }
 
-    .content {
-        padding: clamp(5px, 1.5vw, 10px) clamp(5px, 1.5vw, 5px);
-    }
+            .content {
+                padding: clamp(5px, 1.5vw, 10px) clamp(5px, 1.5vw, 5px);
+            }
 
-    .card {
-        width: clamp(120px, 16vw, 140px);
-        height: clamp(150px, 20vw, 184px);
-    }
+            .card {
+                width: clamp(120px, 16vw, 140px);
+                height: clamp(150px, 20vw, 184px);
+            }
 
-    .card-front img {
-        width: clamp(30px, 4vw, 40px);
-        height: clamp(30px, 4vw, 40px);
-    }
+            .card-front img {
+                width: clamp(30px, 4vw, 40px);
+                height: clamp(30px, 4vw, 40px);
+            }
 
-    .title {
-        font-size: clamp(0.8rem, 1.8vw, 1rem);
-    }
+            .title {
+                font-size: clamp(0.8rem, 1.8vw, 1rem);
+            }
 
-    .subtitle {
-        font-size: clamp(0.6rem, 1.5vw, 0.8rem);
-    }
+            .subtitle {
+                font-size: clamp(0.6rem, 1.5vw, 0.8rem);
+            }
 
-    .card-back p {
-        font-size: clamp(0.6rem, 1.2vw, 0.7rem);
-    }
+            .card-back p {
+                font-size: clamp(0.6rem, 1.2vw, 0.7rem);
+            }
 
-    footer {
-        padding: clamp(8px, 2vw, 10px);
-        min-height: clamp(30px, 4vw, 36px);
-    }
-}
+            footer {
+                padding: clamp(8px, 2vw, 10px);
+                min-height: clamp(30px, 4vw, 36px);
+            }
+        }
     </style>
 </head>
 <body>
