@@ -19,7 +19,7 @@ app = Flask(__name__)
 app.secret_key = os.getenv('FLASK_SECRET_KEY', 'your_default_secret')  # Ensure this is set in your environment
 
 # Load TFLite model
-interpreter = tf.lite.Interpreter(model_path="ChipAI/models/mobilenetv2_final.tflite")
+interpreter = tf.lite.Interpreter(model_path="ChipAI/models/ChipAI.tflite")
 interpreter.allocate_tensors()
 
 # Get input and output details for reuse
