@@ -1,8 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
 import os
-import psycopg2
 from dotenv import load_dotenv
-from psycopg2 import OperationalError
+import psycopg2
 from psycopg2.extras import RealDictCursor
 import logging
 
@@ -31,7 +30,7 @@ def get_db_connection():
         )
         logger.info("Database connection established.")
         return connection
-    except OperationalError as e:
+    except psycopg2.OperationalError as e:
         logger.error("Database connection failed: %s", e)
         raise
 
@@ -127,6 +126,13 @@ def upload_image():
     image = request.files['image']
     if image.filename == '':
         return jsonify({'error': 'No selected file'}), 400
+    # Validate file type
+    allowed_extensions = {'png', 'jpg', 'jpeg', 'gif'}
+    if not '.' in image.filename or image.filename.rsplit('.', 1)[1].lower() not in allowed_extensions:
+        return jsonify({'error': 'Invalid file type. Allowed types: png, jpg, jpeg, gif'}), 400
+    # Check file size (5MB limit)
+    if image.content_length > 5 * 1024 * 1024:
+        return jsonify({'error': 'File too large. Maximum size is 5MB'}), 400
     try:
         # Save the image to the uploads folder
         image_path = os.path.join(upload_folder, image.filename)
@@ -141,7 +147,7 @@ def upload_image():
         })
     except Exception as e:
         logger.error("Error saving the image: %s", str(e))
-        return jsonify({'error': 'Error saving the image. Please try again.'}), 500
+        return jsonify({'error': f'Error saving the image: {str(e)}'}), 500
 
 @app.route('/')
 def index():

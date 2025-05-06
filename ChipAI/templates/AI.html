@@ -5,8 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ChipAI - Chili Prediction</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <!-- Load locally hosted TensorFlow.js and Teachable Machine from root js folder -->
     <script src="../js/tf.min.js"></script>
-    <script src="../js/image.min.js"></script>
+    <script src="../js/teachablemachine-image.min.js"></script>
 </head>
 <body>
     <header>
@@ -29,6 +30,7 @@
 
     <div class="content">
         <h2>Capture or Upload and Predict Chili</h2>
+        <div>Teachable Machine Image Model</div>
         <button type="button" onclick="document.getElementById('fileInput').click()" class="btn">Choose File</button>
         <input type="file" id="fileInput" accept="image/*" style="display: none;">
         <button type="button" onclick="init()" class="btn">Start Camera</button>
@@ -430,8 +432,8 @@
     </style>
 
     <script type="text/javascript">
-        // the link to your model provided by Teachable Machine export panel
-        const URL = "../models/";
+        // the link to your converted model
+        const URL = "../models_converted/";
 
         let model, webcam, labelContainer, maxPredictions, snapshot;
 
@@ -441,34 +443,48 @@
             const metadataURL = URL + "metadata.json";
 
             // load the model and metadata
-            model = await tmImage.load(modelURL, metadataURL);
-            maxPredictions = model.getTotalClasses();
+            try {
+                model = await tmImage.load(modelURL, metadataURL);
+                maxPredictions = model.getTotalClasses();
+                console.log("Model loaded successfully with", maxPredictions, "classes");
+            } catch (error) {
+                console.error("Failed to load model:", error);
+                document.getElementById("predictionResult").innerHTML = '<p style="color:red;">Failed to load model. Check console for details.</p>';
+                return;
+            }
 
             // Convenience function to setup a webcam
             const flip = true; // whether to flip the webcam
             webcam = new tmImage.Webcam(200, 200, flip); // width, height, flip
-            await webcam.setup(); // request access to the webcam
-            await webcam.play();
-            window.requestAnimationFrame(loop);
+            try {
+                await webcam.setup(); // request access to the webcam
+                await webcam.play();
+                window.requestAnimationFrame(loop);
+                document.getElementById("webcam-container").appendChild(webcam.canvas);
+                document.getElementById("captureImage").style.display = "inline-block";
+                console.log("Webcam initialized successfully");
+            } catch (error) {
+                console.error("Failed to initialize webcam:", error);
+                document.getElementById("predictionResult").innerHTML = '<p style="color:red;">Failed to start camera. Ensure camera permissions are granted and a camera is connected.</p>';
+            }
 
-            // append elements to the DOM
-            document.getElementById("webcam-container").appendChild(webcam.canvas);
             labelContainer = document.getElementById("label-container");
             for (let i = 0; i < maxPredictions; i++) {
                 labelContainer.appendChild(document.createElement("div"));
             }
-
-            // Show capture button
-            document.getElementById("captureImage").style.display = "inline-block";
         }
 
         async function loop() {
-            webcam.update(); // update the webcam frame
+            if (webcam) webcam.update(); // update the webcam frame
             window.requestAnimationFrame(loop);
         }
 
         // Capture image from webcam
         document.getElementById("captureImage").addEventListener("click", async () => {
+            if (!webcam) {
+                document.getElementById("predictionResult").innerHTML = '<p style="color:red;">Webcam not initialized. Try restarting the camera.</p>';
+                return;
+            }
             const canvas = document.createElement("canvas");
             canvas.width = 200;
             canvas.height = 200;
@@ -505,7 +521,8 @@
                     });
                     const uploadResult = await uploadResponse.json();
                     if (!uploadResult.success) {
-                        document.getElementById("predictionResult").innerHTML = `<p style="color:red;">${uploadResult.error || 'Upload failed.'}</p>`;
+                        document.getElementById("predictionResult").innerHTML = `<p style="color:red;">Upload failed: ${uploadResult.error || 'Unknown error'}</p>`;
+                        console.error("Upload error:", uploadResult);
                         fileInput.value = ''; // Clear the input on error
                         return;
                     }
@@ -534,7 +551,7 @@
                     };
                 } catch (error) {
                     console.error("Error processing uploaded image:", error);
-                    document.getElementById("predictionResult").innerHTML = '<p style="color:red;">Failed to process uploaded image.</p>';
+                    document.getElementById("predictionResult").innerHTML = `<p style="color:red;">Failed to process uploaded image: ${error.message}</p>`;
                     fileInput.value = ''; // Clear the input on error
                 }
             }
