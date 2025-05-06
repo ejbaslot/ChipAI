@@ -1,14 +1,9 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
-import psycopg2
-import tensorflow as tf
-import numpy as np
 import os
-from PIL import Image
-import io
+import psycopg2
 from dotenv import load_dotenv
 from psycopg2 import OperationalError
 from psycopg2.extras import RealDictCursor
-from io import BytesIO
 import logging
 
 # Set up logging
@@ -18,23 +13,13 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 app.secret_key = os.getenv('FLASK_SECRET_KEY', 'your_default_secret')  # Ensure this is set in your environment
 
-# Load TFLite model
-interpreter = tf.lite.Interpreter(model_path="ChipAI/models/mobilenetv2_finales.tflite")
-interpreter.allocate_tensors()
-
-# Get input and output details for reuse
-input_details = interpreter.get_input_details()
-output_details = interpreter.get_output_details()
-
-# Verify input shape
-logger.info("TFLite model input details: %s", input_details)
-
 # Ensure the uploads directory exists
 upload_folder = 'uploads'
 if not os.path.exists(upload_folder):
     os.makedirs(upload_folder)
 
 load_dotenv()
+
 def get_db_connection():
     try:
         connection = psycopg2.connect(
@@ -54,57 +39,11 @@ def get_db_connection():
 IMAGE_MAPPING = {
     "Siling Labuyo": "siling_labuyo.jpg",
     "Siling Atsal": "bell_pepper.jpg",
-    "Siling Espada": "siling_haba.jpg", 
+    "Siling Espada": "siling_haba.jpg",
     "Scotch Bonnet": "scotch_bonnet.jpg",
     "Siling Talbusan": "siling_talbusan.jpg"
 }
 
-# Consolidated image preprocessing function
-def preprocess_image(image_stream, target_size=(224, 224)):
-    try:
-        img = Image.open(image_stream).convert("RGB")  # Ensure RGB format
-        img = img.resize(target_size, Image.Resampling.LANCZOS)  # Resize to 224x224
-        img_array = np.array(img, dtype=np.float32) / 255.0  # Normalize to [0, 1]
-        img_array = np.expand_dims(img_array, axis=0)  # Add batch dimension
-        logger.info("Image preprocessing successful: shape=%s", img_array.shape)
-        return img_array
-    except Exception as e:
-        logger.error("Error in preprocess_image: %s", str(e))
-        return None
-        
-# Prediction function for the chili pepper classifier
-def predict_chili_variety(image_stream):
-    try:
-        # Preprocess image
-        img_array = preprocess_image(image_stream, target_size=(224, 224))
-        if img_array is None:
-            raise ValueError("Image preprocessing failed")
-
-        # Set input tensor
-        interpreter.set_tensor(input_details[0]['index'], img_array)
-        interpreter.invoke()
-
-        # Get output
-        output_data = interpreter.get_tensor(output_details[0]['index'])
-        logger.info("Prediction raw output (TFLite): %s", output_data)
-
-        # Class labels (consistent with training)
-        class_labels = ["Siling Atsal", "Siling Labuyo", "Siling Espada", "Scotch Bonnet", "Siling Talbusan"]
-        predicted_prob = np.max(output_data[0])
-        predicted_label = class_labels[np.argmax(output_data[0])]
-        confidence = float(predicted_prob)
-
-        # Threshold for chili detection
-        if predicted_prob < 0.50:
-            logger.info("Prediction below threshold: %s (confidence: %.4f)", predicted_label, confidence)
-            return {"label": "No Chili Detected", "confidence": confidence}
-
-        logger.info("Prediction result: %s (confidence: %.4f)", predicted_label, confidence)
-        return {"label": predicted_label, "confidence": confidence}
-    except Exception as e:
-        logger.error("Error in TFLite prediction: %s", str(e))
-        return {"label": "Error processing the image", "error": str(e)}
-    
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
@@ -189,29 +128,21 @@ def upload_image():
     if image.filename == '':
         return jsonify({'error': 'No selected file'}), 400
     try:
-        image_bytes = image.read()
-        image_stream = BytesIO(image_bytes)
-        img = Image.open(image_stream)
-        img.verify()  # Verify image integrity
-        logger.info("Image is valid.")
-        image_stream.seek(0)
+        # Save the image to the uploads folder
+        image_path = os.path.join(upload_folder, image.filename)
+        image.save(image_path)
+        logger.info("Image saved to %s", image_path)
 
-        # Predict chili variety
-        result = predict_chili_variety(image_stream)
-        if "error" in result:
-            return jsonify({'error': f"Failed to process image: {result['error']}"}), 400
-
+        # Return success response (client handles prediction)
         return jsonify({
-            'prediction': result['label'],
-            'confidence': result['confidence']
+            'success': True,
+            'message': 'Image uploaded successfully. Prediction will be handled client-side.',
+            'filename': image.filename
         })
-    except (IOError, SyntaxError) as e:
-        logger.error("Invalid image file: %s", str(e))
-        return jsonify({'error': 'Invalid image file. Please upload a valid image.'}), 400
     except Exception as e:
-        logger.error("Error processing the image: %s", str(e))
-        return jsonify({'error': 'Error processing the image. Please try again.'}), 500
-    
+        logger.error("Error saving the image: %s", str(e))
+        return jsonify({'error': 'Error saving the image. Please try again.'}), 500
+
 @app.route('/')
 def index():
     if 'user_id' in session:

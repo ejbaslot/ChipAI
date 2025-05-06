@@ -1,3 +1,13 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ChipAI - Chili Prediction</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <script src="../js/tf.min.js"></script>
+    <script src="../js/image.min.js"></script>
+</head>
 <body>
     <header>
         <div class="header-left">
@@ -12,42 +22,29 @@
         </label>
         <nav>
             <ul>
-                <li><a href="https://chipai.onrender.com/login" class="back-link">Home</a></li>
+                <li><a href="{{ url_for('index') }}" class="back-link">Home</a></li>
             </ul>
         </nav>
     </header>
 
-    <!-- Camera Section -->
     <div class="content">
-        <h2>Upload or Capture Image</h2>
+        <h2>Capture or Upload and Predict Chili</h2>
+        <button type="button" onclick="document.getElementById('fileInput').click()" class="btn">Choose File</button>
         <input type="file" id="fileInput" accept="image/*" style="display: none;">
-        <button onclick="document.getElementById('fileInput').click();">Choose File</button>
-        <button class="btn" id="startCamera">Start Camera</button>
-        <button class="btn" id="turnOffCamera" style="display: none;">Turn Off Camera</button>
-        <button class="btn" id="captureImage" style="display: none;">Capture Image</button>
-        <button class="btn" id="deleteImage" style="display: none;">Delete Image</button>
-
-        <!-- Container for video and captured image -->
-        <div class="camera-container">
-            <video id="video" autoplay style="display: none;"></video>
-            <img id="snapshot" alt="Captured Image" style="display: none;">
+        <button type="button" onclick="init()" class="btn">Start Camera</button>
+        <button type="button" id="captureImage" style="display: none;" class="btn">Capture Image</button>
+        <button type="button" id="deleteImage" style="display: none;" class="btn">Delete Image</button>
+        <button type="button" id="predictButton" style="display: none;" class="btn">Predict</button>
+        <div id="webcam-container" class="camera-container"></div>
+        <div id="snapshot-container" class="camera-container">
+            <img id="snapshot" alt="Captured or Uploaded Image" style="display: none;">
         </div>
-
-        <div class="instructions content-card">
-            <h3>Instructions:</h3>
-            <p>1. Click "Choose File" to select an image from your device.</p>
-            <p>2. Click "Start Camera" to access your camera.</p>
-            <p>3. When the camera feed appears, click "Capture Image" to take a snapshot.</p>
-            <p>4. Submit the selected or captured image for processing.</p>
-        </div>
-        
-        <button class="btn" id="submitBtn" disabled>Submit</button>
+        <div id="label-container" class="content-card"></div>
         <div id="predictionResult" class="content-card result"></div>
     </div>
 
-    <!-- Footer -->
     <footer>
-        <p>© 2024 ChipAI. All rights reserved.</p>
+        <p>© 2025 ChipAI. All rights reserved.</p>
     </footer>
 
     <style>
@@ -55,6 +52,7 @@
         html, body {
             margin: 0;
             min-height: 100vh;
+            box-sizing: border-box;
         }
 
         body {
@@ -69,7 +67,7 @@
 
         main {
             overflow-y: auto;
-            min-height: calc(100vh - 130px);
+            min-height: calc(100vh - 110px);
             flex: 1;
         }
 
@@ -79,24 +77,24 @@
         }
 
         h1 {
-            font-size: clamp(2rem, 5vw, 2.5rem);
+            font-size: clamp(1.5rem, 4vw, 2rem);
             margin: 0;
             color: #FFFFFF;
         }
 
         h2 {
-            font-size: clamp(1.5rem, 4vw, 1.75rem);
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
         }
 
         h3 {
-            font-size: clamp(1.2rem, 3.5vw, 1.5rem);
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
         }
 
         /* Content */
         .content {
-            padding: clamp(20px, 5vw, 40px) clamp(10px, 3vw, 20px);
+            padding: clamp(15px, 4vw, 30px) clamp(8px, 2vw, 15px);
             text-align: center;
-            max-width: 1200px;
+            max-width: 1000px;
             margin: 0 auto;
         }
 
@@ -106,13 +104,13 @@
             justify-content: space-between;
             align-items: center;
             background-color: #2E7D32;
-            padding: clamp(10px, 2vw, 20px);
+            padding: clamp(8px, 1.5vw, 15px);
             color: #FFFFFF;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
             position: sticky;
             top: 0;
             z-index: 100;
-            min-height: clamp(70px, 8vw, 90px); /* Increased min-height to accommodate larger logo */
+            min-height: clamp(60px, 7vw, 80px);
         }
 
         .header-left {
@@ -122,9 +120,9 @@
         }
 
         .logo {
-            width: clamp(60px, 8vw, 100px); /* Increased minimum and maximum sizes */
-            height: clamp(60px, 8vw, 100px); /* Increased minimum and maximum sizes */
-            margin-right: clamp(10px, 2vw, 15px); /* Adjusted margin for better spacing */
+            width: clamp(50px, 7vw, 80px);
+            height: clamp(50px, 7vw, 80px);
+            margin-right: clamp(8px, 1.5vw, 12px);
             vertical-align: middle;
         }
 
@@ -134,28 +132,28 @@
         }
 
         .toggle {
-            width: clamp(30px, 5vw, 40px);
-            height: clamp(30px, 5vw, 40px);
+            width: clamp(25px, 4vw, 35px);
+            height: clamp(25px, 4vw, 35px);
             cursor: pointer;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: clamp(4px, 1vw, 8px);
-            padding: clamp(3px, 1vw, 5px);
+            gap: clamp(3px, 0.8vw, 6px);
+            padding: clamp(2px, 0.8vw, 4px);
             transition: transform 0.3s ease;
         }
 
         .bars {
             width: 100%;
-            height: clamp(2px, 0.5vw, 4px);
+            height: clamp(1.5px, 0.4vw, 3px);
             background-color: #FFFFFF;
             border-radius: 2px;
             transition: transform 0.3s ease, opacity 0.3s ease;
         }
 
         #checkbox:checked + .toggle #bar1 {
-            transform: translateY(clamp(8px, 2vw, 12px)) rotate(45deg);
+            transform: translateY(clamp(6px, 1.5vw, 10px)) rotate(45deg);
         }
 
         #checkbox:checked + .toggle #bar2 {
@@ -163,33 +161,33 @@
         }
 
         #checkbox:checked + .toggle #bar3 {
-            transform: translateY(clamp(-8px, -2vw, -12px)) rotate(-45deg);
+            transform: translateY(clamp(-6px, -1.5vw, -10px)) rotate(-45deg);
         }
 
         nav ul {
             list-style: none;
             display: none;
             flex-direction: column;
-            gap: clamp(5px, 1.5vw, 10px);
+            gap: clamp(4px, 1vw, 8px);
             position: absolute;
-            top: clamp(70px, 8vw, 90px); /* Updated to match header min-height */
-            right: clamp(10px, 2vw, 20px);
+            top: clamp(60px, 7vw, 80px);
+            right: clamp(8px, 1.5vw, 15px);
             background-color: #2E7D32;
-            padding: clamp(8px, 2vw, 15px);
+            padding: clamp(6px, 1.5vw, 12px);
             border-radius: 5px;
             box-shadow: 0 0 10px #26802b;
             z-index: 100;
-            width: clamp(150px, 25vw, 200px);
+            width: clamp(120px, 20vw, 180px);
         }
 
         nav ul li a {
             color: #FFFFFF;
             text-decoration: none;
-            padding: clamp(8px, 2vw, 10px);
+            padding: clamp(6px, 1.5vw, 8px);
             border-radius: 3px;
             display: block;
             transition: background 0.2s;
-            font-size: clamp(0.9rem, 2vw, 1rem);
+            font-size: clamp(0.8rem, 1.8vw, 0.9rem);
         }
 
         nav ul li a:hover {
@@ -205,51 +203,96 @@
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: clamp(10px, 2.5vw, 20px);
-            margin: clamp(10px, 2.5vw, 20px) auto;
-            max-width: clamp(200px, 25vw, 280px);
+            gap: clamp(8px, 2vw, 15px);
+            margin: clamp(8px, 2vw, 15px) auto;
+            max-width: clamp(160px, 20vw, 200px);
             border: 2px solid #2E7D32;
             border-radius: 10px;
-            padding: clamp(5px, 1.5vw, 10px);
+            padding: clamp(4px, 1vw, 8px);
         }
 
         video, #snapshot {
             width: 100%;
-            max-width: clamp(200px, 25vw, 280px);
+            max-width: clamp(160px, 20vw, 200px);
             border-radius: 10px;
         }
 
         /* Content Card */
         .content-card {
             background-color: #FFFFFF;
-            border-radius: 15px;
-            padding: clamp(15px, 4vw, 30px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-            margin: clamp(15px, 4vw, 30px) auto;
-            max-width: 800px;
+            border-radius: 12px;
+            padding: clamp(12px, 3vw, 25px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+            margin: clamp(12px, 3vw, 25px) auto;
+            max-width: 700px;
             border: 1px solid #f5f5f5;
+        }
+
+        /* Result Content */
+        .result-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .chili-image img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .chili-info ul {
+            list-style: none;
+            padding: 0;
+            text-align: left;
+        }
+
+        .chili-info li {
+            margin: 8px 0;
+            font-size: clamp(0.8rem, 1.8vw, 0.9rem);
+        }
+
+        .chili-info strong {
+            color: #2E7D32;
+        }
+
+        /* Spinner for Loading */
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #2E7D32;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            animation: spin 1s linear infinite;
+            margin: 15px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         /* Buttons */
         .btn {
             background-color: #2E7D32;
             color: #FFFFFF;
-            padding: clamp(8px, 2vw, 12px) clamp(16px, 4vw, 24px);
+            padding: clamp(6px, 1.5vw, 10px) clamp(12px, 3vw, 20px);
             border: none;
             cursor: pointer;
             border-radius: 5px;
             transition: background 0.3s, transform 0.3s;
-            margin: clamp(10px, 2.5vw, 15px) 0;
+            margin: clamp(8px, 2vw, 12px) 0;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            font-size: clamp(0.8rem, 2vw, 1rem);
+            letter-spacing: 0.8px;
+            font-size: clamp(0.7rem, 1.8vw, 0.9rem);
         }
 
         .btn:hover {
             background-color: #197e1e;
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
 
         /* Footer */
@@ -258,9 +301,9 @@
             background-color: #2E7D32;
             color: #FFFFFF;
             text-align: center;
-            padding: clamp(10px, 3vw, 15px);
+            padding: clamp(8px, 2.5vw, 12px);
             margin-top: auto;
-            min-height: clamp(40px, 5vw, 50px);
+            min-height: clamp(35px, 4vw, 45px);
         }
 
         /* Responsive Styles */
@@ -268,8 +311,8 @@
             header {
                 flex-direction: row;
                 align-items: center;
-                padding: clamp(8px, 2vw, 10px);
-                min-height: clamp(60px, 6vw, 75px); /* Adjusted for larger logo */
+                padding: clamp(6px, 1.5vw, 8px);
+                min-height: clamp(50px, 5vw, 65px);
             }
 
             .header-left {
@@ -279,18 +322,18 @@
             }
 
             .logo {
-                width: clamp(50px, 7vw, 90px); /* Adjusted for responsiveness */
-                height: clamp(50px, 7vw, 90px); /* Adjusted for responsiveness */
+                width: clamp(40px, 6vw, 70px);
+                height: clamp(40px, 6vw, 70px);
             }
 
             .toggle {
-                width: clamp(25px, 4vw, 35px);
-                height: clamp(25px, 4vw, 35px);
-                gap: clamp(3px, 1vw, 6px);
+                width: clamp(20px, 3.5vw, 30px);
+                height: clamp(20px, 3.5vw, 30px);
+                gap: clamp(2px, 0.8vw, 5px);
             }
 
             .bars {
-                height: clamp(2px, 0.5vw, 3px);
+                height: clamp(1.5px, 0.4vw, 2.5px);
             }
 
             nav ul {
@@ -299,304 +342,270 @@
                 right: 0;
                 left: 0;
                 border-radius: 0;
-                padding: clamp(10px, 2vw, 15px);
+                padding: clamp(8px, 1.5vw, 12px);
             }
 
             nav ul li a {
-                padding: clamp(8px, 2vw, 12px);
-                font-size: clamp(0.8rem, 2vw, 1.1rem);
+                padding: clamp(6px, 1.5vw, 10px);
+                font-size: clamp(0.7rem, 1.8vw, 0.9rem);
             }
 
             .content {
-                padding: clamp(15px, 3.5vw, 20px) clamp(5px, 2vw, 10px);
+                padding: clamp(12px, 3vw, 15px) clamp(4px, 1.5vw, 8px);
             }
 
             .content-card {
                 width: 90%;
-                max-width: 600px;
-                padding: clamp(15px, 3.5vw, 20px);
+                max-width: 500px;
+                padding: clamp(12px, 3vw, 15px);
             }
 
             .camera-container {
-                max-width: clamp(250px, 35vw, 300px);
+                max-width: clamp(200px, 30vw, 240px);
             }
 
             video, #snapshot {
-                max-width: clamp(250px, 35vw, 300px);
+                max-width: clamp(200px, 30vw, 240px);
             }
 
             footer {
-                padding: clamp(10px, 2.5vw, 15px);
-                min-height: clamp(40px, 5vw, 48px);
+                padding: clamp(8px, 2vw, 12px);
+                min-height: clamp(35px, 4vw, 40px);
             }
         }
 
         @media only screen and (max-width: 480px) {
             header {
-                padding: clamp(6px, 1.5vw, 8px);
-                min-height: clamp(50px, 5vw, 65px); /* Adjusted for larger logo */
+                padding: clamp(5px, 1.2vw, 6px);
+                min-height: clamp(45px, 4.5vw, 55px);
             }
 
             .logo {
-                width: clamp(40px, 6vw, 80px); /* Adjusted for responsiveness */
-                height: clamp(40px, 6vw, 80px); /* Adjusted for responsiveness */
+                width: clamp(35px, 5vw, 60px);
+                height: clamp(35px, 5vw, 60px);
             }
 
             .toggle {
-                width: clamp(20px, 3.5vw, 35px);
-                height: clamp(20px, 3.5vw, 35px);
-                gap: clamp(2px, 0.8vw, 6px);
+                width: clamp(18px, 3vw, 30px);
+                height: clamp(18px, 3vw, 30px);
+                gap: clamp(1.5px, 0.6vw, 5px);
             }
 
             .bars {
-                height: clamp(1.5px, 0.4vw, 3px);
+                height: clamp(1px, 0.3vw, 2.5px);
             }
 
             nav ul {
-                padding: clamp(8px, 1.5vw, 10px);
+                padding: clamp(6px, 1.2vw, 8px);
             }
 
             nav ul li a {
-                font-size: clamp(0.7rem, 1.8vw, 0.9rem);
-                padding: clamp(6px, 1.5vw, 10px);
+                font-size: clamp(0.6rem, 1.6vw, 0.8rem);
+                padding: clamp(5px, 1.2vw, 8px);
             }
 
             .content {
-                padding: clamp(5px, 1.5vw, 10px) clamp(5px, 1.5vw, 5px);
+                padding: clamp(4px, 1.2vw, 8px) clamp(4px, 1.2vw, 4px);
             }
 
             .content-card {
                 width: 95%;
-                max-width: 500px;
-                padding: clamp(10px, 2.5vw, 15px);
+                max-width: 400px;
+                padding: clamp(8px, 2vw, 12px);
             }
 
             .camera-container {
-                max-width: clamp(200px, 30vw, 250px);
+                max-width: clamp(160px, 25vw, 200px);
             }
 
             video, #snapshot {
-                max-width: clamp(200px, 30vw, 250px);
+                max-width: clamp(160px, 25vw, 200px);
             }
 
             footer {
-                padding: clamp(8px, 2vw, 10px);
-                min-height: clamp(30px, 4vw, 36px);
+                padding: clamp(6px, 1.5vw, 8px);
+                min-height: clamp(25px, 3.5vw, 30px);
             }
         }
     </style>
 
-<script>
-    const fileInput = document.getElementById('fileInput');
-    const startCameraButton = document.getElementById('startCamera');
-    const turnOffCameraButton = document.getElementById('turnOffCamera');
-    const captureImageButton = document.getElementById('captureImage');
-    const deleteImageButton = document.getElementById('deleteImage');
-    const submitBtn = document.getElementById('submitBtn');
-    const predictionResult = document.getElementById('predictionResult');
-    const video = document.getElementById('video');
-    const snapshot = document.getElementById('snapshot');
-    const canvas = document.createElement('canvas');
-    let stream;
+    <script type="text/javascript">
+        // the link to your model provided by Teachable Machine export panel
+        const URL = "../models/";
 
-    // Resize image to 224x224 while preserving aspect ratio
-    async function resizeImage(imageSource, targetSize = 224) {
-        return new Promise((resolve, reject) => {
-            const img = new Image();
-            img.src = imageSource;
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                canvas.width = targetSize;
-                canvas.height = targetSize;
-                const ctx = canvas.getContext('2d');
+        let model, webcam, labelContainer, maxPredictions, snapshot;
 
-                // Calculate scaling to preserve aspect ratio
-                const scale = Math.min(img.width, img.height) / targetSize;
-                const scaledWidth = img.width / scale;
-                const scaledHeight = img.height / scale;
-                const offsetX = (targetSize - scaledWidth) / 2;
-                const offsetY = (targetSize - scaledHeight) / 2;
+        // Load the image model and setup the webcam
+        async function init() {
+            const modelURL = URL + "model.json";
+            const metadataURL = URL + "metadata.json";
 
-                // Draw image centered on canvas
-                ctx.fillStyle = 'black';
-                ctx.fillRect(0, 0, targetSize, targetSize);
-                ctx.drawImage(img, offsetX, offsetY, scaledWidth, scaledHeight);
+            // load the model and metadata
+            model = await tmImage.load(modelURL, metadataURL);
+            maxPredictions = model.getTotalClasses();
 
-                canvas.toBlob((blob) => {
-                    resolve(blob);
-                }, 'image/jpeg', 0.9);
-            };
-            img.onerror = () => reject(new Error('Failed to load image'));
+            // Convenience function to setup a webcam
+            const flip = true; // whether to flip the webcam
+            webcam = new tmImage.Webcam(200, 200, flip); // width, height, flip
+            await webcam.setup(); // request access to the webcam
+            await webcam.play();
+            window.requestAnimationFrame(loop);
+
+            // append elements to the DOM
+            document.getElementById("webcam-container").appendChild(webcam.canvas);
+            labelContainer = document.getElementById("label-container");
+            for (let i = 0; i < maxPredictions; i++) {
+                labelContainer.appendChild(document.createElement("div"));
+            }
+
+            // Show capture button
+            document.getElementById("captureImage").style.display = "inline-block";
+        }
+
+        async function loop() {
+            webcam.update(); // update the webcam frame
+            window.requestAnimationFrame(loop);
+        }
+
+        // Capture image from webcam
+        document.getElementById("captureImage").addEventListener("click", async () => {
+            const canvas = document.createElement("canvas");
+            canvas.width = 200;
+            canvas.height = 200;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(webcam.canvas, 0, 0, 200, 200);
+
+            snapshot = document.getElementById("snapshot");
+            snapshot.src = canvas.toDataURL("image/png");
+            snapshot.style.display = "block";
+
+            document.getElementById("deleteImage").style.display = "inline-block";
+            document.getElementById("predictButton").style.display = "inline-block";
+            document.getElementById("predictionResult").innerHTML = '<p style="color:green;">Image captured. Click Predict to classify.</p>';
         });
-    }
 
-    // Start camera and display live feed
-    startCameraButton.addEventListener('click', async () => {
-        try {
-            stream = await navigator.mediaDevices.getUserMedia({ video: true });
-            video.srcObject = stream;
-            video.style.display = 'block';
-            captureImageButton.style.display = 'inline-block';
-            turnOffCameraButton.style.display = 'inline-block';
-            startCameraButton.style.display = 'none';
-            predictionResult.innerHTML = '';
-            submitBtn.disabled = true;
-        } catch (error) {
-            console.error('Error accessing camera:', error);
-            predictionResult.innerHTML = '<p style="color:red;">Unable to access the camera.</p>';
-        }
-    });
-
-    // Turn off the camera
-    turnOffCameraButton.addEventListener('click', () => {
-        if (stream) {
-            stream.getTracks().forEach(track => track.stop());
-        }
-        video.style.display = 'none';
-        turnOffCameraButton.style.display = 'none';
-        captureImageButton.style.display = 'none';
-        startCameraButton.style.display = 'inline-block';
-        snapshot.style.display = 'none';
-        deleteImageButton.style.display = 'none';
-        predictionResult.innerHTML = '';
-        submitBtn.disabled = true;
-    });
-
-    // Capture image from the live video feed
-    captureImageButton.addEventListener('click', async () => {
-        try {
-            canvas.width = 224;
-            canvas.height = 224;
-            const ctx = canvas.getContext('2d');
-
-            // Calculate scaling to fit video into 224x224
-            const scale = Math.min(video.videoWidth, video.videoHeight) / 224;
-            const scaledWidth = video.videoWidth / scale;
-            const scaledHeight = video.videoHeight / scale;
-            const offsetX = (224 - scaledWidth) / 2;
-            const offsetY = (224 - scaledHeight) / 2;
-
-            ctx.fillStyle = 'black';
-            ctx.fillRect(0, 0, 224, 224);
-            ctx.drawImage(video, offsetX, offsetY, scaledWidth, scaledHeight);
-
-            const blob = await new Promise((resolve) => {
-                canvas.toBlob(resolve, 'image/jpeg', 0.9);
-            });
-
-            snapshot.src = canvas.toDataURL('image/jpeg');
-            snapshot.style.display = 'block';
-            submitBtn.disabled = false;
-            deleteImageButton.style.display = 'inline-block';
-            predictionResult.innerHTML = '<p style="color:green;">Image captured successfully.</p>';
-        } catch (error) {
-            console.error('Error capturing image:', error);
-            predictionResult.innerHTML = '<p style="color:red;">Failed to capture image.</p>';
-        }
-    });
-
-    // Delete captured image
-    deleteImageButton.addEventListener('click', () => {
-        snapshot.src = '';
-        snapshot.style.display = 'none';
-        deleteImageButton.style.display = 'none';
-        submitBtn.disabled = true;
-        predictionResult.innerHTML = '';
-    });
-
-    // Handle file input selection
-    fileInput.addEventListener('change', async (event) => {
-        const file = event.target.files[0];
-        if (file) {
-            try {
-                const imageUrl = URL.createObjectURL(file);
-                const resizedBlob = await resizeImage(imageUrl);
-                snapshot.src = URL.createObjectURL(resizedBlob);
-                snapshot.style.display = 'block';
-                submitBtn.disabled = false;
-                deleteImageButton.style.display = 'inline-block';
-                predictionResult.innerHTML = '<p style="color:green;">Image selected successfully.</p>';
-            } catch (error) {
-                console.error('Error processing selected image:', error);
-                predictionResult.innerHTML = '<p style="color:red;">Failed to process selected image.</p>';
-            }
-        }
-    });
-
-    // Submit image to the server
-    submitBtn.addEventListener('click', async () => {
-        console.log("✅ Submit button clicked!");
-        predictionResult.innerHTML = '<p>Loading...</p>';
-
-        const file = fileInput.files[0];
-        const imageDataUrl = snapshot.src;
-        const formData = new FormData();
-
-        try {
+        // Handle file upload
+        document.getElementById("fileInput").addEventListener("change", async (event) => {
+            const file = event.target.files[0];
             if (file) {
-                const imageUrl = URL.createObjectURL(file);
-                const resizedBlob = await resizeImage(imageUrl);
-                formData.append('image', resizedBlob, 'image.jpg');
-                console.log("📸 File selected and resized:", file.name);
-            } else if (imageDataUrl && imageDataUrl.startsWith('data:')) {
-                const response = await fetch(imageDataUrl);
-                const blob = await response.blob();
-                formData.append('image', blob, 'captured_image.jpg');
-                console.log("📷 Captured image prepared.");
+                // Check file size (5MB limit)
+                if (file.size > 5 * 1024 * 1024) {
+                    document.getElementById("predictionResult").innerHTML = '<p style="color:red;">File too large. Maximum size is 5MB.</p>';
+                    fileInput.value = ''; // Clear the input
+                    return;
+                }
+                try {
+                    const formData = new FormData();
+                    formData.append('image', file);
+
+                    // Upload to server
+                    const uploadResponse = await fetch('/upload', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const uploadResult = await uploadResponse.json();
+                    if (!uploadResult.success) {
+                        document.getElementById("predictionResult").innerHTML = `<p style="color:red;">${uploadResult.error || 'Upload failed.'}</p>`;
+                        fileInput.value = ''; // Clear the input on error
+                        return;
+                    }
+
+                    const imageUrl = URL.createObjectURL(file);
+                    const img = new Image();
+                    img.src = imageUrl;
+                    img.onload = async () => {
+                        const canvas = document.createElement("canvas");
+                        canvas.width = 200;
+                        canvas.height = 200;
+                        const ctx = canvas.getContext("2d");
+                        ctx.drawImage(img, 0, 0, 200, 200);
+
+                        snapshot = document.getElementById("snapshot");
+                        snapshot.src = canvas.toDataURL("image/png");
+                        snapshot.style.display = "block";
+
+                        document.getElementById("deleteImage").style.display = "inline-block";
+                        document.getElementById("predictButton").style.display = "inline-block";
+                        document.getElementById("predictionResult").innerHTML = '<p style="color:green;">Image uploaded. Click Predict to classify.</p>';
+                    };
+                    img.onerror = () => {
+                        document.getElementById("predictionResult").innerHTML = '<p style="color:red;">Failed to load uploaded image.</p>';
+                        fileInput.value = ''; // Clear the input on error
+                    };
+                } catch (error) {
+                    console.error("Error processing uploaded image:", error);
+                    document.getElementById("predictionResult").innerHTML = '<p style="color:red;">Failed to process uploaded image.</p>';
+                    fileInput.value = ''; // Clear the input on error
+                }
+            }
+        });
+
+        // Delete captured or uploaded image
+        document.getElementById("deleteImage").addEventListener("click", () => {
+            snapshot.src = "";
+            snapshot.style.display = "none";
+            document.getElementById("deleteImage").style.display = "none";
+            document.getElementById("predictButton").style.display = "none";
+            document.getElementById("label-container").innerHTML = "";
+            document.getElementById("predictionResult").innerHTML = "";
+            document.getElementById("fileInput").value = ""; // Clear file input
+        });
+
+        // Predict on captured or uploaded image
+        document.getElementById("predictButton").addEventListener("click", async () => {
+            if (!snapshot.src || snapshot.style.display !== "block") {
+                document.getElementById("predictionResult").innerHTML = '<p style="color:red;">Please capture or upload an image first.</p>';
+                return;
+            }
+            await predict();
+        });
+
+        // Run the captured or uploaded image through the image model
+        async function predict() {
+            document.getElementById("label-container").innerHTML = "";
+            for (let i = 0; i < maxPredictions; i++) {
+                labelContainer.appendChild(document.createElement("div"));
+            }
+
+            const prediction = await model.predict(snapshot);
+            let highestConfidence = 0;
+            let bestPrediction = null;
+
+            for (let i = 0; i < maxPredictions; i++) {
+                const classPrediction = prediction[i].className + ": " + prediction[i].probability.toFixed(2);
+                labelContainer.childNodes[i].innerHTML = classPrediction;
+
+                if (prediction[i].probability > highestConfidence) {
+                    highestConfidence = prediction[i].probability;
+                    bestPrediction = prediction[i].className;
+                }
+            }
+
+            // Display detailed prediction if confidence > 0.50
+            if (highestConfidence > 0.50) {
+                await displayDetailedPrediction(bestPrediction, highestConfidence);
             } else {
-                predictionResult.innerHTML = '<p style="color:red;">⚠️ Please select or capture an image first.</p>';
-                return;
+                document.getElementById("predictionResult").innerHTML = '<p style="color:gray;">No clear chili detected. Try capturing or uploading another image.</p>';
             }
-
-            console.log("📤 Sending image to server...");
-            const response = await fetch('/upload', {
-                method: 'POST',
-                body: formData
-            });
-
-            console.log("📥 Received response from server.");
-            const result = await response.json();
-            console.log("🔍 Prediction Result:", result);
-
-            if (result.error) {
-                predictionResult.innerHTML = `<p style="color:red;">Error: ${result.error}</p>`;
-                return;
-            }
-
-            displayPrediction(result);
-        } catch (error) {
-            console.error('❌ Error during prediction:', error);
-            predictionResult.innerHTML = '<p style="color:red;">⚠️ There was an error processing your image.</p>';
-        }
-    });
-
-    function displayPrediction(result) {
-        const prediction = result.prediction;
-        const confidence = result.confidence ? (result.confidence * 100).toFixed(2) : null;
-
-        if (prediction === 'No Chili Detected') {
-            predictionResult.innerHTML = `
-                <p>No chili detected in the image.</p>
-                <p>Confidence: ${confidence}%</p>
-                <p>Please try another image.</p>`;
-            return;
         }
 
-        predictionResult.innerHTML = '<p>Loading chili information...</p>';
+        async function displayDetailedPrediction(prediction, confidence) {
+            document.getElementById("predictionResult").innerHTML = '<p>Loading chili information...</p><div class="spinner"></div>';
 
-        fetch(`/get_chili_info?name=${encodeURIComponent(prediction)}`)
-            .then(response => response.json())
-            .then(data => {
+            try {
+                const response = await fetch(`/get_chili_info?name=${encodeURIComponent(prediction)}`);
+                const data = await response.json();
+
                 if (data.error) {
-                    predictionResult.innerHTML = `
+                    document.getElementById("predictionResult").innerHTML = `
                         <p style="color:red;">Error: ${data.error}</p>
-                        <p>Prediction: ${prediction} (Confidence: ${confidence}%)</p>`;
+                        <p>Prediction: ${prediction} (Confidence: ${(confidence * 100).toFixed(2)}%)</p>`;
                     return;
                 }
 
-                predictionResult.innerHTML = `
+                document.getElementById("predictionResult").innerHTML = `
                     <h3>Prediction: ${data.name}</h3>
-                    <p>Confidence: ${confidence}%</p>
+                    <p>Confidence: ${(confidence * 100).toFixed(2)}%</p>
                     <div class="result-content">
                         <div class="chili-image">
                             <img src="${data.image_url}" alt="${data.name}" style="width:200px;height:auto;border-radius:5px;margin-bottom:10px;">
@@ -610,15 +619,13 @@
                             </ul>
                         </div>
                     </div>`;
-            })
-            .catch(error => {
+            } catch (error) {
                 console.error("Error fetching chili details:", error);
-                predictionResult.innerHTML = `
+                document.getElementById("predictionResult").innerHTML = `
                     <p style="color:red;">Error retrieving chili information. Please try again.</p>
-                    <p>Prediction: ${prediction} (Confidence: ${confidence}%)</p>`;
-            });
-    }
-</script>
-
-
+                    <p>Prediction: ${prediction} (Confidence: ${(confidence * 100).toFixed(2)}%)</p>`;
+            }
+        }
+    </script>
 </body>
+</html>
