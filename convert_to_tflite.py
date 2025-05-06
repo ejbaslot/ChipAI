@@ -1,7 +1,7 @@
 import tensorflow as tf
 
 # Load the .h5 model
-model = tf.keras.models.load_model('ChipAI/models/mobilenetv2_chili_pepper_classifier.h5')
+model = tf.keras.models.load_model('ChipAI/models/keras_model.h5')
 
 # Convert the model to TensorFlow Lite format
 converter = tf.lite.TFLiteConverter.from_keras_model(model)
