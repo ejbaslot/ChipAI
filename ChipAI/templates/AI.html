@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ChipAI - Chili Prediction</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 </head>
@@ -63,6 +63,7 @@
         html, body {
             margin: 0;
             min-height: 100vh;
+            font-size: 16px;
         }
 
         body {
@@ -77,7 +78,7 @@
 
         main {
             overflow-y: auto;
-            min-height: calc(100vh - 130px);
+            min-height: calc(100vh - 100px);
             flex: 1;
         }
 
@@ -87,24 +88,24 @@
         }
 
         h1 {
-            font-size: clamp(2rem, 5vw, 2.5rem);
+            font-size: 1.5rem;
             margin: 0;
             color: #FFFFFF;
         }
 
         h2 {
-            font-size: clamp(1.5rem, 4vw, 1.75rem);
+            font-size: 1.25rem;
         }
 
         h3 {
-            font-size: clamp(1.2rem, 3.5vw, 1.5rem);
+            font-size: 1rem;
         }
 
         /* Content */
         .content {
-            padding: clamp(20px, 5vw, 40px) clamp(10px, 3vw, 20px);
+            padding: 15px 10px;
             text-align: center;
-            max-width: 1200px;
+            max-width: 800px;
             margin: 0 auto;
         }
 
@@ -114,13 +115,13 @@
             justify-content: space-between;
             align-items: center;
             background-color: #2E7D32;
-            padding: clamp(10px, 2vw, 20px);
+            padding: 10px;
             color: #FFFFFF;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
             position: sticky;
             top: 0;
             z-index: 100;
-            min-height: clamp(70px, 8vw, 90px);
+            min-height: 60px;
         }
 
         .header-left {
@@ -130,9 +131,9 @@
         }
 
         .logo {
-            width: clamp(60px, 8vw, 100px);
-            height: clamp(60px, 8vw, 100px);
-            margin-right: clamp(10px, 2vw, 15px);
+            width: 50px;
+            height: 50px;
+            margin-right: 10px;
             vertical-align: middle;
         }
 
@@ -142,28 +143,28 @@
         }
 
         .toggle {
-            width: clamp(30px, 5vw, 40px);
-            height: clamp(30px, 5vw, 40px);
+            width: 25px;
+            height: 25px;
             cursor: pointer;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: clamp(4px, 1vw, 8px);
-            padding: clamp(3px, 1vw, 5px);
+            gap: 3px;
+            padding: 2px;
             transition: transform 0.3s ease;
         }
 
         .bars {
             width: 100%;
-            height: clamp(2px, 0.5vw, 4px);
+            height: 2px;
             background-color: #FFFFFF;
             border-radius: 2px;
             transition: transform 0.3s ease, opacity 0.3s ease;
         }
 
         #checkbox:checked + .toggle #bar1 {
-            transform: translateY(clamp(8px, 2vw, 12px)) rotate(45deg);
+            transform: translateY(6px) rotate(45deg);
         }
 
         #checkbox:checked + .toggle #bar2 {
@@ -171,33 +172,33 @@
         }
 
         #checkbox:checked + .toggle #bar3 {
-            transform: translateY(clamp(-8px, -2vw, -12px)) rotate(-45deg);
+            transform: translateY(-6px) rotate(-45deg);
         }
 
         nav ul {
             list-style: none;
             display: none;
             flex-direction: column;
-            gap: clamp(5px, 1.5vw, 10px);
+            gap: 5px;
             position: absolute;
-            top: clamp(70px, 8vw, 90px);
-            right: clamp(10px, 2vw, 20px);
+            top: 60px;
+            right: 10px;
             background-color: #2E7D32;
-            padding: clamp(8px, 2vw, 15px);
+            padding: 8px;
             border-radius: 5px;
             box-shadow: 0 0 10px #26802b;
             z-index: 100;
-            width: clamp(150px, 25vw, 200px);
+            width: 150px;
         }
 
         nav ul li a {
             color: #FFFFFF;
             text-decoration: none;
-            padding: clamp(8px, 2vw, 10px);
+            padding: 8px;
             border-radius: 3px;
             display: block;
             transition: background 0.2s;
-            font-size: clamp(0.9rem, 2vw, 1rem);
+            font-size: 0.9rem;
         }
 
         nav ul li a:hover {
@@ -213,28 +214,28 @@
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: clamp(10px, 2.5vw, 20px);
-            margin: clamp(10px, 2.5vw, 20px) auto;
-            max-width: clamp(200px, 25vw, 280px);
+            gap: 10px;
+            margin: 10px auto;
+            max-width: 200px;
             border: 2px solid #2E7D32;
             border-radius: 10px;
-            padding: clamp(5px, 1.5vw, 10px);
+            padding: 5px;
         }
 
         video, #snapshot {
             width: 100%;
-            max-width: clamp(200px, 25vw, 280px);
+            max-width: 200px;
             border-radius: 10px;
         }
 
         /* Content Card */
         .content-card {
             background-color: #FFFFFF;
-            border-radius: 15px;
-            padding: clamp(15px, 4vw, 30px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-            margin: clamp(15px, 4vw, 30px) auto;
-            max-width: 800px;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+            margin: 15px auto;
+            max-width: 600px;
             border: 1px solid #f5f5f5;
         }
 
@@ -242,7 +243,7 @@
         .result-content {
             display: flex;
             flex-wrap: wrap;
-            gap: 20px;
+            gap: 15px;
             justify-content: center;
             align-items: center;
         }
@@ -259,8 +260,8 @@
         }
 
         .chili-info li {
-            margin: 10px 0;
-            font-size: clamp(0.9rem, 2vw, 1rem);
+            margin: 8px 0;
+            font-size: 0.9rem;
         }
 
         .chili-info strong {
@@ -269,13 +270,13 @@
 
         /* Spinner for Loading */
         .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #2E7D32;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #2E7D32;
             border-radius: 50%;
-            width: 30px;
-            height: 30px;
+            width: 20px;
+            height: 20px;
             animation: spin 1s linear infinite;
-            margin: 20px auto;
+            margin: 15px auto;
         }
 
         @keyframes spin {
@@ -287,22 +288,22 @@
         .btn {
             background-color: #2E7D32;
             color: #FFFFFF;
-            padding: clamp(8px, 2vw, 12px) clamp(16px, 4vw, 24px);
+            padding: 8px 16px;
             border: none;
             cursor: pointer;
             border-radius: 5px;
             transition: background 0.3s, transform 0.3s;
-            margin: clamp(10px, 2.5vw, 15px) 0;
+            margin: 10px 0;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            font-size: clamp(0.8rem, 2vw, 1rem);
+            letter-spacing: 0.8px;
+            font-size: 0.9rem;
         }
 
         .btn:hover {
             background-color: #197e1e;
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
         }
 
         /* Footer */
@@ -311,130 +312,109 @@
             background-color: #2E7D32;
             color: #FFFFFF;
             text-align: center;
-            padding: clamp(10px, 3vw, 15px);
+            padding: 10px;
             margin-top: auto;
-            min-height: clamp(40px, 5vw, 50px);
+            min-height: 40px;
         }
 
         /* Responsive Styles */
         @media only screen and (max-width: 768px) {
             header {
-                flex-direction: row;
-                align-items: center;
-                padding: clamp(8px, 2vw, 10px);
-                min-height: clamp(60px, 6vw, 75px);
-            }
-
-            .header-left {
-                flex: 1;
-                justify-content: flex-start;
-                align-items: center;
+                min-height: 50px;
             }
 
             .logo {
-                width: clamp(50px, 7vw, 90px);
-                height: clamp(50px, 7vw, 90px);
+                width: 40px;
+                height: 40px;
             }
 
             .toggle {
-                width: clamp(25px, 4vw, 35px);
-                height: clamp(25px, 4vw, 35px);
-                gap: clamp(3px, 1vw, 6px);
+                width: 20px;
+                height: 20px;
+                gap: 2px;
             }
 
             .bars {
-                height: clamp(2px, 0.5vw, 3px);
+                height: 1.5px;
             }
 
             nav ul {
-                top: 100%;
-                width: 100%;
-                right: 0;
-                left: 0;
-                border-radius: 0;
-                padding: clamp(10px, 2vw, 15px);
-            }
-
-            nav ul li a {
-                padding: clamp(8px, 2vw, 12px);
-                font-size: clamp(0.8rem, 2vw, 1.1rem);
+                top: 50px;
+                width: 120px;
+                right: 5px;
             }
 
             .content {
-                padding: clamp(15px, 3.5vw, 20px) clamp(5px, 2vw, 10px);
+                padding: 10px 5px;
             }
 
             .content-card {
                 width: 90%;
-                max-width: 600px;
-                padding: clamp(15px, 3.5vw, 20px);
+                max-width: 500px;
             }
 
             .camera-container {
-                max-width: clamp(250px, 35vw, 300px);
+                max-width: 180px;
             }
 
             video, #snapshot {
-                max-width: clamp(250px, 35vw, 300px);
+                max-width: 180px;
             }
 
             footer {
-                padding: clamp(10px, 2.5vw, 15px);
-                min-height: clamp(40px, 5vw, 48px);
+                min-height: 35px;
             }
         }
 
         @media only screen and (max-width: 480px) {
             header {
-                padding: clamp(6px, 1.5vw, 8px);
-                min-height: clamp(50px, 5vw, 65px);
+                min-height: 45px;
             }
 
             .logo {
-                width: clamp(40px, 6vw, 80px);
-                height: clamp(40px, 6vw, 80px);
+                width: 35px;
+                height: 35px;
             }
 
             .toggle {
-                width: clamp(20px, 3.5vw, 35px);
-                height: clamp(20px, 3.5vw, 35px);
-                gap: clamp(2px, 0.8vw, 6px);
+                width: 18px;
+                height: 18px;
+                gap: 1.5px;
             }
 
             .bars {
-                height: clamp(1.5px, 0.4vw, 3px);
+                height: 1.5px;
             }
 
             nav ul {
-                padding: clamp(8px, 1.5vw, 10px);
+                width: 100px;
+                padding: 6px;
             }
 
             nav ul li a {
-                font-size: clamp(0.7rem, 1.8vw, 0.9rem);
-                padding: clamp(6px, 1.5vw, 10px);
+                font-size: 0.8rem;
+                padding: 6px;
             }
 
             .content {
-                padding: clamp(5px, 1.5vw, 10px) clamp(5px, 1.5vw, 5px);
+                padding: 5px;
             }
 
             .content-card {
                 width: 95%;
-                max-width: 500px;
-                padding: clamp(10px, 2.5vw, 15px);
+                max-width: 400px;
             }
 
             .camera-container {
-                max-width: clamp(200px, 30vw, 250px);
+                max-width: 150px;
             }
 
             video, #snapshot {
-                max-width: clamp(200px, 30vw, 250px);
+                max-width: 150px;
             }
 
             footer {
-                padding: clamp(8px, 2vw, 10px);
-                min-height: clamp(30px, 4vw, 36px);
+                min-height: 30px;
             }
         }
     </style>
@@ -470,7 +450,6 @@
                     canvas.height = targetSize;
                     const ctx = canvas.getContext('2d');
 
-                    // Use ImageOps.fit-like behavior: crop to center
                     const scale = Math.max(img.width, img.height) / targetSize;
                     const scaledWidth = img.width / scale;
                     const scaledHeight = img.height / scale;
@@ -479,7 +458,6 @@
 
                     ctx.drawImage(img, cropX, cropY, scaledWidth, scaledHeight, 0, 0, targetSize, targetSize);
 
-                    // Use PNG to preserve RGB format
                     canvas.toBlob((blob) => {
                         resolve(blob);
                     }, 'image/png');
@@ -527,7 +505,6 @@
                 canvas.height = 224;
                 const ctx = canvas.getContext('2d');
 
-                // Calculate cropping region to fit video into 224x224
                 const scale = Math.max(video.videoWidth, video.videoHeight) / 224;
                 const scaledWidth = video.videoWidth / scale;
                 const scaledHeight = video.videoHeight / scale;
@@ -565,10 +542,9 @@
         fileInput.addEventListener('change', async (event) => {
             const file = event.target.files[0];
             if (file) {
-                // Check file size (5MB limit)
                 if (file.size > 5 * 1024 * 1024) {
                     predictionResult.innerHTML = '<p style="color:red;">File too large. Maximum size is 5MB.</p>';
-                    fileInput.value = ''; // Clear the input
+                    fileInput.value = '';
                     return;
                 }
                 try {
@@ -582,14 +558,13 @@
                 } catch (error) {
                     console.error('Error processing selected image:', error);
                     predictionResult.innerHTML = '<p style="color:red;">Failed to process selected image.</p>';
-                    fileInput.value = ''; // Clear the input on error
+                    fileInput.value = '';
                 }
             }
         });
 
         // Submit image to the server
         submitBtn.addEventListener('click', async () => {
-            console.log("✅ Submit button clicked!");
             predictionResult.innerHTML = '<p>Loading...</p><div class="spinner"></div>';
 
             const file = fileInput.files[0];
@@ -601,38 +576,30 @@
                     const imageUrl = URL.createObjectURL(file);
                     const croppedBlob = await cropImage(imageUrl, 224);
                     formData.append('image', croppedBlob, 'image.png');
-                    console.log("📸 File selected and cropped:", file.name);
                 } else if (imageDataUrl && imageDataUrl.startsWith('data:')) {
                     const response = await fetch(imageDataUrl);
                     const blob = await response.blob();
                     formData.append('image', blob, 'captured_image.png');
-                    console.log("📷 Captured image prepared.");
                 } else {
-                    predictionResult.innerHTML = '<p style="color:red;">⚠️ Please select or capture an image first.</p>';
+                    predictionResult.innerHTML = '<p style="color:red;">Please select or capture an image first.</p>';
                     return;
                 }
 
-                console.log("📤 Sending image to server...");
                 const response = await fetch('/upload', {
                     method: 'POST',
                     body: formData
                 });
 
-                console.log("📥 Received response from server.");
                 const result = await response.json();
-                console.log("🔍 Prediction Result:", result);
-
                 if (result.error) {
-                    predictionResult.innerHTML = `
-                        <p style="color:red;">Error: ${result.error}</p>
-                        <p>Ensure your image is a valid 224x224 image.</p>`;
+                    predictionResult.innerHTML = `<p style="color:red;">Error: ${result.error}</p>`;
                     return;
                 }
 
                 displayPrediction(result);
             } catch (error) {
-                console.error('❌ Error during prediction:', error);
-                predictionResult.innerHTML = '<p style="color:red;">⚠️ There was an error processing your image. Please try again.</p>';
+                console.error('Error during prediction:', error);
+                predictionResult.innerHTML = '<p style="color:red;">There was an error processing your image. Please try again.</p>';
             }
         });
 
@@ -665,7 +632,7 @@
                         <p>Confidence: ${confidence}%</p>
                         <div class="result-content">
                             <div class="chili-image">
-                                <img src="${data.image_url}" alt="${data.name}" style="width:200px;height:auto;border-radius:5px;margin-bottom:10px;">
+                                <img src="${data.image_url}" alt="${data.name}" style="width:150px;height:auto;border-radius:5px;margin-bottom:10px;">
                             </div>
                             <div class="chili-info">
                                 <ul>
