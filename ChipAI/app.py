@@ -19,7 +19,8 @@ app = Flask(__name__)
 app.secret_key = os.getenv('FLASK_SECRET_KEY', 'your_default_secret')  # Ensure this is set in your environment
 
 # Load TFLite model
-interpreter = tf.lite.Interpreter(model_path="ChipAI/models/ChipAI.tflite")
+model_path = "ChipAI/models/model_unquant.tflite"  # Update to your .tflite file name
+interpreter = tf.lite.Interpreter(model_path=model_path)
 interpreter.allocate_tensors()
 
 # Get input and output details for reuse
@@ -28,6 +29,19 @@ output_details = interpreter.get_output_details()
 
 # Verify input shape
 logger.info("TFLite model input details: %s", input_details)
+
+# Load class labels from labels.txt
+labels_path = "ChipAI/models/labels.txt"  # Path to your labels.txt
+try:
+    with open(labels_path, 'r') as f:
+        class_labels = [line.strip() for line in f if line.strip()]
+    logger.info("Loaded class labels: %s", class_labels)
+except FileNotFoundError:
+    logger.error("labels.txt not found at %s", labels_path)
+    class_labels = ["Siling Atsal", "Siling Labuyo", "Siling Espada", "Scotch Bonnet", "Siling Talbusan"]  # Fallback
+except Exception as e:
+    logger.error("Error reading labels.txt: %s", str(e))
+    class_labels = ["Siling Atsal", "Siling Labuyo", "Siling Espada", "Scotch Bonnet", "Siling Talbusan"]  # Fallback
 
 # Ensure the uploads directory exists
 upload_folder = 'uploads'
@@ -59,7 +73,20 @@ IMAGE_MAPPING = {
     "Siling Talbusan": "siling_talbusan.jpg"
 }
 
-# Consolidated image preprocessing function
+# Consolidated image preprocessing function (bypassing preprocessing)
+def preprocess_image(image_stream):
+    try:
+        img = Image.open(image_stream)  # Load image in its original format
+        img_array = np.array(img, dtype=np.float32)  # Convert to numpy array, keep raw pixel values
+        img_array = np.expand_dims(img_array, axis=0)  # Add batch dimension
+        logger.info("Image loaded without preprocessing: shape=%s", img_array.shape)
+        return img_array
+    except Exception as e:
+        logger.error("Error in preprocess_image: %s", str(e))
+        return None
+
+# Alternative preprocessing function (uncomment to use standard Teachable Machine preprocessing)
+"""
 def preprocess_image(image_stream, target_size=(224, 224)):
     try:
         img = Image.open(image_stream).convert("RGB")  # Ensure RGB format
@@ -71,14 +98,32 @@ def preprocess_image(image_stream, target_size=(224, 224)):
     except Exception as e:
         logger.error("Error in preprocess_image: %s", str(e))
         return None
-        
+"""
+
 # Prediction function for the chili pepper classifier
 def predict_chili_variety(image_stream):
     try:
-        # Preprocess image
-        img_array = preprocess_image(image_stream, target_size=(224, 224))
+        # Load image without preprocessing
+        img_array = preprocess_image(image_stream)
         if img_array is None:
-            raise ValueError("Image preprocessing failed")
+            raise ValueError("Image loading failed")
+
+        # Check input shape compatibility with Teachable Machine model
+        expected_shape = input_details[0]['shape']  # Typically (1, 224, 224, 3)
+        if img_array.shape != tuple(expected_shape):
+            logger.error("Input shape %s does not match model expected shape %s", img_array.shape, expected_shape)
+            return {
+                "label": "Error processing the image",
+                "error": f"Input shape {img_array.shape} does not match model expected shape {expected_shape}. Teachable Machine models typically require 224x224 RGB images."
+            }
+
+        # Verify channel count (Teachable Machine expects RGB)
+        if img_array.shape[-1] != 3:
+            logger.error("Image has %d channels, expected 3 (RGB)", img_array.shape[-1])
+            return {
+                "label": "Error processing the image",
+                "error": f"Image has {img_array.shape[-1]} channels, but Teachable Machine model expects 3 (RGB)."
+            }
 
         # Set input tensor
         interpreter.set_tensor(input_details[0]['index'], img_array)
@@ -88,8 +133,7 @@ def predict_chili_variety(image_stream):
         output_data = interpreter.get_tensor(output_details[0]['index'])
         logger.info("Prediction raw output (TFLite): %s", output_data)
 
-        # Class labels (consistent with training)
-        class_labels = ["Siling Atsal", "Siling Labuyo", "Siling Espada", "Scotch Bonnet", "Siling Talbusan"]
+        # Use loaded class labels
         predicted_prob = np.max(output_data[0])
         predicted_label = class_labels[np.argmax(output_data[0])]
         confidence = float(predicted_prob)
@@ -104,7 +148,7 @@ def predict_chili_variety(image_stream):
     except Exception as e:
         logger.error("Error in TFLite prediction: %s", str(e))
         return {"label": "Error processing the image", "error": str(e)}
-    
+
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
@@ -211,7 +255,7 @@ def upload_image():
     except Exception as e:
         logger.error("Error processing the image: %s", str(e))
         return jsonify({'error': 'Error processing the image. Please try again.'}), 500
-    
+
 @app.route('/')
 def index():
     if 'user_id' in session:

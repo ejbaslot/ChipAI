@@ -12,7 +12,7 @@
         </label>
         <nav>
             <ul>
-                <li><a href="https://chipai.onrender.com/login" class="back-link">Home</a></li>
+                <li><a href="{{ url_for('index') }}" class="back-link">Home</a></li>
             </ul>
         </nav>
     </header>
@@ -35,10 +35,11 @@
 
         <div class="instructions content-card">
             <h3>Instructions:</h3>
-            <p>1. Click "Choose File" to select an image from your device.</p>
+            <p>1. Click "Choose File" to select an image (will be resized to 224x224).</p>
             <p>2. Click "Start Camera" to access your camera.</p>
-            <p>3. When the camera feed appears, click "Capture Image" to take a snapshot.</p>
-            <p>4. Submit the selected or captured image for processing.</p>
+            <p>3. When the camera feed appears, click "Capture Image" to take a snapshot (will be resized to 224x224).</p>
+            <p>4. Submit the image for chili variety prediction.</p>
+            <p><strong>Note:</strong> Images must be in RGB format (not grayscale or RGBA) for successful prediction.</p>
         </div>
         
         <button class="btn" id="submitBtn" disabled>Submit</button>
@@ -47,7 +48,7 @@
 
     <!-- Footer -->
     <footer>
-        <p>© 2024 ChipAI. All rights reserved.</p>
+        <p>© 2025 ChipAI. All rights reserved.</p>
     </footer>
 
     <style>
@@ -112,7 +113,7 @@
             position: sticky;
             top: 0;
             z-index: 100;
-            min-height: clamp(70px, 8vw, 90px); /* Increased min-height to accommodate larger logo */
+            min-height: clamp(70px, 8vw, 90px);
         }
 
         .header-left {
@@ -122,9 +123,9 @@
         }
 
         .logo {
-            width: clamp(60px, 8vw, 100px); /* Increased minimum and maximum sizes */
-            height: clamp(60px, 8vw, 100px); /* Increased minimum and maximum sizes */
-            margin-right: clamp(10px, 2vw, 15px); /* Adjusted margin for better spacing */
+            width: clamp(60px, 8vw, 100px);
+            height: clamp(60px, 8vw, 100px);
+            margin-right: clamp(10px, 2vw, 15px);
             vertical-align: middle;
         }
 
@@ -172,7 +173,7 @@
             flex-direction: column;
             gap: clamp(5px, 1.5vw, 10px);
             position: absolute;
-            top: clamp(70px, 8vw, 90px); /* Updated to match header min-height */
+            top: clamp(70px, 8vw, 90px);
             right: clamp(10px, 2vw, 20px);
             background-color: #2E7D32;
             padding: clamp(8px, 2vw, 15px);
@@ -269,7 +270,7 @@
                 flex-direction: row;
                 align-items: center;
                 padding: clamp(8px, 2vw, 10px);
-                min-height: clamp(60px, 6vw, 75px); /* Adjusted for larger logo */
+                min-height: clamp(60px, 6vw, 75px);
             }
 
             .header-left {
@@ -279,8 +280,8 @@
             }
 
             .logo {
-                width: clamp(50px, 7vw, 90px); /* Adjusted for responsiveness */
-                height: clamp(50px, 7vw, 90px); /* Adjusted for responsiveness */
+                width: clamp(50px, 7vw, 90px);
+                height: clamp(50px, 7vw, 90px);
             }
 
             .toggle {
@@ -334,12 +335,12 @@
         @media only screen and (max-width: 480px) {
             header {
                 padding: clamp(6px, 1.5vw, 8px);
-                min-height: clamp(50px, 5vw, 65px); /* Adjusted for larger logo */
+                min-height: clamp(50px, 5vw, 65px);
             }
 
             .logo {
-                width: clamp(40px, 6vw, 80px); /* Adjusted for responsiveness */
-                height: clamp(40px, 6vw, 80px); /* Adjusted for responsiveness */
+                width: clamp(40px, 6vw, 80px);
+                height: clamp(40px, 6vw, 80px);
             }
 
             .toggle {
@@ -399,7 +400,7 @@
     const canvas = document.createElement('canvas');
     let stream;
 
-    // Resize image to 224x224 while preserving aspect ratio
+    // Resize image to 224x224, preserving aspect ratio and original format
     async function resizeImage(imageSource, targetSize = 224) {
         return new Promise((resolve, reject) => {
             const img = new Image();
@@ -417,14 +418,15 @@
                 const offsetX = (targetSize - scaledWidth) / 2;
                 const offsetY = (targetSize - scaledHeight) / 2;
 
-                // Draw image centered on canvas
+                // Fill with black and draw image centered
                 ctx.fillStyle = 'black';
                 ctx.fillRect(0, 0, targetSize, targetSize);
                 ctx.drawImage(img, offsetX, offsetY, scaledWidth, scaledHeight);
 
+                // Use PNG to preserve original channel format (e.g., grayscale, RGBA)
                 canvas.toBlob((blob) => {
                     resolve(blob);
-                }, 'image/jpeg', 0.9);
+                }, 'image/png');
             };
             img.onerror = () => reject(new Error('Failed to load image'));
         });
@@ -462,7 +464,7 @@
         submitBtn.disabled = true;
     });
 
-    // Capture image from the live video feed
+    // Capture image from the live video feed and resize to 224x224
     captureImageButton.addEventListener('click', async () => {
         try {
             canvas.width = 224;
@@ -481,14 +483,14 @@
             ctx.drawImage(video, offsetX, offsetY, scaledWidth, scaledHeight);
 
             const blob = await new Promise((resolve) => {
-                canvas.toBlob(resolve, 'image/jpeg', 0.9);
+                canvas.toBlob(resolve, 'image/png');
             });
 
-            snapshot.src = canvas.toDataURL('image/jpeg');
+            snapshot.src = canvas.toDataURL('image/png');
             snapshot.style.display = 'block';
             submitBtn.disabled = false;
             deleteImageButton.style.display = 'inline-block';
-            predictionResult.innerHTML = '<p style="color:green;">Image captured successfully.</p>';
+            predictionResult.innerHTML = '<p style="color:green;">Image captured and resized to 224x224. Ensure it is RGB for best results.</p>';
         } catch (error) {
             console.error('Error capturing image:', error);
             predictionResult.innerHTML = '<p style="color:red;">Failed to capture image.</p>';
@@ -504,18 +506,18 @@
         predictionResult.innerHTML = '';
     });
 
-    // Handle file input selection
+    // Handle file input selection and resize to 224x224
     fileInput.addEventListener('change', async (event) => {
         const file = event.target.files[0];
         if (file) {
             try {
                 const imageUrl = URL.createObjectURL(file);
-                const resizedBlob = await resizeImage(imageUrl);
+                const resizedBlob = await resizeImage(imageUrl, 224);
                 snapshot.src = URL.createObjectURL(resizedBlob);
                 snapshot.style.display = 'block';
                 submitBtn.disabled = false;
                 deleteImageButton.style.display = 'inline-block';
-                predictionResult.innerHTML = '<p style="color:green;">Image selected successfully.</p>';
+                predictionResult.innerHTML = '<p style="color:green;">Image selected and resized to 224x224. Ensure it is RGB for best results.</p>';
             } catch (error) {
                 console.error('Error processing selected image:', error);
                 predictionResult.innerHTML = '<p style="color:red;">Failed to process selected image.</p>';
@@ -535,13 +537,13 @@
         try {
             if (file) {
                 const imageUrl = URL.createObjectURL(file);
-                const resizedBlob = await resizeImage(imageUrl);
-                formData.append('image', resizedBlob, 'image.jpg');
+                const resizedBlob = await resizeImage(imageUrl, 224);
+                formData.append('image', resizedBlob, 'image.png');
                 console.log("📸 File selected and resized:", file.name);
             } else if (imageDataUrl && imageDataUrl.startsWith('data:')) {
                 const response = await fetch(imageDataUrl);
                 const blob = await response.blob();
-                formData.append('image', blob, 'captured_image.jpg');
+                formData.append('image', blob, 'captured_image.png');
                 console.log("📷 Captured image prepared.");
             } else {
                 predictionResult.innerHTML = '<p style="color:red;">⚠️ Please select or capture an image first.</p>';
@@ -559,14 +561,16 @@
             console.log("🔍 Prediction Result:", result);
 
             if (result.error) {
-                predictionResult.innerHTML = `<p style="color:red;">Error: ${result.error}</p>`;
+                predictionResult.innerHTML = `
+                    <p style="color:red;">Error: ${result.error}</p>
+                    <p>Ensure your image is in RGB format (not grayscale or RGBA). Use an image editor to convert if needed.</p>`;
                 return;
             }
 
             displayPrediction(result);
         } catch (error) {
             console.error('❌ Error during prediction:', error);
-            predictionResult.innerHTML = '<p style="color:red;">⚠️ There was an error processing your image.</p>';
+            predictionResult.innerHTML = '<p style="color:red;">⚠️ There was an error processing your image. Please try again.</p>';
         }
     });
 
@@ -578,7 +582,7 @@
             predictionResult.innerHTML = `
                 <p>No chili detected in the image.</p>
                 <p>Confidence: ${confidence}%</p>
-                <p>Please try another image.</p>`;
+                <p>Please try another RGB image resized to 224x224.</p>`;
             return;
         }
 
@@ -619,6 +623,4 @@
             });
     }
 </script>
-
-
 </body>
