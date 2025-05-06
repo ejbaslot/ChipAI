@@ -226,6 +226,7 @@
             width: 100%;
             max-width: 224px;
             border-radius: 10px;
+            object-fit: contain;
         }
 
         /* Content Card */
@@ -439,8 +440,8 @@
             startCameraButton.textContent = 'Camera Not Supported';
         }
 
-        // Crop image to 224x224 using center cropping
-        async function cropImage(imageSource, targetSize = 224) {
+        // Resize image to 224x224 while preserving aspect ratio
+        async function resizeImage(imageSource, targetSize = 224) {
             return new Promise((resolve, reject) => {
                 const img = new Image();
                 img.src = imageSource;
@@ -450,13 +451,29 @@
                     canvas.height = targetSize;
                     const ctx = canvas.getContext('2d');
 
-                    const scale = Math.max(img.width, img.height) / targetSize;
-                    const scaledWidth = img.width / scale;
-                    const scaledHeight = img.height / scale;
-                    const cropX = (img.width - scaledWidth) / 2;
-                    const cropY = (img.height - scaledHeight) / 2;
+                    // Calculate scaling to fit image within 224x224 while preserving aspect ratio
+                    const aspectRatio = img.width / img.height;
+                    let newWidth, newHeight;
+                    if (aspectRatio > 1) {
+                        // Wider than tall
+                        newWidth = targetSize;
+                        newHeight = targetSize / aspectRatio;
+                    } else {
+                        // Taller than wide or square
+                        newHeight = targetSize;
+                        newWidth = targetSize * aspectRatio;
+                    }
 
-                    ctx.drawImage(img, cropX, cropY, scaledWidth, scaledHeight, 0, 0, targetSize, targetSize);
+                    // Center the image on the canvas
+                    const offsetX = (targetSize - newWidth) / 2;
+                    const offsetY = (targetSize - newHeight) / 2;
+
+                    // Clear canvas with black background (or transparent if preferred)
+                    ctx.fillStyle = 'black';
+                    ctx.fillRect(0, 0, targetSize, targetSize);
+
+                    // Draw the resized image
+                    ctx.drawImage(img, offsetX, offsetY, newWidth, newHeight);
 
                     canvas.toBlob((blob) => {
                         resolve(blob);
@@ -473,7 +490,7 @@
                     video: {
                         width: { ideal: 224 },
                         height: { ideal: 224 },
-                        aspectRatio: 1.0 // Square aspect ratio to match crop
+                        aspectRatio: 1.0 // Square aspect ratio to match output
                     }
                 };
                 stream = await navigator.mediaDevices.getUserMedia(constraints);
@@ -505,15 +522,36 @@
             submitBtn.disabled = true;
         });
 
-        // Capture image from the live video feed and crop to 224x224
+        // Capture image from the live video feed and resize to 224x224
         captureImageButton.addEventListener('click', async () => {
             try {
                 canvas.width = 224;
                 canvas.height = 224;
                 const ctx = canvas.getContext('2d');
 
-                // Use the full video frame since resolution is constrained
-                ctx.drawImage(video, 0, 0, 224, 224);
+                // Calculate scaling to fit video frame within 224x224 while preserving aspect ratio
+                const aspectRatio = video.videoWidth / video.videoHeight;
+                let newWidth, newHeight;
+                if (aspectRatio > 1) {
+                    // Wider than tall
+                    newWidth = 224;
+                    newHeight = 224 / aspectRatio;
+                } else {
+                    // Taller than wide or square
+                    newHeight = 224;
+                    newWidth = 224 * aspectRatio;
+                }
+
+                // Center the image on the canvas
+                const offsetX = (224 - newWidth) / 2;
+                const offsetY = (224 - newHeight) / 2;
+
+                // Clear canvas with black background
+                ctx.fillStyle = 'black';
+                ctx.fillRect(0, 0, 224, 224);
+
+                // Draw the resized video frame
+                ctx.drawImage(video, offsetX, offsetY, newWidth, newHeight);
 
                 const blob = await new Promise((resolve) => {
                     canvas.toBlob(resolve, 'image/png');
@@ -523,7 +561,7 @@
                 snapshot.style.display = 'block';
                 submitBtn.disabled = false;
                 deleteImageButton.style.display = 'inline-block';
-                predictionResult.innerHTML = '<p style="color:green;">Image captured and cropped to 224x224.</p>';
+                predictionResult.innerHTML = '<p style="color:green;">Image captured and resized to 224x224.</p>';
             } catch (error) {
                 console.error('Error capturing image:', error);
                 predictionResult.innerHTML = '<p style="color:red;">Failed to capture image.</p>';
@@ -540,7 +578,7 @@
             fileInput.value = ''; // Clear the file input
         });
 
-        // Handle file input selection and crop to 224x224
+        // Handle file input selection and resize to 224x224
         fileInput.addEventListener('change', async (event) => {
             const file = event.target.files[0];
             if (file) {
@@ -551,12 +589,12 @@
                 }
                 try {
                     const imageUrl = URL.createObjectURL(file);
-                    const croppedBlob = await cropImage(imageUrl, 224);
-                    snapshot.src = URL.createObjectURL(croppedBlob);
+                    const resizedBlob = await resizeImage(imageUrl, 224);
+                    snapshot.src = URL.createObjectURL(resizedBlob);
                     snapshot.style.display = 'block';
                     submitBtn.disabled = false;
                     deleteImageButton.style.display = 'inline-block';
-                    predictionResult.innerHTML = '<p style="color:green;">Image selected and cropped to 224x224.</p>';
+                    predictionResult.innerHTML = '<p style="color:green;">Image selected and resized to 224x224.</p>';
                 } catch (error) {
                     console.error('Error processing selected image:', error);
                     predictionResult.innerHTML = '<p style="color:red;">Failed to process selected image.</p>';
@@ -576,8 +614,8 @@
             try {
                 if (file) {
                     const imageUrl = URL.createObjectURL(file);
-                    const croppedBlob = await cropImage(imageUrl, 224);
-                    formData.append('image', croppedBlob, 'image.png');
+                    const resizedBlob = await resizeImage(imageUrl, 224);
+                    formData.append('image', resizedBlob, 'image.png');
                 } else if (imageDataUrl && imageDataUrl.startsWith('data:')) {
                     const response = await fetch(imageDataUrl);
                     const blob = await response.blob();
