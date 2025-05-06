@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify, send_from_directory
 import os
 from dotenv import load_dotenv
 import psycopg2
@@ -118,6 +118,11 @@ def dashboard():
         return redirect(url_for('login'))
     logger.info("Rendering dashboard for user_id: %s", session['user_id'])
     return render_template('login.html')
+
+
+@app.route('/models/<path:filename>')
+def serve_models(filename):
+    return send_from_directory('ChipAI/models', filename)
 
 @app.route('/upload', methods=['POST'])
 def upload_image():
