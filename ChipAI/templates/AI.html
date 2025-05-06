@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ChipAI - Chili Prediction</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-    <script src="../js/tf.min.js"></script>
-    <script src="../js/image.min.js"></script>
+    <script src=".ChipAI/js/tf.min.js"></script>
+    <script src=".ChipAI/js/image.min.js"></script>
 </head>
 <body>
     <header>
@@ -431,7 +431,7 @@
 
     <script type="text/javascript">
         // the link to your converted model
-        const URL = "../models_converted/";
+        const URL = ".ChipAI/models/";
 
         let model, webcam, labelContainer, maxPredictions, snapshot;
 
@@ -513,10 +513,14 @@
                     formData.append('image', file);
 
                     // Upload to server
+                    console.log("Attempting to upload image to /upload");
                     const uploadResponse = await fetch('/upload', {
                         method: 'POST',
                         body: formData
                     });
+                    if (!uploadResponse.ok) {
+                        throw new Error(`Upload failed with status: ${uploadResponse.status} ${uploadResponse.statusText}`);
+                    }
                     const uploadResult = await uploadResponse.json();
                     if (!uploadResult.success) {
                         document.getElementById("predictionResult").innerHTML = `<p style="color:red;">Upload failed: ${uploadResult.error || 'Unknown error'}</p>`;
@@ -525,28 +529,36 @@
                         return;
                     }
 
-                    const imageUrl = URL.createObjectURL(file);
-                    const img = new Image();
-                    img.src = imageUrl;
-                    img.onload = async () => {
-                        const canvas = document.createElement("canvas");
-                        canvas.width = 200;
-                        canvas.height = 200;
-                        const ctx = canvas.getContext("2d");
-                        ctx.drawImage(img, 0, 0, 200, 200);
+                    // Use FileReader to load the image
+                    const reader = new FileReader();
+                    reader.onload = async (e) => {
+                        const img = new Image();
+                        img.src = e.target.result;
+                        img.onload = async () => {
+                            const canvas = document.createElement("canvas");
+                            canvas.width = 200;
+                            canvas.height = 200;
+                            const ctx = canvas.getContext("2d");
+                            ctx.drawImage(img, 0, 0, 200, 200);
 
-                        snapshot = document.getElementById("snapshot");
-                        snapshot.src = canvas.toDataURL("image/png");
-                        snapshot.style.display = "block";
+                            snapshot = document.getElementById("snapshot");
+                            snapshot.src = canvas.toDataURL("image/png");
+                            snapshot.style.display = "block";
 
-                        document.getElementById("deleteImage").style.display = "inline-block";
-                        document.getElementById("predictButton").style.display = "inline-block";
-                        document.getElementById("predictionResult").innerHTML = '<p style="color:green;">Image uploaded. Click Predict to classify.</p>';
+                            document.getElementById("deleteImage").style.display = "inline-block";
+                            document.getElementById("predictButton").style.display = "inline-block";
+                            document.getElementById("predictionResult").innerHTML = '<p style="color:green;">Image uploaded. Click Predict to classify.</p>';
+                        };
+                        img.onerror = () => {
+                            document.getElementById("predictionResult").innerHTML = '<p style="color:red;">Failed to load uploaded image.</p>';
+                            fileInput.value = ''; // Clear the input on error
+                        };
                     };
-                    img.onerror = () => {
-                        document.getElementById("predictionResult").innerHTML = '<p style="color:red;">Failed to load uploaded image.</p>';
+                    reader.onerror = () => {
+                        document.getElementById("predictionResult").innerHTML = '<p style="color:red;">Failed to read the uploaded file.</p>';
                         fileInput.value = ''; // Clear the input on error
                     };
+                    reader.readAsDataURL(file);
                 } catch (error) {
                     console.error("Error processing uploaded image:", error);
                     document.getElementById("predictionResult").innerHTML = `<p style="color:red;">Failed to process uploaded image: ${error.message}</p>`;
