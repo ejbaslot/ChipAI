@@ -1,5 +1,5 @@
-0 Siling Labuyo
-1 Siling Atsal
-2 Siling Talbusan
-3 Siling Espada
-4 Scotch Bonnet
+Siling Labuyo
+Siling Atsal
+Siling Talbusan
+Siling Espada
+Scotch Bonnet
