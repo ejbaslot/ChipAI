@@ -44,7 +44,7 @@ except Exception as e:
     class_labels = ["Siling Atsal", "Siling Labuyo", "Siling Espada", "Scotch Bonnet", "Siling Talbusan"]  # Fallback
 
 # Ensure the uploads directory exists
-upload_folder = 'uploads'
+upload_folder = 'Uploads'
 if not os.path.exists(upload_folder):
     os.makedirs(upload_folder)
 
@@ -73,13 +73,13 @@ IMAGE_MAPPING = {
     "Siling Talbusan": "siling_talbusan.jpg"
 }
 
-# Consolidated image preprocessing function (bypassing preprocessing)
+# Consolidated image preprocessing function
 def preprocess_image(image_stream):
     try:
-        img = Image.open(image_stream)  # Load image in its original format
+        img = Image.open(image_stream).convert("RGB")  # Convert to RGB
         img_array = np.array(img, dtype=np.float32)  # Convert to numpy array, keep raw pixel values
         img_array = np.expand_dims(img_array, axis=0)  # Add batch dimension
-        logger.info("Image loaded without preprocessing: shape=%s", img_array.shape)
+        logger.info("Image processed: shape=%s", img_array.shape)
         return img_array
     except Exception as e:
         logger.error("Error in preprocess_image: %s", str(e))
@@ -103,7 +103,7 @@ def preprocess_image(image_stream, target_size=(224, 224)):
 # Prediction function for the chili pepper classifier
 def predict_chili_variety(image_stream):
     try:
-        # Load image without preprocessing
+        # Load image
         img_array = preprocess_image(image_stream)
         if img_array is None:
             raise ValueError("Image loading failed")
@@ -114,15 +114,15 @@ def predict_chili_variety(image_stream):
             logger.error("Input shape %s does not match model expected shape %s", img_array.shape, expected_shape)
             return {
                 "label": "Error processing the image",
-                "error": f"Input shape {img_array.shape} does not match model expected shape {expected_shape}. Teachable Machine models typically require 224x224 RGB images."
+                "error": f"Input shape {img_array.shape} does not match model expected shape {expected_shape}. Ensure your image is a 224x224 RGB image (not grayscale or RGBA)."
             }
 
-        # Verify channel count (Teachable Machine expects RGB)
+        # Verify channel count (should be redundant due to RGB conversion)
         if img_array.shape[-1] != 3:
             logger.error("Image has %d channels, expected 3 (RGB)", img_array.shape[-1])
             return {
                 "label": "Error processing the image",
-                "error": f"Image has {img_array.shape[-1]} channels, but Teachable Machine model expects 3 (RGB)."
+                "error": f"Image has {img_array.shape[-1]} channels, but Teachable Machine model expects 3 (RGB). Ensure your image is in RGB format (not grayscale or RGBA)."
             }
 
         # Set input tensor
