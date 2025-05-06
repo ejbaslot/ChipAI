@@ -1,10 +1,9 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
 import psycopg2
-import tensorflow as tf
+from tensorflow import keras
 import numpy as np
 import os
-from PIL import Image
-import io
+from PIL import Image, ImageOps
 from dotenv import load_dotenv
 from psycopg2 import OperationalError
 from psycopg2.extras import RealDictCursor
@@ -18,17 +17,9 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 app.secret_key = os.getenv('FLASK_SECRET_KEY', 'your_default_secret')  # Ensure this is set in your environment
 
-# Load TFLite model
-model_path = "ChipAI/models/model_unquant.tflite"  # Update to your .tflite file name
-interpreter = tf.lite.Interpreter(model_path=model_path)
-interpreter.allocate_tensors()
-
-# Get input and output details for reuse
-input_details = interpreter.get_input_details()
-output_details = interpreter.get_output_details()
-
-# Verify input shape
-logger.info("TFLite model input details: %s", input_details)
+# Load Keras model
+model_path = "ChipAI/models/keras_Model.h5"  # Update to your Keras model file
+model = keras.models.load_model(model_path, compile=False)
 
 # Load class labels from labels.txt
 labels_path = "ChipAI/models/labels.txt"  # Path to your labels.txt
@@ -73,65 +64,36 @@ IMAGE_MAPPING = {
     "Siling Talbusan": "siling_talbusan.jpg"
 }
 
-# Consolidated image preprocessing function
+# Consolidated image preprocessing function matching Teachable Machine Keras
 def preprocess_image(image_stream):
     try:
-        img = Image.open(image_stream)  # Load image in its original format
-        # Convert to RGB if not already RGB
-        if img.mode != 'RGB':
-            logger.info("Converting image from mode %s to RGB", img.mode)
-            img = img.convert("RGB")
-        img_array = np.array(img, dtype=np.float32)  # Convert to numpy array, keep raw pixel values
-        img_array = np.expand_dims(img_array, axis=0)  # Add batch dimension
-        logger.info("Image processed: shape=%s", img_array.shape)
-        return img_array
+        img = Image.open(image_stream)  # Load image
+        img = img.convert("RGB")  # Ensure RGB format
+        size = (224, 224)
+        img = ImageOps.fit(img, size, Image.Resampling.LANCZOS)  # Crop to 224x224 from center
+        img_array = np.asarray(img)  # Convert to numpy array
+        normalized_image_array = (img_array.astype(np.float32) / 127.5) - 1  # Normalize to [-1, 1]
+        data = np.ndarray(shape=(1, 224, 224, 3), dtype=np.float32)
+        data[0] = normalized_image_array
+        logger.info("Image processed: shape=%s", data.shape)
+        return data
     except Exception as e:
         logger.error("Error in preprocess_image: %s", str(e))
         return None
-
-# Alternative preprocessing function (uncomment to use standard Teachable Machine preprocessing)
-"""
-def preprocess_image(image_stream, target_size=(224, 224)):
-    try:
-        img = Image.open(image_stream).convert("RGB")  # Ensure RGB format
-        img = img.resize(target_size, Image.Resampling.LANCZOS)  # Resize to 224x224
-        img_array = np.array(img, dtype=np.float32) / 255.0  # Normalize to [0, 1]
-        img_array = np.expand_dims(img_array, axis=0)  # Add batch dimension
-        logger.info("Image preprocessing successful: shape=%s", img_array.shape)
-        return img_array
-    except Exception as e:
-        logger.error("Error in preprocess_image: %s", str(e))
-        return None
-"""
 
 # Prediction function for the chili pepper classifier
 def predict_chili_variety(image_stream):
     try:
-        # Load image
-        img_array = preprocess_image(image_stream)
-        if img_array is None:
+        # Load and preprocess image
+        data = preprocess_image(image_stream)
+        if data is None:
             raise ValueError("Image loading failed")
 
-        # Check input shape compatibility with Teachable Machine model
-        expected_shape = input_details[0]['shape']  # Typically (1, 224, 224, 3)
-        if img_array.shape != tuple(expected_shape):
-            logger.error("Input shape %s does not match model expected shape %s", img_array.shape, expected_shape)
-            return {
-                "label": "Error processing the image",
-                "error": f"Input shape {img_array.shape} does not match model expected shape {expected_shape}. Ensure your image is a 224x224 image."
-            }
-
-        # Set input tensor
-        interpreter.set_tensor(input_details[0]['index'], img_array)
-        interpreter.invoke()
-
-        # Get output
-        output_data = interpreter.get_tensor(output_details[0]['index'])
-        logger.info("Prediction raw output (TFLite): %s", output_data)
-
-        # Use loaded class labels
-        predicted_prob = np.max(output_data[0])
-        predicted_label = class_labels[np.argmax(output_data[0])]
+        # Predict with Keras model
+        prediction = model.predict(data)
+        index = np.argmax(prediction)
+        predicted_prob = prediction[0][index]
+        predicted_label = class_labels[index]
         confidence = float(predicted_prob)
 
         # Threshold for chili detection
@@ -142,7 +104,7 @@ def predict_chili_variety(image_stream):
         logger.info("Prediction result: %s (confidence: %.4f)", predicted_label, confidence)
         return {"label": predicted_label, "confidence": confidence}
     except Exception as e:
-        logger.error("Error in TFLite prediction: %s", str(e))
+        logger.error("Error in Keras prediction: %s", str(e))
         return {"label": "Error processing the image", "error": str(e)}
 
 @app.route('/signup', methods=['GET', 'POST'])

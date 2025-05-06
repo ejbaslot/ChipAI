@@ -43,9 +43,9 @@
 
         <div class="instructions content-card">
             <h3>Instructions:</h3>
-            <p>1. Click "Choose File" to select an image.</p>
+            <p>1. Click "Choose File" to select an image (will be cropped to 224x224).</p>
             <p>2. Click "Start Camera" to access your camera.</p>
-            <p>3. When the camera feed appears, click "Capture Image" to take a snapshot.</p>
+            <p>3. When the camera feed appears, click "Capture Image" to take a snapshot (will be cropped to 224x224).</p>
             <p>4. Submit the image for chili variety prediction.</p>
         </div>
         
@@ -407,8 +407,8 @@
         const canvas = document.createElement('canvas');
         let stream;
 
-        // Resize image to 224x224, preserving aspect ratio and original format
-        async function resizeImage(imageSource, targetSize = 224) {
+        // Crop image to 224x224 using center cropping
+        async function cropImage(imageSource, targetSize = 224) {
             return new Promise((resolve, reject) => {
                 const img = new Image();
                 img.src = imageSource;
@@ -418,19 +418,16 @@
                     canvas.height = targetSize;
                     const ctx = canvas.getContext('2d');
 
-                    // Calculate scaling to preserve aspect ratio
-                    const scale = Math.min(img.width, img.height) / targetSize;
+                    // Use ImageOps.fit-like behavior: crop to center
+                    const scale = Math.max(img.width, img.height) / targetSize;
                     const scaledWidth = img.width / scale;
                     const scaledHeight = img.height / scale;
-                    const offsetX = (targetSize - scaledWidth) / 2;
-                    const offsetY = (targetSize - scaledHeight) / 2;
+                    const cropX = (img.width - scaledWidth) / 2;
+                    const cropY = (img.height - scaledHeight) / 2;
 
-                    // Fill with black and draw image centered
-                    ctx.fillStyle = 'black';
-                    ctx.fillRect(0, 0, targetSize, targetSize);
-                    ctx.drawImage(img, offsetX, offsetY, scaledWidth, scaledHeight);
+                    ctx.drawImage(img, cropX, cropY, scaledWidth, scaledHeight, 0, 0, targetSize, targetSize);
 
-                    // Use PNG to preserve original channel format (e.g., grayscale, RGBA)
+                    // Use PNG to preserve RGB format
                     canvas.toBlob((blob) => {
                         resolve(blob);
                     }, 'image/png');
@@ -471,23 +468,21 @@
             submitBtn.disabled = true;
         });
 
-        // Capture image from the live video feed and resize to 224x224
+        // Capture image from the live video feed and crop to 224x224
         captureImageButton.addEventListener('click', async () => {
             try {
                 canvas.width = 224;
                 canvas.height = 224;
                 const ctx = canvas.getContext('2d');
 
-                // Calculate scaling to fit video into 224x224
-                const scale = Math.min(video.videoWidth, video.videoHeight) / 224;
+                // Calculate cropping region to fit video into 224x224
+                const scale = Math.max(video.videoWidth, video.videoHeight) / 224;
                 const scaledWidth = video.videoWidth / scale;
                 const scaledHeight = video.videoHeight / scale;
-                const offsetX = (224 - scaledWidth) / 2;
-                const offsetY = (224 - scaledHeight) / 2;
+                const cropX = (video.videoWidth - scaledWidth) / 2;
+                const cropY = (video.videoHeight - scaledHeight) / 2;
 
-                ctx.fillStyle = 'black';
-                ctx.fillRect(0, 0, 224, 224);
-                ctx.drawImage(video, offsetX, offsetY, scaledWidth, scaledHeight);
+                ctx.drawImage(video, cropX, cropY, scaledWidth, scaledHeight, 0, 0, 224, 224);
 
                 const blob = await new Promise((resolve) => {
                     canvas.toBlob(resolve, 'image/png');
@@ -497,7 +492,7 @@
                 snapshot.style.display = 'block';
                 submitBtn.disabled = false;
                 deleteImageButton.style.display = 'inline-block';
-                predictionResult.innerHTML = '<p style="color:green;">Image captured and resized to 224x224.</p>';
+                predictionResult.innerHTML = '<p style="color:green;">Image captured and cropped to 224x224.</p>';
             } catch (error) {
                 console.error('Error capturing image:', error);
                 predictionResult.innerHTML = '<p style="color:red;">Failed to capture image.</p>';
@@ -513,7 +508,7 @@
             predictionResult.innerHTML = '';
         });
 
-        // Handle file input selection and resize to 224x224
+        // Handle file input selection and crop to 224x224
         fileInput.addEventListener('change', async (event) => {
             const file = event.target.files[0];
             if (file) {
@@ -525,12 +520,12 @@
                 }
                 try {
                     const imageUrl = URL.createObjectURL(file);
-                    const resizedBlob = await resizeImage(imageUrl, 224);
-                    snapshot.src = URL.createObjectURL(resizedBlob);
+                    const croppedBlob = await cropImage(imageUrl, 224);
+                    snapshot.src = URL.createObjectURL(croppedBlob);
                     snapshot.style.display = 'block';
                     submitBtn.disabled = false;
                     deleteImageButton.style.display = 'inline-block';
-                    predictionResult.innerHTML = '<p style="color:green;">Image selected and resized to 224x224.</p>';
+                    predictionResult.innerHTML = '<p style="color:green;">Image selected and cropped to 224x224.</p>';
                 } catch (error) {
                     console.error('Error processing selected image:', error);
                     predictionResult.innerHTML = '<p style="color:red;">Failed to process selected image.</p>';
@@ -550,9 +545,9 @@
             try {
                 if (file) {
                     const imageUrl = URL.createObjectURL(file);
-                    const resizedBlob = await resizeImage(imageUrl, 224);
-                    formData.append('image', resizedBlob, 'image.png');
-                    console.log("📸 File selected and resized:", file.name);
+                    const croppedBlob = await cropImage(imageUrl, 224);
+                    formData.append('image', croppedBlob, 'image.png');
+                    console.log("📸 File selected and cropped:", file.name);
                 } else if (imageDataUrl && imageDataUrl.startsWith('data:')) {
                     const response = await fetch(imageDataUrl);
                     const blob = await response.blob();
