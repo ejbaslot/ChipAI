@@ -76,7 +76,11 @@ IMAGE_MAPPING = {
 # Consolidated image preprocessing function
 def preprocess_image(image_stream):
     try:
-        img = Image.open(image_stream).convert("RGB")  # Convert to RGB
+        img = Image.open(image_stream)  # Load image in its original format
+        # Convert to RGB if not already RGB
+        if img.mode != 'RGB':
+            logger.info("Converting image from mode %s to RGB", img.mode)
+            img = img.convert("RGB")
         img_array = np.array(img, dtype=np.float32)  # Convert to numpy array, keep raw pixel values
         img_array = np.expand_dims(img_array, axis=0)  # Add batch dimension
         logger.info("Image processed: shape=%s", img_array.shape)
@@ -114,15 +118,7 @@ def predict_chili_variety(image_stream):
             logger.error("Input shape %s does not match model expected shape %s", img_array.shape, expected_shape)
             return {
                 "label": "Error processing the image",
-                "error": f"Input shape {img_array.shape} does not match model expected shape {expected_shape}. Ensure your image is a 224x224 RGB image (not grayscale or RGBA)."
-            }
-
-        # Verify channel count (should be redundant due to RGB conversion)
-        if img_array.shape[-1] != 3:
-            logger.error("Image has %d channels, expected 3 (RGB)", img_array.shape[-1])
-            return {
-                "label": "Error processing the image",
-                "error": f"Image has {img_array.shape[-1]} channels, but Teachable Machine model expects 3 (RGB). Ensure your image is in RGB format (not grayscale or RGBA)."
+                "error": f"Input shape {img_array.shape} does not match model expected shape {expected_shape}. Ensure your image is a 224x224 image."
             }
 
         # Set input tensor
