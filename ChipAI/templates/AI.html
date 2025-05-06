@@ -8,7 +8,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.19.0/dist/tf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8.5/dist/teachablemachine-image.min.js"></script>
 </head>
-<body>
+<body onload="init()">
     <header>
         <div class="header-left">
             <img src="{{ url_for('static', filename='images/logo.png') }}" alt="ChipAI Logo" class="logo">
@@ -34,7 +34,7 @@
         <button type="button" onclick="init()" class="btn">Start Camera</button>
         <button type="button" id="captureImage" style="display: none;" class="btn">Capture Image</button>
         <button type="button" id="deleteImage" style="display: none;" class="btn">Delete Image</button>
-        <button type="button" id="predictButton" style="display: none;" class="btn">Predict</button>
+        <button type="button" id="predictButton" style="display: none;" class="btn" disabled>Predict</button>
         <div id="webcam-container" class="camera-container"></div>
         <div id="snapshot-container" class="camera-container">
             <img id="snapshot" alt="Captured or Uploaded Image" style="display: none;">
@@ -44,7 +44,7 @@
     </div>
 
     <footer>
-        <p>© 2024 ChipAI. All rights reserved.</p>
+        <p>© 2025 ChipAI. All rights reserved.</p>
     </footer>
 
     <style>
@@ -295,6 +295,13 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
 
+        .btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
         /* Footer */
         footer {
             width: 100%;
@@ -439,15 +446,37 @@
         async function init() {
             const modelURL = URL + "model.json";
             const metadataURL = URL + "metadata.json";
+            console.log("Attempting to load model from:", modelURL);
+            console.log("Metadata URL:", metadataURL);
 
-            // load the model and metadata
+            // Check if model files are accessible
+            try {
+                const modelResponse = await fetch(modelURL);
+                if (!modelResponse.ok) {
+                    throw new Error(`Failed to fetch model.json: ${modelResponse.status} ${modelResponse.statusText}`);
+                }
+                const metadataResponse = await fetch(metadataURL);
+                if (!metadataResponse.ok) {
+                    throw new Error(`Failed to fetch metadata.json: ${metadataResponse.status} ${metadataResponse.statusText}`);
+                }
+                console.log("Model and metadata files are accessible");
+            } catch (error) {
+                console.error("Model accessibility check failed:", error);
+                document.getElementById("predictionResult").innerHTML = `<p style="color:red;">Failed to access model files. Ensure they are in 'ChipAI/ChipAI/models/' on the server. Error: ${error.message}</p>`;
+                return;
+            }
+
+            // Load the model and metadata
             try {
                 model = await tmImage.load(modelURL, metadataURL);
                 maxPredictions = model.getTotalClasses();
                 console.log("Model loaded successfully with", maxPredictions, "classes");
+                document.getElementById("predictionResult").innerHTML = '<p style="color:green;">Model loaded successfully. You can now capture or upload an image.</p>';
+                // Enable the predict button only after the model is loaded
+                document.getElementById("predictButton").disabled = false;
             } catch (error) {
                 console.error("Failed to load model:", error);
-                document.getElementById("predictionResult").innerHTML = '<p style="color:red;">Failed to load model. Check console for details.</p>';
+                document.getElementById("predictionResult").innerHTML = `<p style="color:red;">Failed to load model. Ensure the model files are in 'ChipAI/ChipAI/models/' on the server. Error: ${error.message}</p>`;
                 return;
             }
 
@@ -589,30 +618,42 @@
 
         // Run the captured or uploaded image through the image model
         async function predict() {
+            if (!model) {
+                document.getElementById("predictionResult").innerHTML = '<p style="color:red;">Model not loaded. Please reload the page and ensure the model files are available.</p>';
+                console.error("Model is undefined");
+                return;
+            }
             document.getElementById("label-container").innerHTML = "";
             for (let i = 0; i < maxPredictions; i++) {
                 labelContainer.appendChild(document.createElement("div"));
             }
 
-            const prediction = await model.predict(snapshot);
-            let highestConfidence = 0;
-            let bestPrediction = null;
+            try {
+                const prediction = await model.predict(snapshot);
+                console.log("Prediction results:", prediction);
+                let highestConfidence = 0;
+                let bestPrediction = null;
 
-            for (let i = 0; i < maxPredictions; i++) {
-                const classPrediction = prediction[i].className + ": " + prediction[i].probability.toFixed(2);
-                labelContainer.childNodes[i].innerHTML = classPrediction;
+                for (let i = 0; i < maxPredictions; i++) {
+                    const classPrediction = prediction[i].className + ": " + prediction[i].probability.toFixed(2);
+                    labelContainer.childNodes[i].innerHTML = classPrediction;
+                    console.log("Class:", prediction[i].className, "Probability:", prediction[i].probability);
 
-                if (prediction[i].probability > highestConfidence) {
-                    highestConfidence = prediction[i].probability;
-                    bestPrediction = prediction[i].className;
+                    if (prediction[i].probability > highestConfidence) {
+                        highestConfidence = prediction[i].probability;
+                        bestPrediction = prediction[i].className;
+                    }
                 }
-            }
 
-            // Display detailed prediction if confidence > 0.50
-            if (highestConfidence > 0.50) {
-                await displayDetailedPrediction(bestPrediction, highestConfidence);
-            } else {
-                document.getElementById("predictionResult").innerHTML = '<p style="color:gray;">No clear chili detected. Try capturing or uploading another image.</p>';
+                // Display detailed prediction if confidence > 0.50
+                if (highestConfidence > 0.50) {
+                    await displayDetailedPrediction(bestPrediction, highestConfidence);
+                } else {
+                    document.getElementById("predictionResult").innerHTML = '<p style="color:gray;">No clear chili detected. Try capturing or uploading another image.</p>';
+                }
+            } catch (error) {
+                console.error("Prediction error:", error);
+                document.getElementById("predictionResult").innerHTML = `<p style="color:red;">Prediction failed: ${error.message}</p>`;
             }
         }
 
