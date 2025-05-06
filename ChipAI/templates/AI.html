@@ -238,6 +238,51 @@
             border: 1px solid #f5f5f5;
         }
 
+        /* Result Content */
+        .result-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .chili-image img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .chili-info ul {
+            list-style: none;
+            padding: 0;
+            text-align: left;
+        }
+
+        .chili-info li {
+            margin: 10px 0;
+            font-size: clamp(0.9rem, 2vw, 1rem);
+        }
+
+        .chili-info strong {
+            color: #2E7D32;
+        }
+
+        /* Spinner for Loading */
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #2E7D32;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
         /* Buttons */
         .btn {
             background-color: #2E7D32;
@@ -407,6 +452,13 @@
         const canvas = document.createElement('canvas');
         let stream;
 
+        // Check for camera support
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            startCameraButton.disabled = true;
+            startCameraButton.style.backgroundColor = '#cccccc';
+            startCameraButton.textContent = 'Camera Not Supported';
+        }
+
         // Crop image to 224x224 using center cropping
         async function cropImage(imageSource, targetSize = 224) {
             return new Promise((resolve, reject) => {
@@ -449,7 +501,7 @@
                 submitBtn.disabled = true;
             } catch (error) {
                 console.error('Error accessing camera:', error);
-                predictionResult.innerHTML = '<p style="color:red;">Unable to access the camera.</p>';
+                predictionResult.innerHTML = '<p style="color:red;">Unable to access the camera. Please use "Choose File" instead.</p>';
             }
         });
 
@@ -506,6 +558,7 @@
             deleteImageButton.style.display = 'none';
             submitBtn.disabled = true;
             predictionResult.innerHTML = '';
+            fileInput.value = ''; // Clear the file input
         });
 
         // Handle file input selection and crop to 224x224
@@ -529,6 +582,7 @@
                 } catch (error) {
                     console.error('Error processing selected image:', error);
                     predictionResult.innerHTML = '<p style="color:red;">Failed to process selected image.</p>';
+                    fileInput.value = ''; // Clear the input on error
                 }
             }
         });
@@ -536,7 +590,7 @@
         // Submit image to the server
         submitBtn.addEventListener('click', async () => {
             console.log("✅ Submit button clicked!");
-            predictionResult.innerHTML = '<p>Loading...</p>';
+            predictionResult.innerHTML = '<p>Loading...</p><div class="spinner"></div>';
 
             const file = fileInput.files[0];
             const imageDataUrl = snapshot.src;
@@ -594,7 +648,7 @@
                 return;
             }
 
-            predictionResult.innerHTML = '<p>Loading chili information...</p>';
+            predictionResult.innerHTML = '<p>Loading chili information...</p><div class="spinner"></div>';
 
             fetch(`/get_chili_info?name=${encodeURIComponent(prediction)}`)
                 .then(response => response.json())

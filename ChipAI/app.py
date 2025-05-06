@@ -1,9 +1,10 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
 import psycopg2
-from tensorflow import keras
+import tensorflow as tf
 import numpy as np
 import os
-from PIL import Image, ImageOps
+from PIL import Image
+import io
 from dotenv import load_dotenv
 from psycopg2 import OperationalError
 from psycopg2.extras import RealDictCursor
@@ -17,25 +18,19 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 app.secret_key = os.getenv('FLASK_SECRET_KEY', 'your_default_secret')  # Ensure this is set in your environment
 
-# Load Keras model
-model_path = "ChipAI/models/keras_model.h5"  # Update to your Keras model file
-model = keras.models.load_model(model_path, compile=False)
+# Load TFLite model
+interpreter = tf.lite.Interpreter(model_path="ChipAI/models/mobilenetv2_finales.tflite")
+interpreter.allocate_tensors()
 
-# Load class labels from labels.txt
-labels_path = "ChipAI/models/labels.txt"  # Path to your labels.txt
-try:
-    with open(labels_path, 'r') as f:
-        class_labels = [line.strip() for line in f if line.strip()]
-    logger.info("Loaded class labels: %s", class_labels)
-except FileNotFoundError:
-    logger.error("labels.txt not found at %s", labels_path)
-    class_labels = ["Siling Atsal", "Siling Labuyo", "Siling Espada", "Scotch Bonnet", "Siling Talbusan"]  # Fallback
-except Exception as e:
-    logger.error("Error reading labels.txt: %s", str(e))
-    class_labels = ["Siling Atsal", "Siling Labuyo", "Siling Espada", "Scotch Bonnet", "Siling Talbusan"]  # Fallback
+# Get input and output details for reuse
+input_details = interpreter.get_input_details()
+output_details = interpreter.get_output_details()
+
+# Verify input shape
+logger.info("TFLite model input details: %s", input_details)
 
 # Ensure the uploads directory exists
-upload_folder = 'Uploads'
+upload_folder = 'uploads'
 if not os.path.exists(upload_folder):
     os.makedirs(upload_folder)
 
@@ -64,36 +59,39 @@ IMAGE_MAPPING = {
     "Siling Talbusan": "siling_talbusan.jpg"
 }
 
-# Consolidated image preprocessing function matching Teachable Machine Keras
-def preprocess_image(image_stream):
+# Consolidated image preprocessing function
+def preprocess_image(image_stream, target_size=(224, 224)):
     try:
-        img = Image.open(image_stream)  # Load image
-        img = img.convert("RGB")  # Ensure RGB format
-        size = (224, 224)
-        img = ImageOps.fit(img, size, Image.Resampling.LANCZOS)  # Crop to 224x224 from center
-        img_array = np.asarray(img)  # Convert to numpy array
-        normalized_image_array = (img_array.astype(np.float32) / 127.5) - 1  # Normalize to [-1, 1]
-        data = np.ndarray(shape=(1, 224, 224, 3), dtype=np.float32)
-        data[0] = normalized_image_array
-        logger.info("Image processed: shape=%s", data.shape)
-        return data
+        img = Image.open(image_stream).convert("RGB")  # Ensure RGB format
+        img = img.resize(target_size, Image.Resampling.LANCZOS)  # Resize to 224x224
+        img_array = np.array(img, dtype=np.float32) / 255.0  # Normalize to [0, 1]
+        img_array = np.expand_dims(img_array, axis=0)  # Add batch dimension
+        logger.info("Image preprocessing successful: shape=%s", img_array.shape)
+        return img_array
     except Exception as e:
         logger.error("Error in preprocess_image: %s", str(e))
         return None
-
+        
 # Prediction function for the chili pepper classifier
 def predict_chili_variety(image_stream):
     try:
-        # Load and preprocess image
-        data = preprocess_image(image_stream)
-        if data is None:
-            raise ValueError("Image loading failed")
+        # Preprocess image
+        img_array = preprocess_image(image_stream, target_size=(224, 224))
+        if img_array is None:
+            raise ValueError("Image preprocessing failed")
 
-        # Predict with Keras model
-        prediction = model.predict(data)
-        index = np.argmax(prediction)
-        predicted_prob = prediction[0][index]
-        predicted_label = class_labels[index]
+        # Set input tensor
+        interpreter.set_tensor(input_details[0]['index'], img_array)
+        interpreter.invoke()
+
+        # Get output
+        output_data = interpreter.get_tensor(output_details[0]['index'])
+        logger.info("Prediction raw output (TFLite): %s", output_data)
+
+        # Class labels (consistent with training)
+        class_labels = ["Siling Atsal", "Siling Labuyo", "Siling Espada", "Scotch Bonnet", "Siling Talbusan"]
+        predicted_prob = np.max(output_data[0])
+        predicted_label = class_labels[np.argmax(output_data[0])]
         confidence = float(predicted_prob)
 
         # Threshold for chili detection
@@ -104,9 +102,9 @@ def predict_chili_variety(image_stream):
         logger.info("Prediction result: %s (confidence: %.4f)", predicted_label, confidence)
         return {"label": predicted_label, "confidence": confidence}
     except Exception as e:
-        logger.error("Error in Keras prediction: %s", str(e))
+        logger.error("Error in TFLite prediction: %s", str(e))
         return {"label": "Error processing the image", "error": str(e)}
-
+    
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
@@ -213,7 +211,7 @@ def upload_image():
     except Exception as e:
         logger.error("Error processing the image: %s", str(e))
         return jsonify({'error': 'Error processing the image. Please try again.'}), 500
-
+    
 @app.route('/')
 def index():
     if 'user_id' in session:
