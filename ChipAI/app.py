@@ -18,7 +18,7 @@ app = Flask(__name__)
 app.secret_key = os.getenv('FLASK_SECRET_KEY', 'your_default_secret')  # Ensure this is set in your environment
 
 # Load Keras model
-model_path = "ChipAI/models/keras_Model.h5"  # Update to your Keras model file
+model_path = "ChipAI/ChipAI/models/keras_Model.h5"  # Update to your Keras model file
 model = keras.models.load_model(model_path, compile=False)
 
 # Load class labels from labels.txt
