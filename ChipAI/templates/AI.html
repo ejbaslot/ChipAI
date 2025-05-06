@@ -43,9 +43,9 @@
 
         <div class="instructions content-card">
             <h3>Instructions:</h3>
-            <p>1. Click "Choose File" to select an image (will be cropped to 224x224).</p>
+            <p>1. Click "Choose File" to select an image.</p>
             <p>2. Click "Start Camera" to access your camera.</p>
-            <p>3. When the camera feed appears, click "Capture Image" to take a snapshot (will be cropped to 224x224).</p>
+            <p>3. When the camera feed appears, click "Capture Image" to take a snapshot.</p>
             <p>4. Submit the image for chili variety prediction.</p>
         </div>
         
@@ -216,7 +216,7 @@
             justify-content: center;
             gap: 10px;
             margin: 10px auto;
-            max-width: 200px;
+            max-width: 224px;
             border: 2px solid #2E7D32;
             border-radius: 10px;
             padding: 5px;
@@ -224,7 +224,7 @@
 
         video, #snapshot {
             width: 100%;
-            max-width: 200px;
+            max-width: 224px;
             border-radius: 10px;
         }
 
@@ -354,11 +354,11 @@
             }
 
             .camera-container {
-                max-width: 180px;
+                max-width: 200px;
             }
 
             video, #snapshot {
-                max-width: 180px;
+                max-width: 200px;
             }
 
             footer {
@@ -406,11 +406,11 @@
             }
 
             .camera-container {
-                max-width: 150px;
+                max-width: 180px;
             }
 
             video, #snapshot {
-                max-width: 150px;
+                max-width: 180px;
             }
 
             footer {
@@ -466,10 +466,17 @@
             });
         }
 
-        // Start camera and display live feed
+        // Start camera with constrained resolution
         startCameraButton.addEventListener('click', async () => {
             try {
-                stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                const constraints = {
+                    video: {
+                        width: { ideal: 224 },
+                        height: { ideal: 224 },
+                        aspectRatio: 1.0 // Square aspect ratio to match crop
+                    }
+                };
+                stream = await navigator.mediaDevices.getUserMedia(constraints);
                 video.srcObject = stream;
                 video.style.display = 'block';
                 captureImageButton.style.display = 'inline-block';
@@ -505,13 +512,8 @@
                 canvas.height = 224;
                 const ctx = canvas.getContext('2d');
 
-                const scale = Math.max(video.videoWidth, video.videoHeight) / 224;
-                const scaledWidth = video.videoWidth / scale;
-                const scaledHeight = video.videoHeight / scale;
-                const cropX = (video.videoWidth - scaledWidth) / 2;
-                const cropY = (video.videoHeight - scaledHeight) / 2;
-
-                ctx.drawImage(video, cropX, cropY, scaledWidth, scaledHeight, 0, 0, 224, 224);
+                // Use the full video frame since resolution is constrained
+                ctx.drawImage(video, 0, 0, 224, 224);
 
                 const blob = await new Promise((resolve) => {
                     canvas.toBlob(resolve, 'image/png');
