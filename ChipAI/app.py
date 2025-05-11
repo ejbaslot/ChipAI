@@ -16,25 +16,22 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
-app.secret_key = os.getenv('FLASK_SECRET_KEY', 'your_default_secret')  # Ensure this is set in your environment
+app.secret_key = os.getenv('FLASK_SECRET_KEY', 'your_default_secret')
 
 # Load TFLite model
 interpreter = tf.lite.Interpreter(model_path="ChipAI/models/mobilenetv2_grand_finale.tflite")
 interpreter.allocate_tensors()
-
-# Get input and output details for reuse
 input_details = interpreter.get_input_details()
 output_details = interpreter.get_output_details()
-
-# Verify input shape
 logger.info("TFLite model input details: %s", input_details)
 
-# Ensure the uploads directory exists
-upload_folder = 'uploads'
+# Ensure uploads directory exists
+upload_folder = 'Uploads'
 if not os.path.exists(upload_folder):
     os.makedirs(upload_folder)
 
 load_dotenv()
+
 def get_db_connection():
     try:
         connection = psycopg2.connect(
@@ -50,61 +47,50 @@ def get_db_connection():
         logger.error("Database connection failed: %s", e)
         raise
 
-# Mapping of chili names to image filenames
+# Existing IMAGE_MAPPING
 IMAGE_MAPPING = {
     "Siling Labuyo": "siling_labuyo.jpg",
     "Siling Atsal": "bell_pepper.jpg",
-    "Siling Espada": "siling_haba.jpg", 
+    "Siling Espada": "siling_haba.jpg",
     "Scotch Bonnet": "scotch_bonnet.jpg",
     "Siling Talbusan": "siling_talbusan.jpg"
 }
 
-# Consolidated image preprocessing function
+# Existing preprocess_image and predict_chili_variety
 def preprocess_image(image_stream, target_size=(224, 224)):
     try:
-        img = Image.open(image_stream).convert("RGB")  # Ensure RGB format
-        img = img.resize(target_size, Image.Resampling.LANCZOS)  # Resize to 224x224
-        img_array = np.array(img, dtype=np.float32) / 255.0  # Normalize to [0, 1]
-        img_array = np.expand_dims(img_array, axis=0)  # Add batch dimension
+        img = Image.open(image_stream).convert("RGB")
+        img = img.resize(target_size, Image.Resampling.LANCZOS)
+        img_array = np.array(img, dtype=np.float32) / 255.0
+        img_array = np.expand_dims(img_array, axis=0)
         logger.info("Image preprocessing successful: shape=%s", img_array.shape)
         return img_array
     except Exception as e:
         logger.error("Error in preprocess_image: %s", str(e))
         return None
-        
-# Prediction function for the chili pepper classifier
+
 def predict_chili_variety(image_stream):
     try:
-        # Preprocess image
         img_array = preprocess_image(image_stream, target_size=(224, 224))
         if img_array is None:
             raise ValueError("Image preprocessing failed")
-
-        # Set input tensor
         interpreter.set_tensor(input_details[0]['index'], img_array)
         interpreter.invoke()
-
-        # Get output
         output_data = interpreter.get_tensor(output_details[0]['index'])
         logger.info("Prediction raw output (TFLite): %s", output_data)
-
-        # Class labels (consistent with training)
         class_labels = ["Siling Atsal", "Siling Labuyo", "Siling Espada", "Scotch Bonnet", "Siling Talbusan"]
         predicted_prob = np.max(output_data[0])
         predicted_label = class_labels[np.argmax(output_data[0])]
         confidence = float(predicted_prob)
-
-        # Threshold for chili detection
         if predicted_prob < 0.50:
             logger.info("Prediction below threshold: %s (confidence: %.4f)", predicted_label, confidence)
             return {"label": "No Chili Detected", "confidence": confidence}
-
         logger.info("Prediction result: %s (confidence: %.4f)", predicted_label, confidence)
         return {"label": predicted_label, "confidence": confidence}
     except Exception as e:
         logger.error("Error in TFLite prediction: %s", str(e))
         return {"label": "Error processing the image", "error": str(e)}
-    
+
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
@@ -126,16 +112,19 @@ def signup():
                 conn.commit()
                 cursor.execute("SELECT * FROM sp_login(%s, %s)", (username, password))
                 login_result = cursor.fetchone()
-                if login_result and login_result[0]:
+                if login_result and login_result[0] and login_result[2] == 'User found':
                     session['user_id'] = login_result[0]
                     logger.info("User signed up and logged in: %s", username)
-                return jsonify({'success': True, 'message': signup_status.lower()}), 200
+                    return jsonify({'success': True, 'message': signup_status.lower()}), 200
+                else:
+                    return jsonify({'success': False, 'message': 'Auto-login failed'}), 400
             else:
                 return jsonify({'success': False, 'message': signup_status}), 400
         except Exception as e:
             logger.error("Signup error: %s", str(e))
             return jsonify({'success': False, 'message': str(e)}), 500
         finally:
+            cursor.close()
             conn.close()
     return render_template('index.html')
 
@@ -154,7 +143,7 @@ def login():
             result = cursor.fetchone()
             if not result:
                 return jsonify({'success': False, 'message': 'Login failed: No result returned.'}), 401
-            p_user_id, _, p_status = result
+            p_user_id, p_stored_password, p_status = result
             if p_status == 'User found' and p_user_id is not None:
                 session['user_id'] = p_user_id
                 logger.info("User logged in: %s", username)
@@ -165,14 +154,70 @@ def login():
             logger.error("Login error: %s", str(e))
             return jsonify({'success': False, 'message': f"Database error: {e}"}), 500
         finally:
+            cursor.close()
             conn.close()
-    # For GET requests, render login page if not logged in
     if 'user_id' not in session:
         logger.info("User not logged in, rendering login page")
         return render_template('index.html')
     logger.info("User already logged in, redirecting to dashboard")
     return redirect(url_for('dashboard'))
 
+# New Feedback Routes
+@app.route('/get_username', methods=['GET'])
+def get_username():
+    if 'user_id' not in session:
+        logger.info("No user_id in session for get_username")
+        return jsonify({'error': 'User not logged in'}), 401
+    conn = get_db_connection()
+    cursor = conn.cursor(cursor_factory=RealDictCursor)
+    try:
+        cursor.execute("SELECT username FROM users WHERE id = %s", (session['user_id'],))
+        user = cursor.fetchone()
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
+        return jsonify({'username': user['username']})
+    except Exception as e:
+        logger.error("Error fetching username: %s", str(e))
+        return jsonify({'error': 'Failed to fetch username'}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+@app.route('/submit_feedback', methods=['POST'])
+def submit_feedback():
+    if 'user_id' not in session:
+        logger.info("No user_id in session for submit_feedback")
+        return jsonify({'error': 'User not logged in'}), 401
+    data = request.get_json()
+    user_id = session['user_id']
+    prediction = data.get('prediction')
+    feedback_text = data.get('feedback_text', '') # Allow empty feedback
+    
+    if not prediction:
+        return jsonify({'error': 'Prediction is required'}), 400
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            """
+            INSERT INTO feedback (user_id, prediction, feedback_text, timestamp)
+            VALUES (%s, %s, %s, CURRENT_TIMESTAMP)
+            """,
+            (user_id, prediction, feedback_text)
+        )
+        conn.commit()
+        logger.info("Feedback saved for user_id: %s, prediction: %s", user_id, prediction)
+        return jsonify({'success': True}), 200
+    except Exception as e:
+        conn.rollback()
+        logger.error("Error saving feedback: %s", str(e))
+        return jsonify({'error': 'Failed to save feedback'}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+# Existing Routes
 @app.route('/dashboard')
 def dashboard():
     if 'user_id' not in session:
@@ -192,15 +237,12 @@ def upload_image():
         image_bytes = image.read()
         image_stream = BytesIO(image_bytes)
         img = Image.open(image_stream)
-        img.verify()  # Verify image integrity
+        img.verify()
         logger.info("Image is valid.")
         image_stream.seek(0)
-
-        # Predict chili variety
         result = predict_chili_variety(image_stream)
         if "error" in result:
             return jsonify({'error': f"Failed to process image: {result['error']}"}), 400
-
         return jsonify({
             'prediction': result['label'],
             'confidence': result['confidence']
@@ -211,7 +253,7 @@ def upload_image():
     except Exception as e:
         logger.error("Error processing the image: %s", str(e))
         return jsonify({'error': 'Error processing the image. Please try again.'}), 500
-    
+
 @app.route('/')
 def index():
     if 'user_id' in session:

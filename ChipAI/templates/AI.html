@@ -59,7 +59,7 @@
     </footer>
 
     <style>
-        /* General Styles */
+        /* Existing styles unchanged */
         html, body {
             margin: 0;
             min-height: 100vh;
@@ -307,6 +307,28 @@
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
         }
 
+        /* Feedback Form Styles */
+        .feedback-form {
+            margin-top: 15px;
+            text-align: left;
+        }
+
+        .feedback-form textarea {
+            width: 100%;
+            height: 80px;
+            padding: 10px;
+            border: 1px solid #2E7D32;
+            border-radius: 5px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            resize: vertical;
+            box-sizing: border-box;
+        }
+
+        .feedback-form button {
+            margin-top: 10px;
+        }
+
         /* Footer */
         footer {
             width: 100%;
@@ -362,6 +384,11 @@
                 max-width: 200px;
             }
 
+            .feedback-form textarea {
+                height: 60px;
+                font-size: 0.85rem;
+            }
+
             footer {
                 min-height: 35px;
             }
@@ -414,6 +441,11 @@
                 max-width: 180px;
             }
 
+            .feedback-form textarea {
+                height: 50px;
+                font-size: 0.8rem;
+            }
+
             footer {
                 min-height: 30px;
             }
@@ -455,24 +487,18 @@
                     const aspectRatio = img.width / img.height;
                     let newWidth, newHeight;
                     if (aspectRatio > 1) {
-                        // Wider than tall
                         newWidth = targetSize;
                         newHeight = targetSize / aspectRatio;
                     } else {
-                        // Taller than wide or square
                         newHeight = targetSize;
                         newWidth = targetSize * aspectRatio;
                     }
 
-                    // Center the image on the canvas
                     const offsetX = (targetSize - newWidth) / 2;
                     const offsetY = (targetSize - newHeight) / 2;
 
-                    // Clear canvas with black background (or transparent if preferred)
                     ctx.fillStyle = 'black';
                     ctx.fillRect(0, 0, targetSize, targetSize);
-
-                    // Draw the resized image
                     ctx.drawImage(img, offsetX, offsetY, newWidth, newHeight);
 
                     canvas.toBlob((blob) => {
@@ -483,6 +509,50 @@
             });
         }
 
+        // Fetch logged-in username
+        async function getLoggedInUsername() {
+            try {
+                const response = await fetch('/get_username', {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+                const data = await response.json();
+                if (data.username) {
+                    return data.username;
+                } else {
+                    throw new Error('User not logged in');
+                }
+            } catch (error) {
+                console.error('Error fetching username:', error);
+                return null;
+            }
+        }
+
+        // Submit feedback to the server
+        async function submitFeedback(prediction, feedbackText) {
+            try {
+                const response = await fetch('/submit_feedback', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        prediction: prediction,
+                        feedback_text: feedbackText || '' // Allow empty feedback
+                    })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    predictionResult.innerHTML += '<p style="color:green;">Feedback submitted successfully!</p>';
+                } else {
+                    predictionResult.innerHTML += `<p style="color:red;">Error: ${result.error}</p>`;
+                }
+            } catch (error) {
+                console.error('Error submitting feedback:', error);
+                predictionResult.innerHTML += '<p style="color:red;">Failed to submit feedback. Please try again.</p>';
+            }
+        }
+
         // Start camera with constrained resolution
         startCameraButton.addEventListener('click', async () => {
             try {
@@ -490,7 +560,7 @@
                     video: {
                         width: { ideal: 224 },
                         height: { ideal: 224 },
-                        aspectRatio: 1.0 // Square aspect ratio to match output
+                        aspectRatio: 1.0
                     }
                 };
                 stream = await navigator.mediaDevices.getUserMedia(constraints);
@@ -529,28 +599,21 @@
                 canvas.height = 224;
                 const ctx = canvas.getContext('2d');
 
-                // Calculate scaling to fit video frame within 224x224 while preserving aspect ratio
                 const aspectRatio = video.videoWidth / video.videoHeight;
                 let newWidth, newHeight;
                 if (aspectRatio > 1) {
-                    // Wider than tall
                     newWidth = 224;
                     newHeight = 224 / aspectRatio;
                 } else {
-                    // Taller than wide or square
                     newHeight = 224;
                     newWidth = 224 * aspectRatio;
                 }
 
-                // Center the image on the canvas
                 const offsetX = (224 - newWidth) / 2;
                 const offsetY = (224 - newHeight) / 2;
 
-                // Clear canvas with black background
                 ctx.fillStyle = 'black';
                 ctx.fillRect(0, 0, 224, 224);
-
-                // Draw the resized video frame
                 ctx.drawImage(video, offsetX, offsetY, newWidth, newHeight);
 
                 const blob = await new Promise((resolve) => {
@@ -575,7 +638,7 @@
             deleteImageButton.style.display = 'none';
             submitBtn.disabled = true;
             predictionResult.innerHTML = '';
-            fileInput.value = ''; // Clear the file input
+            fileInput.value = '';
         });
 
         // Handle file input selection and resize to 224x224
@@ -643,53 +706,71 @@
             }
         });
 
-        function displayPrediction(result) {
+        // Display prediction and feedback form
+        async function displayPrediction(result) {
             const prediction = result.prediction;
             const confidence = result.confidence ? (result.confidence * 100).toFixed(2) : null;
+
+            // Check if user is logged in for feedback
+            const username = await getLoggedInUsername();
+            let feedbackForm = '';
+            if (username) {
+                feedbackForm = `
+                    <div class="feedback-form">
+                        <p>Feedback for ${username} (optional):</p>
+                        <textarea id="feedbackText" placeholder="Share your feedback about this prediction..."></textarea>
+                        <button class="btn" onclick="submitFeedback('${prediction}', document.getElementById('feedbackText').value)">Submit Feedback</button>
+                    </div>`;
+            } else {
+                feedbackForm = '<p style="color:#2E7D32;">Log in to submit feedback.</p>';
+            }
 
             if (prediction === 'No Chili Detected') {
                 predictionResult.innerHTML = `
                     <p>No chili detected in the image.</p>
                     <p>Confidence: ${confidence}%</p>
-                    <p>Please try another 224x224 image.</p>`;
+                    <p>Please try another 224x224 image.</p>
+                    ${feedbackForm}`;
                 return;
             }
 
             predictionResult.innerHTML = '<p>Loading chili information...</p><div class="spinner"></div>';
 
-            fetch(`/get_chili_info?name=${encodeURIComponent(prediction)}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.error) {
-                        predictionResult.innerHTML = `
-                            <p style="color:red;">Error: ${data.error}</p>
-                            <p>Prediction: ${prediction} (Confidence: ${confidence}%)</p>`;
-                        return;
-                    }
+            try {
+                const response = await fetch(`/get_chili_info?name=${encodeURIComponent(prediction)}`);
+                const data = await response.json();
+                if (data.error) {
+                    predictionResult.innerHTML = `
+                        <p style="color:red;">Error: ${data.error}</p>
+                        <p>Prediction: ${prediction} (Confidence: ${confidence}%)</p>
+                        ${feedbackForm}`;
+                    return;
+                }
 
-                    predictionResult.innerHTML = `
-                        <h3>Prediction: ${data.name}</h3>
-                        <p>Confidence: ${confidence}%</p>
-                        <div class="result-content">
-                            <div class="chili-image">
-                                <img src="${data.image_url}" alt="${data.name}" style="width:150px;height:auto;border-radius:5px;margin-bottom:10px;">
-                            </div>
-                            <div class="chili-info">
-                                <ul>
-                                    <li><strong>English Name:</strong> ${data.english_name}</li>
-                                    <li><strong>Scientific Name:</strong> ${data.scientific_name}</li>
-                                    <li><strong>SHU (Scoville Heat Units):</strong> ${data.shu_range}</li>
-                                    <li><strong>Description:</strong> ${data.description}</li>
-                                </ul>
-                            </div>
-                        </div>`;
-                })
-                .catch(error => {
-                    console.error("Error fetching chili details:", error);
-                    predictionResult.innerHTML = `
-                        <p style="color:red;">Error retrieving chili information. Please try again.</p>
-                        <p>Prediction: ${prediction} (Confidence: ${confidence}%)</p>`;
-                });
+                predictionResult.innerHTML = `
+                    <h3>Prediction: ${data.name}</h3>
+                    <p>Confidence: ${confidence}%</p>
+                    <div class="result-content">
+                        <div class="chili-image">
+                            <img src="${data.image_url}" alt="${data.name}" style="width:150px;height:auto;border-radius:5px;margin-bottom:10px;">
+                        </div>
+                        <div class="chili-info">
+                            <ul>
+                                <li><strong>English Name:</strong> ${data.english_name}</li>
+                                <li><strong>Scientific Name:</strong> ${data.scientific_name}</li>
+                                <li><strong>SHU (Scoville Heat Units):</strong> ${data.shu_range}</li>
+                                <li><strong>Description:</strong> ${data.description}</li>
+                            </ul>
+                        </div>
+                    </div>
+                    ${feedbackForm}`;
+            } catch (error) {
+                console.error("Error fetching chili details:", error);
+                predictionResult.innerHTML = `
+                    <p style="color:red;">Error retrieving chili information. Please try again.</p>
+                    <p>Prediction: ${prediction} (Confidence: ${confidence}%)</p>
+                    ${feedbackForm}`;
+            }
         }
     </script>
 </body>
