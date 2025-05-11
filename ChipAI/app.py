@@ -47,7 +47,7 @@ def get_db_connection():
         logger.error("Database connection failed: %s", e)
         raise
 
-# Existing IMAGE_MAPPING
+# IMAGE_MAPPING
 IMAGE_MAPPING = {
     "Siling Labuyo": "siling_labuyo.jpg",
     "Siling Atsal": "bell_pepper.jpg",
@@ -56,7 +56,7 @@ IMAGE_MAPPING = {
     "Siling Talbusan": "siling_talbusan.jpg"
 }
 
-# Existing preprocess_image and predict_chili_variety
+# preprocess_image and predict_chili_variety
 def preprocess_image(image_stream, target_size=(224, 224)):
     try:
         img = Image.open(image_stream).convert("RGB")
@@ -115,7 +115,10 @@ def signup():
                 if login_result and login_result[0] and login_result[2] == 'User found':
                     session['user_id'] = login_result[0]
                     logger.info("User signed up and logged in: %s", username)
-                    return jsonify({'success': True, 'message': signup_status.lower()}), 200
+                    cursor.execute("SELECT is_admin FROM users WHERE id = %s", (session['user_id'],))
+                    user = cursor.fetchone()
+                    is_admin = user['is_admin'] if user else False
+                    return jsonify({'success': True, 'message': signup_status.lower(), 'is_admin': is_admin}), 200
                 else:
                     return jsonify({'success': False, 'message': 'Auto-login failed'}), 400
             else:
@@ -137,14 +140,12 @@ def admin_dashboard():
     conn = get_db_connection()
     cursor = conn.cursor(cursor_factory=RealDictCursor)
     try:
-        # Check if user is admin
         cursor.execute("SELECT is_admin FROM users WHERE id = %s", (session['user_id'],))
         user = cursor.fetchone()
         if not user or not user['is_admin']:
             logger.info("Non-admin user attempted to access admin_dashboard")
             return redirect(url_for('dashboard'))
         
-        # Fetch feedback data with usernames
         cursor.execute("""
             SELECT u.username, f.prediction, f.feedback_text, f.timestamp
             FROM feedback f
@@ -153,7 +154,6 @@ def admin_dashboard():
         """)
         feedback_data = cursor.fetchall()
         
-        # Log warning if any feedback records have no matching user
         for record in feedback_data:
             if not record['username']:
                 logger.warning("Feedback ID %s has no matching username (user_id: %s)", record.get('id'), record.get('user_id'))
@@ -166,7 +166,6 @@ def admin_dashboard():
         cursor.close()
         conn.close()
 
-# Modified /login Route
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -181,25 +180,30 @@ def login():
             cursor.execute("SELECT * FROM sp_login(%s, %s)", (username, password))
             result = cursor.fetchone()
             if not result:
-                return jsonify({'success': False, 'message': 'Login failed: No result returned.'}), 401
-            p_user_id, p_stored_password, p_status = result
+                logger.error("sp_login returned no result for username: %s", username)
+                return jsonify({'success': False, 'message': 'Login failed: No result returned from database.'}), 500
+            logger.info("sp_login result for %s: %s", username, result)  # Log full result
+            p_user_id = result.get('user_id')
+            p_stored_password = result.get('stored_password')
+            p_status = result.get('status', 'Unknown status')  # Default to 'Unknown status' if None
+            logger.info("Login attempt for %s: user_id=%s, status=%s", username, p_user_id, p_status)
             if p_status == 'User found' and p_user_id is not None:
                 session['user_id'] = p_user_id
-                # Fetch is_admin status
                 cursor.execute("SELECT is_admin FROM users WHERE id = %s", (p_user_id,))
                 user = cursor.fetchone()
                 is_admin = user['is_admin'] if user else False
                 logger.info("User logged in: %s, is_admin: %s", username, is_admin)
                 return jsonify({
                     'success': True,
-                    'message': 'login successful',
+                    'message': 'Login successful',
                     'is_admin': is_admin
                 }), 200
             else:
+                logger.warning("Login failed for %s: p_status=%s", username, p_status)
                 return jsonify({'success': False, 'message': p_status}), 401
         except Exception as e:
-            logger.error("Login error: %s", str(e))
-            return jsonify({'success': False, 'message': f"Database error: {e}"}), 500
+            logger.error("Login error for %s: %s", username, str(e))
+            return jsonify({'success': False, 'message': f"Database error: {str(e)}"}), 500
         finally:
             cursor.close()
             conn.close()
@@ -209,7 +213,6 @@ def login():
     logger.info("User already logged in, redirecting to dashboard")
     return redirect(url_for('dashboard'))
 
-# New /create_admin Route
 @app.route('/create_admin', methods=['POST'])
 def create_admin():
     if 'user_id' not in session:
@@ -219,49 +222,42 @@ def create_admin():
     conn = get_db_connection()
     cursor = conn.cursor(cursor_factory=RealDictCursor)
     try:
-        # Check if current user is admin
         cursor.execute("SELECT is_admin FROM users WHERE id = %s", (session['user_id'],))
-        current_user = cursor.fetchone()
-        if not current_user or not current_user['is_admin']:
+        user = cursor.fetchone()
+        if not user or not user['is_admin']:
             logger.info("Non-admin user attempted to create admin account")
             return jsonify({'success': False, 'message': 'Unauthorized: Admin access required.'}), 403
-        
-        # Get form data
+
         data = request.get_json()
         username = data.get('username')
         password = data.get('password')
         confirm_password = data.get('confirm_password')
-        
+
         if not username or not password or not confirm_password:
             return jsonify({'success': False, 'message': 'All fields are required.'}), 400
         if password != confirm_password:
             return jsonify({'success': False, 'message': 'Passwords do not match.'}), 400
-        
-        # Use sp_signup to create user
+
         cursor.execute("SELECT sp_signup(%s, %s)", (username, password))
         result = cursor.fetchone()
         signup_status = result[0] if result else "Unknown error."
         
         if "success" in signup_status.lower():
-            # Set is_admin = TRUE for the new user
-            cursor.execute(
-                "UPDATE users SET is_admin = TRUE WHERE username = %s",
-                (username,)
-            )
+            cursor.execute("UPDATE users SET is_admin = TRUE WHERE username = %s", (username,))
             conn.commit()
             logger.info("Admin account created: %s", username)
             return jsonify({'success': True, 'message': 'Admin account created successfully.'}), 200
         else:
+            conn.rollback()
             return jsonify({'success': False, 'message': signup_status}), 400
     except Exception as e:
         conn.rollback()
-        logger.error("Create admin error: %s", str(e))
+        logger.error("Error creating admin account: %s", str(e))
         return jsonify({'success': False, 'message': str(e)}), 500
     finally:
         cursor.close()
         conn.close()
 
-# New Feedback Routes
 @app.route('/get_username', methods=['GET'])
 def get_username():
     if 'user_id' not in session:
@@ -290,7 +286,7 @@ def submit_feedback():
     data = request.get_json()
     user_id = session['user_id']
     prediction = data.get('prediction')
-    feedback_text = data.get('feedback_text', '') # Allows empty string
+    feedback_text = data.get('feedback_text', '')
     if not prediction:
         return jsonify({'error': 'Prediction is required'}), 400
     conn = get_db_connection()
@@ -314,7 +310,6 @@ def submit_feedback():
         cursor.close()
         conn.close()
 
-# Existing Routes
 @app.route('/dashboard')
 def dashboard():
     if 'user_id' not in session:
