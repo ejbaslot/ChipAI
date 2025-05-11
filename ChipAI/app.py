@@ -128,6 +128,45 @@ def signup():
             conn.close()
     return render_template('index.html')
 
+@app.route('/admin_dashboard', methods=['GET'])
+def admin_dashboard():
+    if 'user_id' not in session:
+        logger.info("No user_id in session, redirecting to login")
+        return redirect(url_for('login'))
+    
+    conn = get_db_connection()
+    cursor = conn.cursor(cursor_factory=RealDictCursor)
+    try:
+        # Check if user is admin
+        cursor.execute("SELECT is_admin FROM users WHERE id = %s", (session['user_id'],))
+        user = cursor.fetchone()
+        if not user or not user['is_admin']:
+            logger.info("Non-admin user attempted to access admin_dashboard")
+            return redirect(url_for('dashboard'))
+        
+        # Fetch feedback data with usernames
+        cursor.execute("""
+            SELECT u.username, f.prediction, f.feedback_text, f.timestamp
+            FROM feedback f
+            LEFT JOIN users u ON f.user_id = u.id
+            ORDER BY f.timestamp DESC
+        """)
+        feedback_data = cursor.fetchall()
+        
+        # Log warning if any feedback records have no matching user
+        for record in feedback_data:
+            if not record['username']:
+                logger.warning("Feedback ID %s has no matching username (user_id: %s)", record.get('id'), record.get('user_id'))
+        
+        return render_template('admin_dashboard.html', feedback_data=feedback_data)
+    except Exception as e:
+        logger.error("Error fetching admin dashboard data: %s", str(e))
+        return jsonify({'error': 'Failed to load dashboard'}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+# Modified /login Route
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -137,7 +176,7 @@ def login():
         if not username or not password:
             return jsonify({'success': False, 'message': 'Username and password are required.'}), 400
         conn = get_db_connection()
-        cursor = conn.cursor()
+        cursor = conn.cursor(cursor_factory=RealDictCursor)
         try:
             cursor.execute("SELECT * FROM sp_login(%s, %s)", (username, password))
             result = cursor.fetchone()
@@ -146,8 +185,16 @@ def login():
             p_user_id, p_stored_password, p_status = result
             if p_status == 'User found' and p_user_id is not None:
                 session['user_id'] = p_user_id
-                logger.info("User logged in: %s", username)
-                return jsonify({'success': True, 'message': 'login successful'}), 200
+                # Fetch is_admin status
+                cursor.execute("SELECT is_admin FROM users WHERE id = %s", (p_user_id,))
+                user = cursor.fetchone()
+                is_admin = user['is_admin'] if user else False
+                logger.info("User logged in: %s, is_admin: %s", username, is_admin)
+                return jsonify({
+                    'success': True,
+                    'message': 'login successful',
+                    'is_admin': is_admin
+                }), 200
             else:
                 return jsonify({'success': False, 'message': p_status}), 401
         except Exception as e:
@@ -161,6 +208,58 @@ def login():
         return render_template('index.html')
     logger.info("User already logged in, redirecting to dashboard")
     return redirect(url_for('dashboard'))
+
+# New /create_admin Route
+@app.route('/create_admin', methods=['POST'])
+def create_admin():
+    if 'user_id' not in session:
+        logger.info("No user_id in session for create_admin")
+        return jsonify({'success': False, 'message': 'User not logged in.'}), 401
+    
+    conn = get_db_connection()
+    cursor = conn.cursor(cursor_factory=RealDictCursor)
+    try:
+        # Check if current user is admin
+        cursor.execute("SELECT is_admin FROM users WHERE id = %s", (session['user_id'],))
+        current_user = cursor.fetchone()
+        if not current_user or not current_user['is_admin']:
+            logger.info("Non-admin user attempted to create admin account")
+            return jsonify({'success': False, 'message': 'Unauthorized: Admin access required.'}), 403
+        
+        # Get form data
+        data = request.get_json()
+        username = data.get('username')
+        password = data.get('password')
+        confirm_password = data.get('confirm_password')
+        
+        if not username or not password or not confirm_password:
+            return jsonify({'success': False, 'message': 'All fields are required.'}), 400
+        if password != confirm_password:
+            return jsonify({'success': False, 'message': 'Passwords do not match.'}), 400
+        
+        # Use sp_signup to create user
+        cursor.execute("SELECT sp_signup(%s, %s)", (username, password))
+        result = cursor.fetchone()
+        signup_status = result[0] if result else "Unknown error."
+        
+        if "success" in signup_status.lower():
+            # Set is_admin = TRUE for the new user
+            cursor.execute(
+                "UPDATE users SET is_admin = TRUE WHERE username = %s",
+                (username,)
+            )
+            conn.commit()
+            logger.info("Admin account created: %s", username)
+            return jsonify({'success': True, 'message': 'Admin account created successfully.'}), 200
+        else:
+            return jsonify({'success': False, 'message': signup_status}), 400
+    except Exception as e:
+        conn.rollback()
+        logger.error("Create admin error: %s", str(e))
+        return jsonify({'success': False, 'message': str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
 
 # New Feedback Routes
 @app.route('/get_username', methods=['GET'])
@@ -191,11 +290,9 @@ def submit_feedback():
     data = request.get_json()
     user_id = session['user_id']
     prediction = data.get('prediction')
-    feedback_text = data.get('feedback_text', '') # Allow empty feedback
-    
+    feedback_text = data.get('feedback_text', '') # Allows empty string
     if not prediction:
         return jsonify({'error': 'Prediction is required'}), 400
-    
     conn = get_db_connection()
     cursor = conn.cursor()
     try:

@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ChipAI - Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="header-left">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="ChipAI Logo" class="logo">
+            <h1>ChipAI Admin</h1>
+        </div>
+        <input id="checkbox" type="checkbox">
+        <label class="toggle" for="checkbox">
+            <div id="bar1" class="bars"></div>
+            <div id="bar2" class="bars"></div>
+            <div id="bar3" class="bars"></div>
+        </label>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('index') }}" class="back-link">Home</a></li>
+                <li><a href="#" id="createAdminBtn">Create Admin</a></li>
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="content">
+        <h2>Admin Dashboard</h2>
+        <div class="content-card">
+            <h3>Feedback Records</h3>
+            {% if feedback_data %}
+                <table class="feedback-table">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Prediction</th>
+                            <th>Feedback</th>
+                            <th>Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in feedback_data %}
+                            <tr>
+                                <td>{{ record.username if record.username else 'Deleted User' }}</td>
+                                <td>{{ record.prediction }}</td>
+                                <td>{{ record.feedback_text if record.feedback_text else 'No feedback' }}</td>
+                                <td>{{ record.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>No feedback records available.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Create Admin Modal -->
+    <div id="createAdminModal" class="modal">
+        <div class="modal-content form">
+            <span class="close" id="closeCreateAdminModal">×</span>
+            <h2 class="title">Create Admin Account</h2>
+            <div class="create-admin-form">
+                <div class="input-container">
+                    <input type="text" id="adminUsername" class="input" placeholder=" " required>
+                    <label for="adminUsername" class="iLabel">Username</label>
+                </div>
+                <div class="input-container">
+                    <input type="password" id="adminPassword" class="input" placeholder=" " required>
+                    <label for="adminPassword" class="iLabel">Password</label>
+                </div>
+                <div class="input-container">
+                    <input type="password" id="adminConfirmPassword" class="input" placeholder=" " required>
+                    <label for="adminConfirmPassword" class="iLabel">Confirm Password</label>
+                </div>
+                <button id="submitCreateAdminBtn" class="submit">Create Admin</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success/Error Modal -->
+    <div id="adminMessageModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeAdminMessageModal">×</span>
+            <p id="adminModalMessage"></p>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2025 ChipAI. All rights reserved.</p>
+    </footer>
+
+    <style>
+        /* General Styles */
+        html, body {
+            margin: 0;
+            min-height: 100vh;
+            font-size: 16px;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #FFFFFF;
+            color: #333333;
+            padding: 0;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        main {
+            overflow-y: auto;
+            min-height: calc(100vh - 100px);
+            flex: 1;
+        }
+
+        h2, h3 {
+            color: #2E7D32;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            margin: 0;
+            color: #FFFFFF;
+        }
+
+        h2 {
+            font-size: 1.25rem;
+        }
+
+        h3 {
+            font-size: 1rem;
+        }
+
+        /* Content */
+        .content {
+            padding: 15px 10px;
+            text-align: center;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #2E7D32;
+            padding: 10px;
+            color: #FFFFFF;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            min-height: 60px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            flex: 1;
+        }
+
+        .logo {
+            width: 50px;
+            height: 50px;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        /* Burger Menu */
+        #checkbox {
+            display: none;
+        }
+
+        .toggle {
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            padding: 2px;
+            transition: transform 0.3s ease;
+        }
+
+        .bars {
+            width: 100%;
+            height: 2px;
+            background-color: #FFFFFF;
+            border-radius: 2px;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        #checkbox:checked + .toggle #bar1 {
+            transform: translateY(6px) rotate(45deg);
+        }
+
+        #checkbox:checked + .toggle #bar2 {
+            opacity: 0;
+        }
+
+        #checkbox:checked + .toggle #bar3 {
+            transform: translateY(-6px) rotate(-45deg);
+        }
+
+        nav ul {
+            list-style: none;
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            position: absolute;
+            top: 60px;
+            right: 10px;
+            background-color: #2E7D32;
+            padding: 8px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px #26802b;
+            z-index: 100;
+            width: 150px;
+        }
+
+        nav ul li a {
+            color: #FFFFFF;
+            text-decoration: none;
+            padding: 8px;
+            border-radius: 3px;
+            display: block;
+            transition: background 0.2s;
+            font-size: 0.9rem;
+        }
+
+        nav ul li a:hover {
+            background-color: #197e1e;
+        }
+
+        #checkbox:checked ~ nav ul {
+            display: flex;
+        }
+
+        /* Content Card */
+        .content-card {
+            background-color: #FFFFFF;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+            margin: 15px auto;
+            max-width: 900px;
+            border: 1px solid #f5f5f5;
+        }
+
+        /* Feedback Table */
+        .feedback-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+
+        .feedback-table th, .feedback-table td {
+            padding: 10px;
+            border: 1px solid #e0e0e0;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+
+        .feedback-table th {
+            background-color: #2E7D32;
+            color: #FFFFFF;
+            font-weight: 600;
+        }
+
+        .feedback-table td {
+            background-color: #FFFFFF;
+        }
+
+        .feedback-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: auto;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            position: relative;
+            margin: auto;
+        }
+
+        .close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .input-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .iLabel {
+            position: absolute;
+            top: -10px;
+            left: 10px;
+            background-color: #fff;
+            padding: 0 5px;
+            font-size: 14px;
+            color: #2E7D32;
+        }
+
+        .submit {
+            background-color: #028d09;
+            color: #FFFFFF;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 1rem;
+            box-shadow: 0 0 5px rgba(4, 128, 10, 0.5);
+        }
+
+        .submit:hover {
+            background-color: #197e1e;
+            transform: translateY(-2px);
+            box-shadow: 0 0 10px rgba(4, 128, 10, 0.7);
+        }
+
+        /* Footer */
+        footer {
+            width: 100%;
+            background-color: #2E7D32;
+            color: #FFFFFF;
+            text-align: center;
+            padding: 10px;
+            margin-top: auto;
+            min-height: 40px;
+        }
+
+        /* Responsive Styles */
+        @media only screen and (max-width: 768px) {
+            header {
+                min-height: 50px;
+            }
+
+            .logo {
+                width: 40px;
+                height: 40px;
+            }
+
+            .toggle {
+                width: 20px;
+                height: 20px;
+                gap: 2px;
+            }
+
+            .bars {
+                height: 1.5px;
+            }
+
+            nav ul {
+                top: 50px;
+                width: 120px;
+                right: 5px;
+            }
+
+            .content {
+                padding: 10px 5px;
+            }
+
+            .content-card {
+                width: 90%;
+                max-width: 700px;
+            }
+
+            .feedback-table th, .feedback-table td {
+                font-size: 0.85rem;
+                padding: 8px;
+            }
+
+            .modal-content {
+                width: 95%;
+                max-width: 350px;
+            }
+
+            footer {
+                min-height: 35px;
+            }
+        }
+
+        @media only screen and (max-width: 480px) {
+            header {
+                min-height: 45px;
+            }
+
+            .logo {
+                width: 35px;
+                height: 35px;
+            }
+
+            .toggle {
+                width: 18px;
+                height: 18px;
+                gap: 1.5px;
+            }
+
+            .bars {
+                height: 1.5px;
+            }
+
+            nav ul {
+                width: 100px;
+                padding: 6px;
+            }
+
+            nav ul li a {
+                font-size: 0.8rem;
+                padding: 6px;
+            }
+
+            .content {
+                padding: 5px;
+            }
+
+            .content-card {
+                width: 95%;
+                max-width: 400px;
+            }
+
+            .feedback-table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+
+            .feedback-table th, .feedback-table td {
+                font-size: 0.8rem;
+                padding: 6px;
+                min-width: 100px;
+            }
+
+            .modal-content {
+                width: 95%;
+                max-width: 300px;
+            }
+
+            .submit {
+                font-size: 0.9rem;
+            }
+
+            footer {
+                min-height: 30px;
+            }
+        }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Elements for create admin modal
+            const createAdminModal = document.getElementById("createAdminModal");
+            const adminMessageModal = document.getElementById("adminMessageModal");
+            const adminModalMessage = document.getElementById("adminModalMessage");
+            const createAdminBtn = document.getElementById("createAdminBtn");
+            const submitCreateAdminBtn = document.getElementById("submitCreateAdminBtn");
+            const closeCreateAdminModal = document.getElementById("closeCreateAdminModal");
+            const closeAdminMessageModal = document.getElementById("closeAdminMessageModal");
+
+            // Ensure modals are hidden on load
+            createAdminModal.style.display = "none";
+            adminMessageModal.style.display = "none";
+
+            // Open create admin modal
+            if (createAdminBtn) {
+                createAdminBtn.onclick = (e) => {
+                    e.preventDefault();
+                    createAdminModal.style.display = "flex";
+                };
+            }
+
+            // Handle create admin submission
+            if (submitCreateAdminBtn) {
+                submitCreateAdminBtn.onclick = async (e) => {
+                    e.preventDefault();
+
+                    const username = document.getElementById("adminUsername").value;
+                    const password = document.getElementById("adminPassword").value;
+                    const confirmPassword = document.getElementById("adminConfirmPassword").value;
+
+                    if (!username || !password || !confirmPassword) {
+                        adminModalMessage.textContent = "Please fill in all fields.";
+                        adminMessageModal.style.display = "flex";
+                        return;
+                    }
+
+                    if (password !== confirmPassword) {
+                        adminModalMessage.textContent = "Passwords do not match.";
+                        adminMessageModal.style.display = "flex";
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch('/create_admin', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ username, password, confirm_password: confirmPassword }),
+                        });
+
+                        const result = await response.json();
+
+                        if (response.ok && result.success) {
+                            adminModalMessage.textContent = "Admin account created successfully!";
+                            adminMessageModal.style.display = "flex";
+                            createAdminModal.style.display = "none";
+                            // Clear form
+                            document.getElementById("adminUsername").value = "";
+                            document.getElementById("adminPassword").value = "";
+                            document.getElementById("adminConfirmPassword").value = "";
+                        } else {
+                            adminModalMessage.textContent = result.message || "Failed to create admin account.";
+                            adminMessageModal.style.display = "flex";
+                        }
+                    } catch (error) {
+                        adminModalMessage.textContent = "An error occurred. Please try again.";
+                        adminMessageModal.style.display = "flex";
+                    }
+                };
+            }
+
+            // Close modal actions
+            if (closeCreateAdminModal) {
+                closeCreateAdminModal.onclick = () => {
+                    createAdminModal.style.display = "none";
+                };
+            }
+
+            if (closeAdminMessageModal) {
+                closeAdminMessageModal.onclick = () => {
+                    adminMessageModal.style.display = "none";
+                };
+            }
+
+            // Close modals when clicking outside
+            window.onclick = (event) => {
+                if (event.target === createAdminModal) {
+                    createAdminModal.style.display = "none";
+                }
+                if (event.target === adminMessageModal) {
+                    adminMessageModal.style.display = "none";
+                }
+            };
+
+            // Close modals with escape key
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape') {
+                    createAdminModal.style.display = "none";
+                    adminMessageModal.style.display = "none";
+                }
+            });
+        });
+    </script>
+</body>
+</html>
