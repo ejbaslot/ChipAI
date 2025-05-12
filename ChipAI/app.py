@@ -108,36 +108,92 @@ def signup():
         conn = get_db_connection()
         cursor = conn.cursor(cursor_factory=RealDictCursor)
         try:
-            cursor.execute("SELECT * FROM sp_signup(%s, %s)", (username, password))
-            result = cursor.fetchone()
-            if not result:
-                logger.error("sp_signup returned no result for username: %s", username)
-                return jsonify({'success': False, 'message': 'Signup failed: No result returned from database.'}), 500
+            # Check if username exists
+            cursor.execute("SELECT id FROM users WHERE username = %s", (username,))
+            if cursor.fetchone():
+                logger.warning("Signup failed: Username %s already exists", username)
+                return jsonify({'success': False, 'message': 'Username already exists.'}), 400
 
-            logger.info("sp_signup result for %s: %s", username, result)
+            # Call sp_signup
+            cursor.execute("CALL sp_signup(%s, %s)", (username, password))
+            conn.commit()
 
-            p_user_id = result.get('user_id')
-            p_status = result.get('status', 'Unknown status')
+            # Get the inserted user's ID
+            cursor.execute("SELECT id, is_admin FROM users WHERE username = %s", (username,))
+            user = cursor.fetchone()
+            if not user:
+                logger.error("sp_signup failed: User %s not found after insertion", username)
+                return jsonify({'success': False, 'message': 'Signup failed: User not created.'}), 500
 
-            if p_status == 'Signup success' and p_user_id:
-                session['user_id'] = p_user_id
-                cursor.execute("SELECT is_admin FROM users WHERE id = %s", (p_user_id,))
-                user = cursor.fetchone()
-                is_admin = user['is_admin'] if user else False
-                logger.info("User signed up and logged in: %s, is_admin: %s", username, is_admin)
-                return jsonify({'success': True, 'message': 'Signup successful', 'is_admin': is_admin}), 200
-            else:
-                logger.warning("Signup failed for %s: %s", username, p_status)
-                return jsonify({'success': False, 'message': p_status}), 400
+            session['user_id'] = user['id']
+            is_admin = user['is_admin']
+            logger.info("User signed up and logged in: %s, is_admin: %s", username, is_admin)
+            return jsonify({'success': True, 'message': 'Signup successful', 'is_admin': is_admin}), 200
 
+        except psycopg2.Error as e:
+            conn.rollback()
+            logger.error("Database error during signup: %s", str(e))
+            return jsonify({'success': False, 'message': f'Database error: {str(e)}'}), 500
         except Exception as e:
-            logger.error("Signup error: %s", str(e))
-            return jsonify({'success': False, 'message': str(e)}), 500
+            conn.rollback()
+            logger.error("Unexpected error during signup: %s", str(e))
+            return jsonify({'success': False, 'message': f'Unexpected error: {str(e)}'}), 500
         finally:
             cursor.close()
             conn.close()
     
     return render_template('index.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        data = request.get_json()
+        username = data.get('username')
+        password = data.get('password')
+        if not username or not password:
+            return jsonify({'success': False, 'message': 'Username and password are required.'}), 400
+        conn = get_db_connection()
+        cursor = conn.cursor(cursor_factory=RealDictCursor)
+        try:
+            cursor.execute("SELECT * FROM sp_login(%s, %s)", (username, password))
+            result = cursor.fetchone()
+            logger.info("sp_login result for %s: %s", username, result)
+            
+            if not result:
+                logger.warning("Login failed: No result from sp_login for %s", username)
+                return jsonify({'success': False, 'message': 'User not found.'}), 401
+
+            user_id = result.get('user_id')
+            status = result.get('status')
+
+            if status == 'User authenticated' and user_id is not None:
+                session['user_id'] = user_id
+                cursor.execute("SELECT is_admin FROM users WHERE id = %s", (user_id,))
+                user = cursor.fetchone()
+                is_admin = user['is_admin'] if user else False
+                logger.info("User logged in: %s, is_admin: %s", username, is_admin)
+                return jsonify({
+                    'success': True,
+                    'message': 'Login successful',
+                    'is_admin': is_admin
+                }), 200
+            else:
+                logger.warning("Login failed for %s: status=%s", username, status)
+                return jsonify({'success': False, 'message': status}), 401
+        except psycopg2.Error as e:
+            logger.error("Database error during login: %s", str(e))
+            return jsonify({'success': False, 'message': f"Database error: {str(e)}"}), 500
+        except Exception as e:
+            logger.error("Unexpected error during login: %s", str(e))
+            return jsonify({'success': False, 'message': f"Unexpected error: {str(e)}"}), 500
+        finally:
+            cursor.close()
+            conn.close()
+    if 'user_id' not in session:
+        logger.info("User not logged in, rendering login page")
+        return render_template('index.html')
+    logger.info("User already logged in, redirecting to dashboard")
+    return redirect(url_for('dashboard'))
 
 @app.route('/admin_dashboard', methods=['GET'])
 def admin_dashboard():
@@ -174,53 +230,6 @@ def admin_dashboard():
         cursor.close()
         conn.close()
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        data = request.get_json()
-        username = data.get('username')
-        password = data.get('password')
-        if not username or not password:
-            return jsonify({'success': False, 'message': 'Username and password are required.'}), 400
-        conn = get_db_connection()
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
-        try:
-            cursor.execute("SELECT * FROM sp_login(%s, %s)", (username, password))
-            result = cursor.fetchone()
-            if not result:
-                logger.error("sp_login returned no result for username: %s", username)
-                return jsonify({'success': False, 'message': 'Login failed: No result returned from database.'}), 500
-            logger.info("sp_login result for %s: %s", username, result)  # Log full result
-            p_user_id = result.get('user_id')
-            p_stored_password = result.get('stored_password')
-            p_status = result.get('status', 'Unknown status')  # Default to 'Unknown status' if None
-            logger.info("Login attempt for %s: user_id=%s, status=%s", username, p_user_id, p_status)
-            if p_status == 'User found' and p_user_id is not None:
-                session['user_id'] = p_user_id
-                cursor.execute("SELECT is_admin FROM users WHERE id = %s", (p_user_id,))
-                user = cursor.fetchone()
-                is_admin = user['is_admin'] if user else False
-                logger.info("User logged in: %s, is_admin: %s", username, is_admin)
-                return jsonify({
-                    'success': True,
-                    'message': 'Login successful',
-                    'is_admin': is_admin
-                }), 200
-            else:
-                logger.warning("Login failed for %s: p_status=%s", username, p_status)
-                return jsonify({'success': False, 'message': p_status}), 401
-        except Exception as e:
-            logger.error("Login error for %s: %s", username, str(e))
-            return jsonify({'success': False, 'message': f"Database error: {str(e)}"}), 500
-        finally:
-            cursor.close()
-            conn.close()
-    if 'user_id' not in session:
-        logger.info("User not logged in, rendering login page")
-        return render_template('index.html')
-    logger.info("User already logged in, redirecting to dashboard")
-    return redirect(url_for('dashboard'))
-
 @app.route('/create_admin', methods=['POST'])
 def create_admin():
     if 'user_id' not in session:
@@ -246,22 +255,19 @@ def create_admin():
         if password != confirm_password:
             return jsonify({'success': False, 'message': 'Passwords do not match.'}), 400
 
-        cursor.execute("SELECT sp_signup(%s, %s)", (username, password))
-        result = cursor.fetchone()
-        signup_status = result[0] if result else "Unknown error."
-        
-        if "success" in signup_status.lower():
-            cursor.execute("UPDATE users SET is_admin = TRUE WHERE username = %s", (username,))
-            conn.commit()
-            logger.info("Admin account created: %s", username)
-            return jsonify({'success': True, 'message': 'Admin account created successfully.'}), 200
-        else:
-            conn.rollback()
-            return jsonify({'success': False, 'message': signup_status}), 400
+        cursor.execute("CALL sp_signup(%s, %s)", (username, password))
+        cursor.execute("UPDATE users SET is_admin = TRUE WHERE username = %s", (username,))
+        conn.commit()
+        logger.info("Admin account created: %s", username)
+        return jsonify({'success': True, 'message': 'Admin account created successfully.'}), 200
+    except psycopg2.Error as e:
+        conn.rollback()
+        logger.error("Database error creating admin account: %s", str(e))
+        return jsonify({'success': False, 'message': f"Database error: {str(e)}"}), 500
     except Exception as e:
         conn.rollback()
-        logger.error("Error creating admin account: %s", str(e))
-        return jsonify({'success': False, 'message': str(e)}), 500
+        logger.error("Unexpected error creating admin account: %s", str(e))
+        return jsonify({'success': False, 'message': f"Unexpected error: {str(e)}"}), 500
     finally:
         cursor.close()
         conn.close()
@@ -430,4 +436,4 @@ def chili_trivia():
         conn.close()
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=int(os.getenv('PORT', 5000)))
