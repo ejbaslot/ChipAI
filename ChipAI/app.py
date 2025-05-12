@@ -10,6 +10,7 @@ from psycopg2 import OperationalError
 from psycopg2.extras import RealDictCursor
 from io import BytesIO
 import logging
+import hashlib
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -98,37 +99,44 @@ def signup():
         username = data.get('username')
         password = data.get('password')
         confirm_password = data.get('confirm_password')
+        
         if not username or not password or not confirm_password:
             return jsonify({'success': False, 'message': 'All fields are required.'}), 400
         if password != confirm_password:
             return jsonify({'success': False, 'message': 'Passwords do not match.'}), 400
+
         conn = get_db_connection()
-        cursor = conn.cursor()
+        cursor = conn.cursor(cursor_factory=RealDictCursor)
         try:
-            cursor.execute("SELECT sp_signup(%s, %s)", (username, password))
+            cursor.execute("SELECT * FROM sp_signup(%s, %s)", (username, password))
             result = cursor.fetchone()
-            signup_status = result[0] if result else "Unknown error."
-            if "success" in signup_status.lower():
-                conn.commit()
-                cursor.execute("SELECT * FROM sp_login(%s, %s)", (username, password))
-                login_result = cursor.fetchone()
-                if login_result and login_result[0] and login_result[2] == 'User found':
-                    session['user_id'] = login_result[0]
-                    logger.info("User signed up and logged in: %s", username)
-                    cursor.execute("SELECT is_admin FROM users WHERE id = %s", (session['user_id'],))
-                    user = cursor.fetchone()
-                    is_admin = user['is_admin'] if user else False
-                    return jsonify({'success': True, 'message': signup_status.lower(), 'is_admin': is_admin}), 200
-                else:
-                    return jsonify({'success': False, 'message': 'Auto-login failed'}), 400
+            if not result:
+                logger.error("sp_signup returned no result for username: %s", username)
+                return jsonify({'success': False, 'message': 'Signup failed: No result returned from database.'}), 500
+
+            logger.info("sp_signup result for %s: %s", username, result)
+
+            p_user_id = result.get('user_id')
+            p_status = result.get('status', 'Unknown status')
+
+            if p_status == 'Signup success' and p_user_id:
+                session['user_id'] = p_user_id
+                cursor.execute("SELECT is_admin FROM users WHERE id = %s", (p_user_id,))
+                user = cursor.fetchone()
+                is_admin = user['is_admin'] if user else False
+                logger.info("User signed up and logged in: %s, is_admin: %s", username, is_admin)
+                return jsonify({'success': True, 'message': 'Signup successful', 'is_admin': is_admin}), 200
             else:
-                return jsonify({'success': False, 'message': signup_status}), 400
+                logger.warning("Signup failed for %s: %s", username, p_status)
+                return jsonify({'success': False, 'message': p_status}), 400
+
         except Exception as e:
             logger.error("Signup error: %s", str(e))
             return jsonify({'success': False, 'message': str(e)}), 500
         finally:
             cursor.close()
             conn.close()
+    
     return render_template('index.html')
 
 @app.route('/admin_dashboard', methods=['GET'])
