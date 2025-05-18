@@ -20,7 +20,7 @@ app = Flask(__name__)
 app.secret_key = os.getenv('FLASK_SECRET_KEY', 'your_default_secret')
 
 # Load TFLite model
-interpreter = tf.lite.Interpreter(model_path="ChipAI/models/mobilenetv2_grand_finalev1.tflite")
+interpreter = tf.lite.Interpreter(model_path="ChipAI/models/mobilenetv2_finalista.tflite")
 interpreter.allocate_tensors()
 input_details = interpreter.get_input_details()
 output_details = interpreter.get_output_details()
